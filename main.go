@@ -1,22 +1,33 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
+	//"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
+	"gorm.io/gorm"
+	"gorm.io/driver/mysql"
+	"os"
+	"fmt"
 )
 
+var DB *gorm.DB
+
 func main() {
-	// Create instance of fiber
-	app := fiber.New()
+	godotenv.Load()
+	dbhost := os.Getenv("MYSQL_HOST")
+	dbuser := os.Getenv("MYSQL_USER")
+	dbpassword := os.Getenv("MYSQL_PASSWORD")
+	dbname := os.Getenv("MYSQL_DBNAME")
 
-	// Create httphandler
-	app.Get("/username", func(ctx *fiber.Ctx) error {
-		return ctx.Status(200).JSON(fiber.Map{
-			"success":true,
-			"message": "Get username created",
-		})
-	})
+	connection := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbuser, dbpassword, dbhost, dbname)
+	var db, err = gorm.Open(mysql.Open(connection), &gorm.Config{})
 
-	// Listen on port
-	app.Listen(":3000")
+	if err != nil {
+		panic("Database connection failed")
+	}
+
+	DB = db
+	fmt.Println("db connected successfully")
+
 
 }
+
