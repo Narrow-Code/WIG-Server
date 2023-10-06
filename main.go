@@ -2,6 +2,7 @@ package main
 
 import (
 	//"github.com/gofiber/fiber/v2"
+	"WIG-Server/models"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 	"gorm.io/driver/mysql"
@@ -28,6 +29,16 @@ func main() {
 	DB = db
 	fmt.Println("db connected successfully")
 
+	AutoMigrate(db)
+}
 
+func AutoMigrate(connection *gorm.DB) {
+	connection.Debug().AutoMigrate(
+		&models.User{},
+		&models.Storage{},
+		&models.Item{},
+		&models.OwnedItem{},
+		&models.Borrower{},
+	)
 }
 

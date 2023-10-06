@@ -1,10 +1,11 @@
-package Models
+package models
 
 type User struct {
-	Username 	string 	'json:"username"'
-	UserEmail 	string 	'json:"user_email"'
-	UserSalt 	string	'json:"user_salt"'
-	UserHash 	string 	'json:"user_hash"'
-	UserConfirmed 	string 	'json:"user_confirmed"'
-	UserTier 	string 	'json:"user_tier"'
+	UserUID		uint	`json:"uid" gorm:"primary_key;column:user_uid"` 
+	Username 	string 	`json:"username" gorm"column:username"`
+	UserEmail 	string 	`json:"email" gorm"column:email"`
+	UserSalt 	string	`json:"salt" gorm"column:salt"`
+	UserHash 	string 	`json:"hash" gorm"column:hash"`
+	EmailConfirm 	string 	`json:"email_confirmed" gorm"email_confirm"`
+	TierLevel 	string 	`json:"tier_level" gorm"tier_level"`
 }
