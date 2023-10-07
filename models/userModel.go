@@ -6,6 +6,6 @@ type User struct {
 	UserEmail 	string 	`json:"email" gorm"column:email"`
 	UserSalt 	string	`json:"salt" gorm"column:salt"`
 	UserHash 	string 	`json:"hash" gorm"column:hash"`
-	EmailConfirm 	string 	`json:"email_confirmed" gorm"email_confirm"`
-	TierLevel 	string 	`json:"tier_level" gorm"tier_level"`
+	EmailConfirm 	string 	`json:"email_confirmed" gorm"column:email_confirm"`
+	TierLevel 	string 	`json:"tier_level" gorm"column:tier_level"`
 }

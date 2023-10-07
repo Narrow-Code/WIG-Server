@@ -35,10 +35,10 @@ func main() {
 func AutoMigrate(connection *gorm.DB) {
 	connection.Debug().AutoMigrate(
 		&models.User{},
-		&models.Storage{},
 		&models.Item{},
-		&models.OwnedItem{},
 		&models.Borrower{},
+		&models.Location{},
+		&models.Ownership{},
 	)
 }
 
