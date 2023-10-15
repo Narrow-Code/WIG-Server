@@ -1,3 +1,9 @@
+/*
+* Package config provides functionalities for configuring and connecting to the database.
+*
+* It includes functions to establish a connection, perform auto migrations, and manage the database connection instance.
+*/
+
 package config
 
 import (
@@ -9,8 +15,14 @@ import (
 	"fmt"
 )
 
+// DB holds the database connection instance.
 var DB *gorm.DB
 
+/*
+* Connect establishes a connection to the database.
+* 
+* It loads environment variables for database configuration, creates a connection string, and initializes the database connection instance.
+*/
 func Connect() {
 	godotenv.Load()
 	dbhost := os.Getenv("MYSQL_HOST")
@@ -31,6 +43,9 @@ func Connect() {
 	AutoMigrate(db)
 }
 
+/*
+* AutoMigrate performs automatic migrations on the provided connection.
+*/
 func AutoMigrate(connection *gorm.DB) {
 	connection.Debug().AutoMigrate(
 		&models.User{},
