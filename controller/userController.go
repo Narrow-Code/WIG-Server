@@ -1,3 +1,7 @@
+/*
+* Package controller provides functions for handling HTTP requests and implementing business logic between the database and application.
+*/
+
 package controller
 
 import (
@@ -6,6 +10,19 @@ import (
 	db "WIG-Server/config"
 )
 
+/*
+* Signup handles user registration requests.
+* 
+* It expects a JSON request body containing the following fields:
+* - username (string): The username of the user.
+* - email (string): The email address of the user.
+* - salt (string): The salt for password hashing.
+* - hash (string): The hashed password.
+*
+* It performs various checks such as data validation and database uniqueness before creating a new user record.
+* 
+* If successful, it returns a JSON response with a success message and the user data.
+*/
 func Signup(c *fiber.Ctx) error {
 	
 	var data map[string]string
