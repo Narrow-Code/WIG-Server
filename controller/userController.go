@@ -1,18 +1,16 @@
-/*
-* Package controller provides functions for handling HTTP requests and implementing business logic between the database and application.
+/* Package controller provides functions for handling HTTP requests and implementing business logic between the database and application.
 */
 
 package controller
 
 import (
-	
+	"github.com/joho/godotenv"
+	"os"
 	"github.com/gofiber/fiber/v2"
 	models "WIG-Server/models"
 	db "WIG-Server/config"
 	"github.com/dgrijalva/jwt-go"
 )
-
-var SECRET = []byte("super-secret-auth-key")
 
 /*
 * Signup handles user registration requests.
@@ -102,11 +100,16 @@ func Signup(c *fiber.Ctx) error {
 
 	// TODO Check username requirements
 
+
 	// TODO Check email validity
+	
+	// Get secret
+	 godotenv.Load()
+	 var secret = []byte(os.Getenv("TOKEN_SECRET"))
 
 	// Generate access token
 	token := jwt.New(jwt.SigningMethodHS256)
-	tokenStr, err := token.SignedString(SECRET)
+	tokenStr, err := token.SignedString(secret)
 
 	// Return error if access token generation fails
 	if err != nil {
@@ -114,7 +117,9 @@ func Signup(c *fiber.Ctx) error {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":"Token generation failed"})
+				"message":"Token generation failed",
+				"user_uid":"",
+ 		                "token":""})
 	}
 
 	// Set up fields
@@ -137,7 +142,6 @@ func Signup(c *fiber.Ctx) error {
 		"user_uid": user.UserUID,
 		"token": user.Token,
 	})
-
 
 	// TODO Send verification email
 
