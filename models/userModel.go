@@ -1,5 +1,11 @@
+/*
+* Package model defines the data models used in the WIG-Server application
+*/
 package models
 
+/* 
+* User represents information about User profiles
+*/
 type User struct {
 	UserUID		uint	`json:"uid" gorm:"primary_key;column:user_uid"` 
 	Username 	string 	`json:"username" gorm"column:username"`

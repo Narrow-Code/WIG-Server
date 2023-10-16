@@ -1,5 +1,11 @@
+/*
+* Package models defines the data models used in the WIG-Server application.
+*/
 package models
 
+/*
+* Ownership represents information about ownership.
+*/
 type Ownership struct {
 	OwnedUID 	uint 	`json:"owned_uid" gorm:"primary_key;column:owned_uid"`
 	OwnedOwner 	uint 	`json:"owned_owner" gorm="column:owned_owner"`

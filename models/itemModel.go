@@ -1,5 +1,11 @@
+/*
+* Package models defines the data models used in the WIG-Server application.
+*/
 package models
 
+/*
+* Item represents information about an item.
+*/
 type Item struct {
 	ItemUID 	uint 	`json:"item_uid" gorm:"primary_key;column:item_uid"`
 	ItemBarcode 	string 	`json:"item_barcode" gorm:"column:item_barcode"`

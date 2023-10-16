@@ -1,5 +1,11 @@
+/*
+* Package models defines the data models used in the WIG-Server application.
+*/
 package models
 
+/*
+Location represents information about a location.
+*/
 type Location struct {
 	LocationUID 	uint 	`json:"location_uid" gorm:"primary_key;column:location_uid"`
 	LocationOwner 	uint 	`json:"location_owner" gorm:"column:location_owner"`
