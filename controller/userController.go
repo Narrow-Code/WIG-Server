@@ -5,10 +5,14 @@
 package controller
 
 import (
+	
 	"github.com/gofiber/fiber/v2"
 	models "WIG-Server/models"
 	db "WIG-Server/config"
+	"github.com/dgrijalva/jwt-go"
 )
+
+var SECRET = []byte("super-secret-auth-key")
 
 /*
 * Signup handles user registration requests.
@@ -86,7 +90,7 @@ func Signup(c *fiber.Ctx) error {
 				"message":"Username already in use"})
 		}
 
-	// Chefks if email exists in database
+	// Checks if email exists in database
 	emailResult := db.DB.Where("user_email = ?", data["email"]).First(&user)
 	if emailResult.RowsAffected != 0 {
 		// TODO log here
@@ -100,11 +104,27 @@ func Signup(c *fiber.Ctx) error {
 
 	// TODO Check email validity
 
+	// Generate access token
+	token := jwt.New(jwt.SigningMethodHS256)
+	tokenStr, err := token.SignedString(SECRET)
+
+	// Return error if access token generation fails
+	if err != nil {
+		// TODO log here
+		return c.Status(400).JSON(
+			fiber.Map{
+				"success":false,
+				"message":"Token generation failed"})
+	}
+
+	// Set up fields
 	user = models.User{
 		Username: data["username"],
 		UserEmail: data["email"],
 		UserSalt: data["salt"],
 		UserHash: data["hash"],
+		Token: tokenStr,
+
 	}
 
 	// TODO get error for failure?
@@ -114,7 +134,9 @@ func Signup(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"success": true,
 		"message": "User added successfully",
-		"data": user })
+		"user_uid": user.UserUID,
+		"token": user.Token,
+	})
 
 
 	// TODO Send verification email
