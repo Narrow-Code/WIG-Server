@@ -104,6 +104,7 @@ func Signup(c *fiber.Ctx) error {
 		UserEmail: data["email"],
 		UserSalt: data["salt"],
 		UserHash: data["hash"],
+		EmailConfirm: "false",
 
 	}
 
