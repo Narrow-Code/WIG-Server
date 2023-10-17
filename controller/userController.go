@@ -10,6 +10,49 @@ import (
 )
 
 /*
+* GetSalt handles user login requesting salt.
+* It checks for existing username and returns the salt.
+*
+* @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
+*
+* @return error - An error, if any, that occurred during the registration process.
+*/
+
+func GetSalt(c *fiber.Ctx) error {
+	var data map[string]string
+        
+        err := c.BodyParser(&data)
+
+        // If theres an error in delivery?
+        if err != nil {
+                // TODO log here
+                return c.Status(400).JSON(
+                        fiber.Map{
+                                "success":false,
+                                "message":"Invalid data",
+				"salt":""})
+                        }
+	// query for username
+	var user models.User
+	result := db.DB.Where("username = ?", data["username"]).First(&user)
+
+	// Check if user is found
+	if result.Error != nil {
+		return c.Status(400).JSON(
+                       	fiber.Map{
+                               	"success":false,
+                               	"message":"Username does not exist",
+                               	"salt":""}) 
+	} else {
+		return c.Status(200).JSON(
+                        fiber.Map{
+                                "success":true,
+                                "message":"Salt returned",          
+                                "salt":user.UserSalt})
+	}
+}
+
+/*
 * Signup handles user registration requests.
 * It performs various checks such as data validation and database uniqueness before creating a new user record.
 * If successful, it returns a JSON response with a success message and the user data.
