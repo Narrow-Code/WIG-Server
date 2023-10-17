@@ -9,6 +9,8 @@ import(
 )
 /*
 * Setup configures the routes on a Fiber application.
+*
+* @param app *fiber.App - The Fiber application instance on which the routes will be configured.
 */
 func Setup(app *fiber.App){
 	app.Post("/users/signup", controller.Signup)

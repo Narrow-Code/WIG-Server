@@ -12,6 +12,9 @@ import (
 
 /*
 * generateToken generates a randomized authentication token for API calls between the WIG-Application and server.
+*
+* @return string - The generated authentication token.
+* @return error - An error, if any, during the token generation process.
 */
 func generateToken() (string, error) {
          godotenv.Load()

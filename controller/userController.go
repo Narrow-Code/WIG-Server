@@ -11,16 +11,12 @@ import (
 
 /*
 * Signup handles user registration requests.
-* 
-* It expects a JSON request body containing the following fields:
-* - username (string): The username of the user.
-* - email (string): The email address of the user.
-* - salt (string): The salt for password hashing.
-* - hash (string): The hashed password.
-*
 * It performs various checks such as data validation and database uniqueness before creating a new user record.
-* 
 * If successful, it returns a JSON response with a success message and the user data.
+*
+* @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
+*
+* @return error - An error, if any, that occurred during the registration process.
 */
 func Signup(c *fiber.Ctx) error {
 	

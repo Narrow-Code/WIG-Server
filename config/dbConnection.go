@@ -45,6 +45,8 @@ func Connect() {
 
 /*
 * AutoMigrate performs automatic migrations on the provided connection.
+*
+* @param connection *gorm.DB - The database connection instance on which the migrations will be applied.
 */
 func AutoMigrate(connection *gorm.DB) {
 	connection.Debug().AutoMigrate(
