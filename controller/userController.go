@@ -34,10 +34,8 @@ func Signup(c *fiber.Ctx) error {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":"Invalid data",
-			})
-	}
-	
+				"message":"Invalid data"})
+			}
 	// If username is empty
 	if data["username"] == "" {
 		// TODO log here
@@ -116,10 +114,7 @@ func Signup(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"success": true,
 		"message": "User added successfully",
-		"username": user.Username,
-		"user_email": user.UserEmail,
 	})
 
 	// TODO Send verification email
-
 }
