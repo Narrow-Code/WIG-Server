@@ -4,12 +4,9 @@
 package controller
 
 import (
-	"github.com/joho/godotenv"
-	"os"
 	"github.com/gofiber/fiber/v2"
 	models "WIG-Server/models"
 	db "WIG-Server/config"
-	"github.com/dgrijalva/jwt-go"
 )
 
 /*
@@ -102,25 +99,6 @@ func Signup(c *fiber.Ctx) error {
 
 
 	// TODO Check email validity
-	
-	// Get secret
-	 godotenv.Load()
-	 var secret = []byte(os.Getenv("TOKEN_SECRET"))
-
-	// Generate access token
-	token := jwt.New(jwt.SigningMethodHS256)
-	tokenStr, err := token.SignedString(secret)
-
-	// Return error if access token generation fails
-	if err != nil {
-		// TODO log here
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":"Token generation failed",
-				"user_uid":"",
- 		                "token":""})
-	}
 
 	// Set up fields
 	user = models.User{
@@ -128,7 +106,6 @@ func Signup(c *fiber.Ctx) error {
 		UserEmail: data["email"],
 		UserSalt: data["salt"],
 		UserHash: data["hash"],
-		Token: tokenStr,
 
 	}
 
@@ -139,8 +116,8 @@ func Signup(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"success": true,
 		"message": "User added successfully",
-		"user_uid": user.UserUID,
-		"token": user.Token,
+		"username": user.Username,
+		"user_email": user.UserEmail,
 	})
 
 	// TODO Send verification email
