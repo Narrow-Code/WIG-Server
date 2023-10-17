@@ -16,7 +16,7 @@ import (
 * @return string - The generated authentication token.
 * @return error - An error, if any, during the token generation process.
 */
-func generateToken() (string, error) {
+func GenerateToken() string {
          godotenv.Load()
          var secret = []byte(os.Getenv("TOKEN_SECRET"))
 
@@ -26,8 +26,8 @@ func generateToken() (string, error) {
 
         // Return error if access token generation fails
         if err != nil {
-		return tokenStr, err
+		return ""
         }
-	return tokenStr, nil
+	return tokenStr
 }
 

@@ -4,6 +4,7 @@
 package controller
 
 import (
+	components "WIG-Server/components"
 	"github.com/gofiber/fiber/v2"
 	models "WIG-Server/models"
 	db "WIG-Server/config"
@@ -17,7 +18,6 @@ import (
 *
 * @return error - An error, if any, that occurred during the registration process.
 */
-
 func GetSalt(c *fiber.Ctx) error {
 	var data map[string]string
         
@@ -37,19 +37,92 @@ func GetSalt(c *fiber.Ctx) error {
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
 
 	// Check if user is found
+	// TODO error handle if fail
 	if result.Error != nil {
+		// TODO log here
 		return c.Status(400).JSON(
                        	fiber.Map{
                                	"success":false,
                                	"message":"Username does not exist",
                                	"salt":""}) 
 	} else {
+		// TODO log here
 		return c.Status(200).JSON(
                         fiber.Map{
                                 "success":true,
                                 "message":"Salt returned",          
                                 "salt":user.UserSalt})
 	}
+}
+
+/*
+* Login handles user login requests.
+* If successful, it returns a JSON response with a success message and access token.
+*
+* @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
+*
+* @return error - An error, if any, that occurred during the registration process.
+*/
+func Login(c *fiber.Ctx) error {
+        
+        var data map[string]string
+        
+        err := c.BodyParser(&data)
+
+	if err != nil {
+		return c.Status(400).JSON(
+			fiber.Map{
+				"success":false,
+				"message":"Error in parse",
+				"token":""})
+	}
+
+	// Check if username and hash match
+        var user models.User
+        result := db.DB.Where("username = ?", data["username"]).First(&user)
+
+        if result.Error != nil {
+		// TODO log here
+                return c.Status(400).JSON(
+                        fiber.Map{
+                                "success":false,
+                                "message":"Error",
+                                "token":""}) 
+        } else {
+		if data["hash"] != user.UserHash {
+			return c.Status(400).JSON(
+				fiber.Map{
+					"success":false,
+					"message":"Username and password do not match",
+					"token":""})
+	}
+
+	// Check if access token exists
+	if user.Token != ""{
+		return c.Status(200).JSON(
+			fiber.Map{
+				"success":true,
+				"message":"User logged in",
+				"token":user.Token})
+	} else {
+		user.Token = components.GenerateToken()
+
+		if err:= db.DB.Save(&user).Error; err != nil || user.Token == "" {
+			return c.Status(400).JSON(
+				fiber.Map{
+					"success":false,
+					"message":"Error saving token",
+					"token":""})
+		}
+
+	}
+	
+	return c.Status(200).JSON(
+		fiber.Map{
+			"success":true,
+			"message":"User logged in",
+			"token":user.Token})
+}
 }
 
 /*
