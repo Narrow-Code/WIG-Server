@@ -1,4 +1,7 @@
-package config
+/*
+* Package components provides functions that may be regularly used throughout the WIG-Application
+*/
+package components
 
 import (
 	"github.com/joho/godotenv"
@@ -7,6 +10,9 @@ import (
 
 )
 
+/*
+* generateToken generates a randomized authentication token for API calls between the WIG-Application and server.
+*/
 func generateToken() (string, error) {
          godotenv.Load()
          var secret = []byte(os.Getenv("TOKEN_SECRET"))
