@@ -16,12 +16,16 @@ import (
 * @return string - The generated authentication token.
 * @return error - An error, if any, during the token generation process.
 */
-func GenerateToken() string {
+func GenerateToken(username string, salt string, email string) string {
          godotenv.Load()
          var secret = []byte(os.Getenv("TOKEN_SECRET"))
 
         // Generate access token
-        token := jwt.New(jwt.SigningMethodHS256)
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "username": username,
+	"salt": salt,
+	"email": email,
+    })
         tokenStr, err := token.SignedString(secret)
 
         // Return error if access token generation fails

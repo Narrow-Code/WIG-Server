@@ -74,7 +74,8 @@ func Login(c *fiber.Ctx) error {
 			fiber.Map{
 				"success":false,
 				"message":"Error in parse",
-				"token":""})
+				"token":"",
+				"user":""})
 	}
 
 	// Check if username and hash match
@@ -87,14 +88,16 @@ func Login(c *fiber.Ctx) error {
                         fiber.Map{
                                 "success":false,
                                 "message":"Error",
-                                "token":""}) 
+                                "token":"",  
+                                "user":""}) 
         } else {
 		if data["hash"] != user.UserHash {
 			return c.Status(400).JSON(
 				fiber.Map{
 					"success":false,
 					"message":"Username and password do not match",
-					"token":""})
+					"token":"",  
+                                	"user":""})
 	}
 
 	// Check if access token exists
@@ -103,16 +106,18 @@ func Login(c *fiber.Ctx) error {
 			fiber.Map{
 				"success":true,
 				"message":"User logged in",
-				"token":user.Token})
+				"token":user.Token,  
+                                "user":user.UserUID})
 	} else {
-		user.Token = components.GenerateToken()
+		user.Token = components.GenerateToken(user.Username, user.UserSalt, user.UserEmail)
 
 		if err:= db.DB.Save(&user).Error; err != nil || user.Token == "" {
 			return c.Status(400).JSON(
 				fiber.Map{
 					"success":false,
 					"message":"Error saving token",
-					"token":""})
+					"token":"",  
+                                	"user":""})
 		}
 
 	}
@@ -121,7 +126,8 @@ func Login(c *fiber.Ctx) error {
 		fiber.Map{
 			"success":true,
 			"message":"User logged in",
-			"token":user.Token})
+			"token":user.Token,  
+                        "user":user.UserUID})
 }
 }
 
