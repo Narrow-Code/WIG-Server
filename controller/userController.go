@@ -75,7 +75,7 @@ func Login(c *fiber.Ctx) error {
 				"success":false,
 				"message":"Error in parse",
 				"token":"",
-				"user":""})
+				"uid":""})
 	}
 
 	// Check if username and hash match
@@ -89,7 +89,7 @@ func Login(c *fiber.Ctx) error {
                                 "success":false,
                                 "message":"Error",
                                 "token":"",  
-                                "user":""}) 
+                                "uid":""}) 
         } else {
 		if data["hash"] != user.UserHash {
 			return c.Status(400).JSON(
@@ -97,7 +97,7 @@ func Login(c *fiber.Ctx) error {
 					"success":false,
 					"message":"Username and password do not match",
 					"token":"",  
-                                	"user":""})
+                                	"uid":""})
 	}
 
 	// Check if access token exists
@@ -107,7 +107,7 @@ func Login(c *fiber.Ctx) error {
 				"success":true,
 				"message":"User logged in",
 				"token":user.Token,  
-                                "user":user.UserUID})
+                                "uid":user.UserUID})
 	} else {
 		user.Token = components.GenerateToken(user.Username, user.UserSalt, user.UserEmail)
 
@@ -117,7 +117,7 @@ func Login(c *fiber.Ctx) error {
 					"success":false,
 					"message":"Error saving token",
 					"token":"",  
-                                	"user":""})
+                                	"uid":""})
 		}
 
 	}
@@ -127,7 +127,7 @@ func Login(c *fiber.Ctx) error {
 			"success":true,
 			"message":"User logged in",
 			"token":user.Token,  
-                        "user":user.UserUID})
+                        "uid":user.UserUID})
 }
 }
 
