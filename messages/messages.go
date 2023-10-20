@@ -22,4 +22,6 @@ const (
 	SaltMissing = "Salt is missing"
 	HashMissing = "Hash is missing"
 	SignupSuccess = "User added successfully"
+	ErrorUsernameRequirements = "Username does not match criteria"
+	ErrorEmailRequirements = "Not a valid email address"
 )

@@ -10,8 +10,18 @@ import (
 	db "WIG-Server/config"
 	messages "WIG-Server/messages"
 	"gorm.io/gorm"
-
+	"regexp"
 )
+
+/*
+* The regex expression to check username requirements
+*/
+var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]{4,20}$`)
+
+/*
+* The regex expression to check email requirements
+*/
+var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
 /*
 * GetSalt handles user login requesting salt.
@@ -255,7 +265,9 @@ func Signup(c *fiber.Ctx) error {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":messages.UsernameInUse})
+				"message":messages.UsernameInUse,
+				"token":"",
+				"uid":""})
 		}
 
 	// Query for email
@@ -273,14 +285,30 @@ func Signup(c *fiber.Ctx) error {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":messages.EmailInUse})
+				"message":messages.EmailInUse,
+				"token":"",
+				"uid":""})
 		}
 
-	// TODO Check username requirements
-
-
+	// Check username requirements
+	if !usernameRegex.MatchString(data["username"]) {
+		return c.Status(400).JSON(
+			fiber.Map{
+				"success":false,
+				"message":messages.ErrorUsernameRequirements,
+				"token":"",
+				"uid":""})
+	}
+	
 	// TODO Check email validity
-
+	if !emailRegex.MatchString(data["email"]) {
+                return c.Status(400).JSON(
+                        fiber.Map{
+                                "success":false,
+                                "message":messages.ErrorEmailRequirements,  
+                                "token":"",  
+                                "uid":""})
+			}
 	// Set up fields
 	user = models.User{
 		Username: data["username"],
@@ -292,9 +320,9 @@ func Signup(c *fiber.Ctx) error {
 	}
 
 	// TODO get error for failure?
+
 	db.DB.Create(&user)
 
-	// TODO log here a success log
 	return c.Status(200).JSON(fiber.Map{
 		"success": true,
 		"message":messages.SignupSuccess,
