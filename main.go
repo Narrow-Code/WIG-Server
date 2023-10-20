@@ -22,7 +22,10 @@ import (
 func main() {
 	// Get port number
 	godotenv.Load()
-         var port = os.Getenv("PORT")
+        var port = os.Getenv("PORT")
+	if port == "" {
+		port = "80"
+	}
 
 	// Connect to the database
 	db.Connect()

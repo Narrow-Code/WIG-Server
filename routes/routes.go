@@ -14,6 +14,7 @@ import(
 */
 func Setup(app *fiber.App){
 	app.Post("/users/signup", controller.Signup)
-	app.Get("/users/login", controller.GetSalt)
-	app.Post("/users/login", controller.Login)
+	app.Get("/users/salt", controller.GetSalt)
+	app.Post("/users/login", controller.PostLogin)
+	app.Get("/users/login", controller.GetLogin)
 }

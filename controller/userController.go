@@ -8,6 +8,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	models "WIG-Server/models"
 	db "WIG-Server/config"
+	messages "WIG-Server/messages"
+	"gorm.io/gorm"
+
 )
 
 /*
@@ -19,40 +22,105 @@ import (
 * @return error - An error, if any, that occurred during the registration process.
 */
 func GetSalt(c *fiber.Ctx) error {
+	// Parse request into data map
 	var data map[string]string
-        
         err := c.BodyParser(&data)
 
-        // If theres an error in delivery?
+        // Error with JSON request
         if err != nil {
-                // TODO log here
                 return c.Status(400).JSON(
                         fiber.Map{
                                 "success":false,
-                                "message":"Invalid data",
+                                "message":messages.ErrorParsingRequest,
 				"salt":""})
                         }
-	// query for username
+	// Query for username
 	var user models.User
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
 
+
 	// Check if user is found
-	// TODO error handle if fail
-	if result.Error != nil {
-		// TODO log here
+	if result.Error == gorm.ErrRecordNotFound {
+		return c.Status(404).JSON(
+			fiber.Map{
+				"success": false,
+				"message": messages.UsernameDoesNotExist,
+				"token": "",
+				"uid": "",})
+	} else if result.Error != nil {
 		return c.Status(400).JSON(
                        	fiber.Map{
                                	"success":false,
-                               	"message":"Username does not exist",
+                               	"message":messages.ErrorWithConnection,
                                	"salt":""}) 
 	} else {
-		// TODO log here
 		return c.Status(200).JSON(
                         fiber.Map{
                                 "success":true,
-                                "message":"Salt returned",          
+                                "message":messages.SaltReturned,          
                                 "salt":user.UserSalt})
 	}
+}
+
+/*
+* GetLogin handles user login checks.
+* It checks if the user is logged in at initial start of application, making sure passwords have not changed.
+*
+* @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
+*
+* @return error - An error, if any, that occured during the registration procces.
+*/
+func GetLogin(c *fiber.Ctx) error {
+	// Parse request into data map
+	var data map[string]string
+	err := c.BodyParser(&data)
+
+	// Error with JSON request
+	if err != nil {
+		return c.Status(400).JSON(
+			fiber.Map{
+				"success":false,
+				"message":messages.ErrorParsingRequest})
+			}
+
+	// Query for UID
+	var user models.User
+        result := db.DB.Where("user_uid = ?", data["uid"]).First(&user)
+
+	// Check if UID was found
+	if result.Error == gorm.ErrRecordNotFound {
+		return c.Status(404).JSON(
+                        fiber.Map{
+                                "success": false,
+                                "message": messages.RecordNotFound,
+                                "token": "",
+                                "uid": "",})
+        } else if result.Error != nil {
+                return c.Status(400).JSON(
+                        fiber.Map{
+                                "success":false,
+                                "message":messages.ErrorWithConnection,
+                                "token":"",  
+                                "uid":""}) 
+        }
+	
+	// Validate token
+	if !components.ValidateToken(user.Username, user.UserHash, data["token"]) {
+		return c.Status(400).JSON(
+                fiber.Map{
+                        "success":false,
+                        "message":messages.ErrorToken,
+                        "token":"",  
+                        "uid":""})
+		}
+	
+	// Token matches
+	return c.Status(200).JSON(
+		fiber.Map{
+			"success":true,
+			"message":messages.TokenPass,
+			"token":"",                  
+			"uid":""})
 }
 
 /*
@@ -63,17 +131,17 @@ func GetSalt(c *fiber.Ctx) error {
 *
 * @return error - An error, if any, that occurred during the registration process.
 */
-func Login(c *fiber.Ctx) error {
-        
+func PostLogin(c *fiber.Ctx) error {
+        // Parse request into data map
         var data map[string]string
-        
         err := c.BodyParser(&data)
 
+	// Error with JSON request
 	if err != nil {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":"Error in parse",
+				"message":messages.ErrorParsingRequest,
 				"token":"",
 				"uid":""})
 	}
@@ -82,12 +150,18 @@ func Login(c *fiber.Ctx) error {
         var user models.User
         result := db.DB.Where("username = ?", data["username"]).First(&user)
 
-        if result.Error != nil {
-		// TODO log here
+	if result.Error == gorm.ErrRecordNotFound {
+                return c.Status(404).JSON(
+                        fiber.Map{
+                                "success": false,
+                                "message": messages.UsernameDoesNotExist,
+                                "token": "",
+                                "uid": "",})
+        } else if result.Error != nil {
                 return c.Status(400).JSON(
                         fiber.Map{
                                 "success":false,
-                                "message":"Error",
+                                "message":messages.ErrorWithConnection,
                                 "token":"",  
                                 "uid":""}) 
         } else {
@@ -95,40 +169,20 @@ func Login(c *fiber.Ctx) error {
 			return c.Status(400).JSON(
 				fiber.Map{
 					"success":false,
-					"message":"Username and password do not match",
-					"token":"",  
-                                	"uid":""})
-	}
-
-	// Check if access token exists
-	if user.Token != ""{
-		return c.Status(200).JSON(
-			fiber.Map{
-				"success":true,
-				"message":"User logged in",
-				"token":user.Token,  
-                                "uid":user.UserUID})
-	} else {
-		user.Token = components.GenerateToken(user.Username, user.UserSalt, user.UserEmail)
-
-		if err:= db.DB.Save(&user).Error; err != nil || user.Token == "" {
-			return c.Status(400).JSON(
-				fiber.Map{
-					"success":false,
-					"message":"Error saving token",
+					"message":messages.UsernamePasswordDoNotMatch,
 					"token":"",  
                                 	"uid":""})
 		}
-
 	}
+	// Generate token
+	token := components.GenerateToken(user.Username, user.UserHash)
 	
 	return c.Status(200).JSON(
 		fiber.Map{
 			"success":true,
-			"message":"User logged in",
-			"token":user.Token,  
+			"message":messages.UserLoginSuccess,
+			"token":token,  
                         "uid":user.UserUID})
-}
 }
 
 /*
@@ -141,74 +195,85 @@ func Login(c *fiber.Ctx) error {
 * @return error - An error, if any, that occurred during the registration process.
 */
 func Signup(c *fiber.Ctx) error {
-	
-	var data map[string]string
-	
+	// Parse request into data map 
+	var data map[string]string	
 	err := c.BodyParser(&data)
 
-	// If theres an error in delivery?
+	// Error with JSON request
 	if err != nil {
-		// TODO log here
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":"Invalid data"})
+				"message":messages.ErrorParsingRequest})
 			}
-	// If username is empty
+
+	// Username empty error
 	if data["username"] == "" {
-		// TODO log here
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":"Username is required"})
+				"message":messages.UsernameEmpty})
 	}
 
-	// If email is empty
+	// Email empty error
 	if data["email"] == "" {
-		// TODO log here
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":"Email is required"})
+				"message":messages.EmailEmpty})
 		}
 	
-	// If salt is empty
+	// Salt empty error
 	if data["salt"] == "" {
-		// TODO log here
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":"Salt is missing"})
+				"message":messages.SaltMissing})
 		}
 
-	// If hash is empty
+	// Hash empty error
 	if data["hash"] == "" {
 		return c.Status(400).JSON(
-			// TODO log here
 			fiber.Map{
 				"success":false,
-				"message":"Hash is missing"})
+				"message":messages.HashMissing})
 		}
 
-	// Checks if username exists in database
+	// Query for username in database
 	var user models.User
 	userResult := db.DB.Where("username = ?", data["username"]).First(&user)
-	if userResult.RowsAffected != 0 {
-		// TODO log here
+
+	// Error with connection
+	if userResult.Error != nil {
+                return c.Status(400).JSON(
+                        fiber.Map{
+                                "success":false,
+                                "message":messages.ErrorWithConnection,
+                                "token":"",  
+                                "uid":""}) 
+	} else if userResult.RowsAffected != 0 {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":"Username already in use"})
+				"message":messages.UsernameInUse})
 		}
 
-	// Checks if email exists in database
+	// Query for email
 	emailResult := db.DB.Where("user_email = ?", data["email"]).First(&user)
-	if emailResult.RowsAffected != 0 {
-		// TODO log here
+
+	// Error with connection
+	if userResult.Error != nil {
+                return c.Status(400).JSON(
+                        fiber.Map{
+                                "success":false,
+                                "message":messages.ErrorWithConnection,
+                                "token":"",  
+                                "uid":""}) 
+	} else if emailResult.RowsAffected != 0 {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":"Email associated with another account"})
+				"message":messages.EmailInUse})
 		}
 
 	// TODO Check username requirements
@@ -232,7 +297,7 @@ func Signup(c *fiber.Ctx) error {
 	// TODO log here a success log
 	return c.Status(200).JSON(fiber.Map{
 		"success": true,
-		"message": "User added successfully",
+		"message":messages.SignupSuccess,
 	})
 
 	// TODO Send verification email

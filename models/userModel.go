@@ -14,5 +14,4 @@ type User struct {
 	UserHash 	string 	`json:"hash" gorm"column:hash"`
 	EmailConfirm 	string 	`json:"email_confirmed" gorm"column:email_confirm"`
 	TierLevel 	string 	`json:"tier_level" gorm"column:tier_level"`
-	Token		string	`json:"token" gorm"column:token"`
 }
