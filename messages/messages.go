@@ -5,6 +5,8 @@ const (
 	ErrorParsingRequest = "There was an error parsing JSON request."
 	ErrorWithConnection = "Connection error"
 	RecordNotFound = "Record was not found"
+	UIDEmpty = "No UID found"
+	TokenEmpty = "No token found"
 	
 	// Login messages
 	UsernameDoesNotExist = "Username does not exist"

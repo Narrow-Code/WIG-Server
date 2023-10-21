@@ -94,6 +94,23 @@ func GetLogin(c *fiber.Ctx) error {
 
 	// Query for UID
 	var user models.User
+
+	// Check if UID and token exist
+        if data["uid"] == "" {
+                return c.Status(400).JSON(
+                        fiber.Map{
+                                "success":false,
+                                "message": messages.UIDEmpty})
+        }
+
+        if data["token"] == "" {
+                return c.Status(400).JSON(
+                        fiber.Map{
+                                "success":false,
+                                "message":messages.TokenEmpty})
+        }
+
+
         result := db.DB.Where("user_uid = ?", data["uid"]).First(&user)
 
 	// Check if UID was found
