@@ -157,6 +157,25 @@ func PostLogin(c *fiber.Ctx) error {
 
 	// Check if username and hash match
         var user models.User
+
+	if data["username"] == "" {
+		return c.Status(400).JSON(
+			fiber.Map{
+				"success":false,
+				"message": messages.UsernameEmpty,
+				"token":"",
+				"uid":""})
+	}
+
+	if data["hash"] == "" {
+		return c.Status(400).JSON(
+			fiber.Map{
+				"success":false,
+				"message":messages.HashMissing,
+				"token":"",
+				"uid":""})
+	}
+
         result := db.DB.Where("username = ?", data["username"]).First(&user)
 
 	if result.Error == gorm.ErrRecordNotFound {
