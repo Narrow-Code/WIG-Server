@@ -101,16 +101,12 @@ func GetLogin(c *fiber.Ctx) error {
 		return c.Status(404).JSON(
                         fiber.Map{
                                 "success": false,
-                                "message": messages.RecordNotFound,
-                                "token": "",
-                                "uid": "",})
+                                "message": messages.RecordNotFound})
         } else if result.Error != nil {
                 return c.Status(400).JSON(
                         fiber.Map{
                                 "success":false,
-                                "message":messages.ErrorWithConnection,
-                                "token":"",  
-                                "uid":""}) 
+                                "message":messages.ErrorWithConnection}) 
         }
 	
 	// Validate token
@@ -118,18 +114,14 @@ func GetLogin(c *fiber.Ctx) error {
 		return c.Status(400).JSON(
                 fiber.Map{
                         "success":false,
-                        "message":messages.ErrorToken,
-                        "token":"",  
-                        "uid":""})
+                        "message":messages.ErrorToken})
 		}
 	
 	// Token matches
 	return c.Status(200).JSON(
 		fiber.Map{
 			"success":true,
-			"message":messages.TokenPass,
-			"token":"",                  
-			"uid":""})
+			"message":messages.TokenPass})
 }
 
 /*
