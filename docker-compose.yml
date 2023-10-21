@@ -3,6 +3,7 @@ services:
 
         
   db:
+    container_name: wigdb
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: secret
