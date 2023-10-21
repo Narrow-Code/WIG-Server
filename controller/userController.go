@@ -55,7 +55,7 @@ func GetSalt(c *fiber.Ctx) error {
 			fiber.Map{
 				"success": false,
 				"message": messages.UsernameDoesNotExist,
-				"salt"})
+				"salt":""})
 	} else if result.Error != nil {
 		return c.Status(400).JSON(
                        	fiber.Map{
