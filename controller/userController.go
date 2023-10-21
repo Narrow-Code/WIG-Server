@@ -11,6 +11,8 @@ import (
 	messages "WIG-Server/messages"
 	"gorm.io/gorm"
 	"regexp"
+	"net"
+	"strings"
 )
 
 /*
@@ -312,7 +314,21 @@ func Signup(c *fiber.Ctx) error {
                         fiber.Map{
                                 "success":false,
                                 "message":messages.ErrorEmailRequirements})
-			}
+	} else {
+		// Run DNS check on Email
+		domain := strings.Split(data["email"], "@")[1]
+		_, err := net.LookupMX(domain)
+		
+		if err != nil {
+			return c.Status(400).JSON(
+				fiber.Map{
+					"success":false,
+					"message":messages.ErrorEmailRequirements})
+	}
+
+
+
+	}
 	// Set up fields
 	user = models.User{
 		Username: data["username"],
