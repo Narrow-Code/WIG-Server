@@ -55,8 +55,7 @@ func GetSalt(c *fiber.Ctx) error {
 			fiber.Map{
 				"success": false,
 				"message": messages.UsernameDoesNotExist,
-				"token": "",
-				"uid": "",})
+				"salt"})
 	} else if result.Error != nil {
 		return c.Status(400).JSON(
                        	fiber.Map{
@@ -252,42 +251,23 @@ func Signup(c *fiber.Ctx) error {
 	// Query for username in database
 	var user models.User
 	userResult := db.DB.Where("username = ?", data["username"]).First(&user)
-
-	// Error with connection
-	if userResult.Error != nil {
-                return c.Status(400).JSON(
-                        fiber.Map{
-                                "success":false,
-                                "message":messages.ErrorWithConnection,
-                                "token":"",  
-                                "uid":""}) 
-	} else if userResult.RowsAffected != 0 {
+ 
+	if userResult.RowsAffected != 0 {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":messages.UsernameInUse,
-				"token":"",
-				"uid":""})
+				"message":messages.UsernameInUse})
 		}
 
 	// Query for email
 	emailResult := db.DB.Where("user_email = ?", data["email"]).First(&user)
 
 	// Error with connection
-	if userResult.Error != nil {
-                return c.Status(400).JSON(
-                        fiber.Map{
-                                "success":false,
-                                "message":messages.ErrorWithConnection,
-                                "token":"",  
-                                "uid":""}) 
-	} else if emailResult.RowsAffected != 0 {
+	if emailResult.RowsAffected != 0 {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":messages.EmailInUse,
-				"token":"",
-				"uid":""})
+				"message":messages.EmailInUse})
 		}
 
 	// Check username requirements
@@ -295,9 +275,7 @@ func Signup(c *fiber.Ctx) error {
 		return c.Status(400).JSON(
 			fiber.Map{
 				"success":false,
-				"message":messages.ErrorUsernameRequirements,
-				"token":"",
-				"uid":""})
+				"message":messages.ErrorUsernameRequirements})
 	}
 	
 	// TODO Check email validity
@@ -305,9 +283,7 @@ func Signup(c *fiber.Ctx) error {
                 return c.Status(400).JSON(
                         fiber.Map{
                                 "success":false,
-                                "message":messages.ErrorEmailRequirements,  
-                                "token":"",  
-                                "uid":""})
+                                "message":messages.ErrorEmailRequirements})
 			}
 	// Set up fields
 	user = models.User{
