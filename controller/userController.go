@@ -34,21 +34,21 @@ var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]
 * @return error - An error, if any, that occurred during the registration process.
 */
 func GetSalt(c *fiber.Ctx) error {
-	// Parse request into data map
-	var data map[string]string
-        err := c.BodyParser(&data)
+	// Get parameters
+	username:= c.Query("username")
 
-        // Error with JSON request
-        if err != nil {
-                return c.Status(400).JSON(
-                        fiber.Map{
-                                "success":false,
-                                "message":messages.ErrorParsingRequest,
+	// Check if parameters are empty
+        if username == "" {
+		return c.Status(400).JSON(
+			fiber.Map{
+				"success": false,
+				"message": messages.UsernameEmpty,
 				"salt":""})
-                        }
+	}
+
 	// Query for username
 	var user models.User
-	result := db.DB.Where("username = ?", data["username"]).First(&user)
+	result := db.DB.Where("username = ?", username).First(&user)
 
 
 	// Check if user is found
@@ -82,38 +82,28 @@ func GetSalt(c *fiber.Ctx) error {
 * @return error - An error, if any, that occured during the registration procces.
 */
 func GetLogin(c *fiber.Ctx) error {
-	// Parse request into data map
-	var data map[string]string
-	err := c.BodyParser(&data)
-
-	// Error with JSON request
-	if err != nil {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.ErrorParsingRequest})
-			}
-
-	// Query for UID
-	var user models.User
+	// Get parameters
+	uid:= c.Query("uid")
+	token:= c.Query("token")
 
 	// Check if UID and token exist
-        if data["uid"] == "" {
+        if uid == "" {
                 return c.Status(400).JSON(
                         fiber.Map{
                                 "success":false,
                                 "message": messages.UIDEmpty})
         }
 
-        if data["token"] == "" {
+        if token == "" {
                 return c.Status(400).JSON(
                         fiber.Map{
                                 "success":false,
                                 "message":messages.TokenEmpty})
         }
-
-
-        result := db.DB.Where("user_uid = ?", data["uid"]).First(&user)
+	
+	// Query for UID
+	var user models.User
+        result := db.DB.Where("user_uid = ?", uid).First(&user)
 
 	// Check if UID was found
 	if result.Error == gorm.ErrRecordNotFound {
@@ -129,7 +119,7 @@ func GetLogin(c *fiber.Ctx) error {
         }
 	
 	// Validate token
-	if !components.ValidateToken(user.Username, user.UserHash, data["token"]) {
+	if !components.ValidateToken(user.Username, user.UserHash, token) {
 		return c.Status(400).JSON(
                 fiber.Map{
                         "success":false,
