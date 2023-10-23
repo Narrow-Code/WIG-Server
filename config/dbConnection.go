@@ -10,6 +10,7 @@ import (
 	"WIG-Server/models"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"gorm.io/driver/mysql"
 	"os"
 	"fmt"
@@ -31,7 +32,9 @@ func Connect() {
 	dbname := os.Getenv("MYSQL_DBNAME")
 
 	connection := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbuser, dbpassword, dbhost, dbname)
-	var db, err = gorm.Open(mysql.Open(connection), &gorm.Config{})
+	var db, err = gorm.Open(mysql.Open(connection), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+			})
 
 	if err != nil {
 		panic("Database connection failed")
