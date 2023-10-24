@@ -36,7 +36,7 @@ var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]
 func GetSalt(c *fiber.Ctx) error {
 	// Get parameters
 	username:= c.Query("username")
-
+	
 	// Check if parameters are empty
         if username == "" {
 		return c.Status(400).JSON(
@@ -45,11 +45,11 @@ func GetSalt(c *fiber.Ctx) error {
 				"message": messages.UsernameEmpty,
 				"salt":""})
 	}
-
+	
 	// Query for username
 	var user models.User
 	result := db.DB.Where("username = ?", username).First(&user)
-
+	
 
 	// Check if user is found
 	if result.Error == gorm.ErrRecordNotFound {

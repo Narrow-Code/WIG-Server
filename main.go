@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
         "os"
+	middle "WIG-Server/middleware"
 )
 
 /*
@@ -34,6 +35,7 @@ func main() {
 	app := fiber.New()
 
 	// Setup routes
+	app.Use(middle.AppAuthHeaderCheck())
 	routes.Setup(app)
 
 	// Start the server and lsiten on port 30001

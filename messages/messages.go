@@ -7,6 +7,7 @@ const (
 	RecordNotFound = "Record was not found"
 	UIDEmpty = "No UID found"
 	TokenEmpty = "No token found"
+	AccessDenied = "Unauthorized"
 	
 	// Login messages
 	UsernameDoesNotExist = "Username does not exist"
