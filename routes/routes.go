@@ -13,8 +13,8 @@ import(
 * @param app *fiber.App - The Fiber application instance on which the routes will be configured.
 */
 func Setup(app *fiber.App){
-	app.Post("/users/signup", controller.Signup)
+	app.Post("/users/signup", controller.PostSignup)
 	app.Get("/users/salt", controller.GetSalt)
 	app.Post("/users/login", controller.PostLogin)
-	app.Get("/users/login", controller.GetLogin)
+	app.Post("/users/login/check", controller.PostLoginCheck)
 }

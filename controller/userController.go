@@ -81,20 +81,31 @@ func GetSalt(c *fiber.Ctx) error {
 *
 * @return error - An error, if any, that occured during the registration procces.
 */
-func GetLogin(c *fiber.Ctx) error {
-	// Get parameters
-	uid:= c.Query("uid")
-	token:= c.Query("token")
+func PostLoginCheck(c *fiber.Ctx) error {
+	// Parse request into data map
+        var data map[string]string
+        err := c.BodyParser(&data)
+
+        // Error with JSON request
+        if err != nil {
+                return c.Status(400).JSON(
+                        fiber.Map{
+                                "success":false,
+                                "message":messages.ErrorParsingRequest,
+                                "token":"",
+                                "uid":""})
+        }
+
 
 	// Check if UID and token exist
-        if uid == "" {
+        if data["uid"] == "" {
                 return c.Status(400).JSON(
                         fiber.Map{
                                 "success":false,
                                 "message": messages.UIDEmpty})
         }
 
-        if token == "" {
+        if data["token"] == "" {
                 return c.Status(400).JSON(
                         fiber.Map{
                                 "success":false,
@@ -103,7 +114,7 @@ func GetLogin(c *fiber.Ctx) error {
 	
 	// Query for UID
 	var user models.User
-        result := db.DB.Where("user_uid = ?", uid).First(&user)
+        result := db.DB.Where("user_uid = ?", data["uid"]).First(&user)
 
 	// Check if UID was found
 	if result.Error == gorm.ErrRecordNotFound {
@@ -119,7 +130,7 @@ func GetLogin(c *fiber.Ctx) error {
         }
 	
 	// Validate token
-	if !components.ValidateToken(user.Username, user.UserHash, token) {
+	if !components.ValidateToken(user.Username, user.UserHash, data["token"]) {
 		return c.Status(400).JSON(
                 fiber.Map{
                         "success":false,
@@ -223,7 +234,7 @@ func PostLogin(c *fiber.Ctx) error {
 *
 * @return error - An error, if any, that occurred during the registration process.
 */
-func Signup(c *fiber.Ctx) error {
+func PostSignup(c *fiber.Ctx) error {
 	// Parse request into data map 
 	var data map[string]string	
 	err := c.BodyParser(&data)
