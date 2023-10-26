@@ -39,11 +39,7 @@ func GetSalt(c *fiber.Ctx) error {
 	
 	// Check if parameters are empty
         if username == "" {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success": false,
-				"message": messages.UsernameEmpty,
-				"salt":""})
+		return returnError(c, 400, messages.UsernameEmpty)
 	}
 	
 	// Query for username
@@ -53,17 +49,11 @@ func GetSalt(c *fiber.Ctx) error {
 
 	// Check if user is found
 	if result.Error == gorm.ErrRecordNotFound {
-		return c.Status(404).JSON(
-			fiber.Map{
-				"success": false,
-				"message": messages.UsernameDoesNotExist,
-				"salt":""})
+		return returnError(c, 404, messages.UsernameDoesNotExist)
+
 	} else if result.Error != nil {
-		return c.Status(400).JSON(
-                       	fiber.Map{
-                               	"success":false,
-                               	"message":messages.ErrorWithConnection,
-                               	"salt":""}) 
+		return returnError(c, 400, messages.ErrorWithConnection)
+
 	} else {
 		return c.Status(200).JSON(
                         fiber.Map{
@@ -88,28 +78,17 @@ func PostLoginCheck(c *fiber.Ctx) error {
 
         // Error with JSON request
         if err != nil {
-                return c.Status(400).JSON(
-                        fiber.Map{
-                                "success":false,
-                                "message":messages.ErrorParsingRequest,
-                                "token":"",
-                                "uid":""})
+                return returnError(c, 400, messages.ErrorParsingRequest)
         }
 
 
 	// Check if UID and token exist
         if data["uid"] == "" {
-                return c.Status(400).JSON(
-                        fiber.Map{
-                                "success":false,
-                                "message": messages.UIDEmpty})
+                return returnError(c, 400, messages.UIDEmpty)
         }
 
         if data["token"] == "" {
-                return c.Status(400).JSON(
-                        fiber.Map{
-                                "success":false,
-                                "message":messages.TokenEmpty})
+                return returnError(c, 400, messages.TokenEmpty)
         }
 	
 	// Query for UID
@@ -118,23 +97,15 @@ func PostLoginCheck(c *fiber.Ctx) error {
 
 	// Check if UID was found
 	if result.Error == gorm.ErrRecordNotFound {
-		return c.Status(404).JSON(
-                        fiber.Map{
-                                "success": false,
-                                "message": messages.RecordNotFound})
+		return returnError(c, 404, messages.RecordNotFound)
+
         } else if result.Error != nil {
-                return c.Status(400).JSON(
-                        fiber.Map{
-                                "success":false,
-                                "message":messages.ErrorWithConnection}) 
+                return returnError(c, 400, messages.ErrorWithConnection)
         }
 	
 	// Validate token
 	if !components.ValidateToken(user.Username, user.Hash, data["token"]) {
-		return c.Status(400).JSON(
-                fiber.Map{
-                        "success":false,
-                        "message":messages.ErrorToken})
+		return returnError(c, 400, messages.ErrorToken)
 		}
 	
 	// Token matches
@@ -159,59 +130,29 @@ func PostLogin(c *fiber.Ctx) error {
 
 	// Error with JSON request
 	if err != nil {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.ErrorParsingRequest,
-				"token":"",
-				"uid":""})
+		return returnError(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Check if username and hash match
         var user models.User
 
 	if data["username"] == "" {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message": messages.UsernameEmpty,
-				"token":"",
-				"uid":""})
+		return returnError(c, 400, messages.UsernameEmpty)
 	}
 
 	if data["hash"] == "" {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.HashMissing,
-				"token":"",
-				"uid":""})
+		return returnError(c, 400, messages.HashMissing)
 	}
 
         result := db.DB.Where("username = ?", data["username"]).First(&user)
 
 	if result.Error == gorm.ErrRecordNotFound {
-                return c.Status(404).JSON(
-                        fiber.Map{
-                                "success": false,
-                                "message": messages.UsernameDoesNotExist,
-                                "token": "",
-                                "uid": "",})
+                return returnError(c, 404, messages.UsernameDoesNotExist)
         } else if result.Error != nil {
-                return c.Status(400).JSON(
-                        fiber.Map{
-                                "success":false,
-                                "message":messages.ErrorWithConnection,
-                                "token":"",  
-                                "uid":""}) 
+                return returnError(c, 400, messages.ErrorWithConnection)
         } else {
 		if data["hash"] != user.Hash {
-			return c.Status(400).JSON(
-				fiber.Map{
-					"success":false,
-					"message":messages.UsernamePasswordDoNotMatch,
-					"token":"",  
-                                	"uid":""})
+			return returnError(c, 400, messages.UsernamePasswordDoNotMatch)
 		}
 	}
 	// Generate token
@@ -241,42 +182,27 @@ func PostSignup(c *fiber.Ctx) error {
 
 	// Error with JSON request
 	if err != nil {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.ErrorParsingRequest})
+		return returnError(c, 400, messages.ErrorParsingRequest)
 			}
 
 	// Username empty error
 	if data["username"] == "" {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.UsernameEmpty})
+		return returnError(c, 400, messages.UsernameEmpty) 
 	}
 
 	// Email empty error
 	if data["email"] == "" {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.EmailEmpty})
+		return returnError(c, 400, messages.EmailEmpty)
 		}
 	
 	// Salt empty error
 	if data["salt"] == "" {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.SaltMissing})
+		return returnError(c, 400, messages.SaltMissing)
 		}
 
 	// Hash empty error
 	if data["hash"] == "" {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.HashMissing})
+		return returnError(c, 400, messages.HashMissing)
 		}
 
 	// Query for username in database
@@ -284,47 +210,32 @@ func PostSignup(c *fiber.Ctx) error {
 	userResult := db.DB.Where("username = ?", data["username"]).First(&user)
  
 	if userResult.RowsAffected != 0 {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.UsernameInUse})
+		return returnError(c, 400, messages.UsernameInUse)
 		}
 
 	// Query for email
-	emailResult := db.DB.Where("user_email = ?", data["email"]).First(&user)
+	emailResult := db.DB.Where("email = ?", data["email"]).First(&user)
 
 	// Error with connection
 	if emailResult.RowsAffected != 0 {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.EmailInUse})
+		return returnError(c, 400, messages.EmailInUse)
 		}
 
 	// Check username requirements
 	if !usernameRegex.MatchString(data["username"]) {
-		return c.Status(400).JSON(
-			fiber.Map{
-				"success":false,
-				"message":messages.ErrorUsernameRequirements})
+		return returnError(c, 400, messages.ErrorUsernameRequirements)
 	}
 	
-	// TODO Check email validity
+	// Check email validity
 	if !emailRegex.MatchString(data["email"]) {
-                return c.Status(400).JSON(
-                        fiber.Map{
-                                "success":false,
-                                "message":messages.ErrorEmailRequirements})
+                return returnError(c, 400, messages.ErrorEmailRequirements)
 	} else {
 		// Run DNS check on Email
 		domain := strings.Split(data["email"], "@")[1]
 		_, err := net.LookupMX(domain)
 		
 		if err != nil {
-			return c.Status(400).JSON(
-				fiber.Map{
-					"success":false,
-					"message":messages.ErrorEmailRequirements})
+			return returnError(c, 400, messages.ErrorEmailRequirements)
 	}
 
 
