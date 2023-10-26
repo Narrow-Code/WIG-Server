@@ -9,18 +9,18 @@ package models
 type Ownership struct {
 	OwnershipUID 	uint 	`json:"ownership_uid" gorm:"primary_key;column:ownership_uid"`
 	ItemOwner 	uint 	`json:"item_owner" gorm="column:item_owner"`
-	ItemBarcode 	uint	`json:"item_barcode" gorm="column:item_barcode"`
-	OwnedCustName	string 	`json:"owned_custom_name" gorm="column:owned_custom_name"`
-	OwnedCustImg	string	`json:"owned_custom_img" gorm="column:owned_custom_img"`
-	OwnedCustDesc	string 	`json:"owned_custom_description" gorm="column:owned_custom_description"`
-	OwnedLocation 	uint 	`json:"owned_location" gorm="column:owned_location"`
-	OwnedQR 	string 	`json:"owned_qr" gorm="column:owned_qr"`
-	OwnedTags	string 	`json:"owned_tags" gorm="column:owned_tags"`
-	OwnedQuantity	int 	`json:"owned_quantity" gorm="column:owned_quantity"`
-	OwnedCheckedOut	string	`json:"owned_checked_out" gorm="column:owned_checked_out"`
-	OwnedBorrower	uint 	`json:"owned_borrower" gorm="column:owned_borrower"`
+	ItemBarcode 	int	`json:"item_barcode" gorm="column:item_barcode"`
+	CustomItemName	string 	`json:"custom_item_name" gorm="column:custom_item_name"`
+	CustItemImg	string	`json:"custom_item_img" gorm="column:custom_item_img"`
+	OwnedCustDesc	string 	`json:"custom_item_description" gorm="column:custom_item_description"`
+	ItemLocation 	uint 	`json:"item_location" gorm="column:item_location"`
+	ItemQR	 	string 	`json:"item_qr" gorm="column:item_qr"`
+	ItemTags	string 	`json:"item_tags" gorm="column:item_tags"`
+	ItemQuantity	int 	`json:"item_quantity" gorm="column:item_quantity"`
+	ItemCheckedOut	string	`json:"item_checked_out" gorm="column:item_checked_out"`
+	ItemBorrower	uint 	`json:"item_borrower" gorm="column:item_borrower"`
 	User            User    `gorm:"foreignkey:item_owner"`
-	Location	Location `gorm:"foreignkey:owned_location"`
+	Location	Location `gorm:"foreignkey:item_location"`
 	Item		Item	`gorm:"foreignkey:item_barcode"`
-	Borrower	Borrower `gorm:"foreignkey:owned_borrower"`
+	Borrower	Borrower `gorm:"foreignkey:item_borrower"`
 }
