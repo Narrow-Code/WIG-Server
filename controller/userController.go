@@ -69,12 +69,12 @@ func GetSalt(c *fiber.Ctx) error {
                         fiber.Map{
                                 "success":true,
                                 "message":messages.SaltReturned,          
-                                "salt":user.UserSalt})
+                                "salt":user.Salt})
 	}
 }
 
 /*
-* GetLogin handles user login checks.
+* PostLoginCheck handles user login checks.
 * It checks if the user is logged in at initial start of application, making sure passwords have not changed.
 *
 * @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
@@ -130,7 +130,7 @@ func PostLoginCheck(c *fiber.Ctx) error {
         }
 	
 	// Validate token
-	if !components.ValidateToken(user.Username, user.UserHash, data["token"]) {
+	if !components.ValidateToken(user.Username, user.Hash, data["token"]) {
 		return c.Status(400).JSON(
                 fiber.Map{
                         "success":false,
@@ -145,7 +145,7 @@ func PostLoginCheck(c *fiber.Ctx) error {
 }
 
 /*
-* Login handles user login requests.
+* PostLogin handles user login requests.
 * If successful, it returns a JSON response with a success message and access token.
 *
 * @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
@@ -205,7 +205,7 @@ func PostLogin(c *fiber.Ctx) error {
                                 "token":"",  
                                 "uid":""}) 
         } else {
-		if data["hash"] != user.UserHash {
+		if data["hash"] != user.Hash {
 			return c.Status(400).JSON(
 				fiber.Map{
 					"success":false,
@@ -215,7 +215,7 @@ func PostLogin(c *fiber.Ctx) error {
 		}
 	}
 	// Generate token
-	token := components.GenerateToken(user.Username, user.UserHash)
+	token := components.GenerateToken(user.Username, user.Hash)
 	
 	return c.Status(200).JSON(
 		fiber.Map{
@@ -226,7 +226,7 @@ func PostLogin(c *fiber.Ctx) error {
 }
 
 /*
-* Signup handles user registration requests.
+* PostSignup handles user registration requests.
 * It performs various checks such as data validation and database uniqueness before creating a new user record.
 * If successful, it returns a JSON response with a success message and the user data.
 *
@@ -333,9 +333,9 @@ func PostSignup(c *fiber.Ctx) error {
 	// Set up fields
 	user = models.User{
 		Username: data["username"],
-		UserEmail: data["email"],
-		UserSalt: data["salt"],
-		UserHash: data["hash"],
+		Email: data["email"],
+		Salt: data["salt"],
+		Hash: data["hash"],
 		EmailConfirm: "false",
 
 	}
