@@ -3,7 +3,6 @@
 *
 * It includes functions to establish a connection, perform auto migrations, and manage the database connection instance.
 */
-
 package config
 
 import (

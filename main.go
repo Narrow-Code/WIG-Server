@@ -3,7 +3,6 @@
 *
 * This package initializes the database connection, sets up routes, and starts the server.
 */
-
 package main
 
 import (

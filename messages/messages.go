@@ -1,3 +1,6 @@
+/*
+* The messages package holds constant error and success messages for easy access.
+*/
 package messages
 
 const (

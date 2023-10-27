@@ -1,3 +1,6 @@
+/*
+* The middleware package handles all middle functions between the API calls.
+*/
 package middleware
 
 import (
@@ -7,6 +10,9 @@ import (
 	"WIG-Server/messages"
 )
 
+/*
+* AppAuthHeaderCheck checks that the AppAuth header is valid.
+*/
 func AppAuthHeaderCheck() fiber.Handler {
 	// Get AppAuth secret
 	godotenv.Load()
