@@ -4,11 +4,11 @@
 package controller
 
 import (
-	components "WIG-Server/components"
+	"WIG-Server/components"
 	"github.com/gofiber/fiber/v2"
-	models "WIG-Server/models"
+	"WIG-Server/models"
 	db "WIG-Server/config"
-	messages "WIG-Server/messages"
+	"WIG-Server/messages"
 	"gorm.io/gorm"
 	"regexp"
 	"net"

@@ -6,12 +6,13 @@
 package main
 
 import (
-	routes "WIG-Server/routes"
+	"WIG-Server/routes"
 	db "WIG-Server/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
         "os"
-	middle "WIG-Server/middleware"
+	"WIG-Server/middleware"
+	item "WIG-Server/upcitemdb"
 )
 
 /*
@@ -34,10 +35,13 @@ func main() {
 	app := fiber.New()
 
 	// Setup routes
-	app.Use(middle.AppAuthHeaderCheck())
+	app.Use(middleware.AppAuthHeaderCheck())
 	routes.Setup(app)
+
+	item.GetBarcode("072067138125")
 
 	// Start the server and lsiten on port 30001
 	app.Listen(":" + port)
+
 }
 
