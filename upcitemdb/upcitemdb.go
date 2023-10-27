@@ -50,19 +50,29 @@ func GetBarcode(barcode string) {
 	
 	if items, exists := data["items"]; exists {
 		for _, item := range items.([]interface{}) {
-                itemData := item.(map[string]interface{})
-                newItem := models.Item{
-                        Barcode: barcode,
-                        Name: itemData["title"].(string),
-                        Brand: itemData["brand"].(string),
-                        Image: itemData["images"].([]interface{})[0].(string),
-                        ItemDesc: itemData["description"].(string),
-                }
-                db.DB.Create(&newItem)
+                	itemData := item.(map[string]interface{})
+                	var newItem models.Item
 
+              		newItem.Barcode =  barcode
+
+            		if title, exists := itemData["title"]; exists {
+                		newItem.Name = title.(string)
+            		}
+
+            		if brand, exists := itemData["brand"]; exists {
+                		newItem.Brand = brand.(string)
+            		}
+
+            		if desc, exists := itemData["description"]; exists {
+               			newItem.ItemDesc = desc.(string)
+            		}
+
+            		if images, exists := itemData["images"]; exists && len(images.([]interface{})) > 0 {
+                		newItem.Image = images.([]interface{})[0].(string)
+            		}
+                db.DB.Create(&newItem)
 		}
 
 	}
-
 
 }
