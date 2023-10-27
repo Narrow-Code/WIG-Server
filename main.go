@@ -12,7 +12,6 @@ import (
 	"github.com/joho/godotenv"
         "os"
 	"WIG-Server/middleware"
-	item "WIG-Server/upcitemdb"
 )
 
 /*
@@ -37,7 +36,7 @@ func main() {
 	// Setup routes
 	app.Use(middleware.AppAuthHeaderCheck())
 	routes.Setup(app)
-
+	
 	// Start the server and lsiten on port 30001
 	app.Listen(":" + port)
 
