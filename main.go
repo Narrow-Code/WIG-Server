@@ -38,8 +38,6 @@ func main() {
 	app.Use(middleware.AppAuthHeaderCheck())
 	routes.Setup(app)
 
-	item.GetBarcode("072067138125")
-
 	// Start the server and lsiten on port 30001
 	app.Listen(":" + port)
 
