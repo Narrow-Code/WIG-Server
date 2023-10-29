@@ -46,7 +46,6 @@ func GetSalt(c *fiber.Ctx) error {
 	var user models.User
 	result := db.DB.Where("username = ?", username).First(&user)
 	
-
 	// Check if user is found
 	if result.Error == gorm.ErrRecordNotFound {
 		return returnError(c, 404, messages.UsernameDoesNotExist)
