@@ -1,6 +1,4 @@
-/* Package controller provides functions for handling HTTP requests and implementing business logic between the database and application.
-*/
-
+// Package controller provides functions for handling HTTP requests and implementing business logic between the database and application.
 package controller
 
 import (
@@ -16,23 +14,18 @@ import (
 	"strings"
 )
 
-/*
-* The regex expression to check username requirements
-*/
+// The regex expression to check username requirements
 var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]{4,20}$`)
 
-/*
-* The regex expression to check email requirements
-*/
+// The regex expression to check email requirements
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
 /*
-* GetSalt handles user login requesting salt.
-* It checks for existing username and returns the salt.
-*
-* @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
-*
-* @return error - An error, if any, that occurred during the registration process.
+GetSalt handles user login requesting salt.
+It checks for existing username and returns the salt.
+
+@param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
+@return error - An error, if any, that occurred during the registration process.
 */
 func GetSalt(c *fiber.Ctx) error {
 	// Get parameters
@@ -64,12 +57,11 @@ func GetSalt(c *fiber.Ctx) error {
 }
 
 /*
-* PostLoginCheck handles user login checks.
-* It checks if the user is logged in at initial start of application, making sure passwords have not changed.
-*
-* @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
-*
-* @return error - An error, if any, that occured during the registration procces.
+PostLoginCheck handles user login checks.
+It checks if the user is logged in at initial start of application, making sure passwords have not changed.
+
+@param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
+@return error - An error, if any, that occured during the registration procces.
 */
 func PostLoginCheck(c *fiber.Ctx) error {
 	// Parse request into data map
@@ -81,47 +73,26 @@ func PostLoginCheck(c *fiber.Ctx) error {
                 return returnError(c, 400, messages.ErrorParsingRequest)
         }
 
+	// Validate Token
+	err = validateToken(c, data["uid"], data["token"])	
+	if err == nil {
+		return validateToken(c, data["uid"], data["token"])
+	}
 
-	// Check if UID and token exist
-        if data["uid"] == "" {
-                return returnError(c, 400, messages.UIDEmpty)
-        }
-
-        if data["token"] == "" {
-                return returnError(c, 400, messages.TokenEmpty)
-        }
-	
-	// Query for UID
-	var user models.User
-        result := db.DB.Where("user_uid = ?", data["uid"]).First(&user)
-
-	// Check if UID was found
-	if result.Error == gorm.ErrRecordNotFound {
-		return returnError(c, 404, messages.RecordNotFound)
-
-        } else if result.Error != nil {
-                return returnError(c, 400, messages.ErrorWithConnection)
-        }
-	
-	// Validate token
-	if !components.ValidateToken(user.Username, user.Hash, data["token"]) {
-		return returnError(c, 400, messages.ErrorToken)
-		}
-	
 	// Token matches
 	return c.Status(200).JSON(
 		fiber.Map{
 			"success":true,
 			"message":messages.TokenPass})
+		
 }
 
 /*
-* PostLogin handles user login requests.
-* If successful, it returns a JSON response with a success message and access token.
-*
-* @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
-*
-* @return error - An error, if any, that occurred during the registration process.
+PostLogin handles user login requests.
+If successful, it returns a JSON response with a success message and access token.
+
+@param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
+@return error - An error, if any, that occurred during the registration process.
 */
 func PostLogin(c *fiber.Ctx) error {
         // Parse request into data map
@@ -167,13 +138,12 @@ func PostLogin(c *fiber.Ctx) error {
 }
 
 /*
-* PostSignup handles user registration requests.
-* It performs various checks such as data validation and database uniqueness before creating a new user record.
-* If successful, it returns a JSON response with a success message and the user data.
-*
-* @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
-*
-* @return error - An error, if any, that occurred during the registration process.
+PostSignup handles user registration requests.
+It performs various checks such as data validation and database uniqueness before creating a new user record.
+/If successful, it returns a JSON response with a success message and the user data.
+
+@param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
+@return error - An error, if any, that occurred during the registration process.
 */
 func PostSignup(c *fiber.Ctx) error {
 	// Parse request into data map 
@@ -237,8 +207,6 @@ func PostSignup(c *fiber.Ctx) error {
 		if err != nil {
 			return returnError(c, 400, messages.ErrorEmailRequirements)
 	}
-
-
 
 	}
 	// Set up fields

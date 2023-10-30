@@ -10,7 +10,8 @@ const (
 	UIDEmpty = "No UID found" // UIDEmpty is a constant string error message for when the UID in a request is empty but required.
 	TokenEmpty = "No token found" // TokenEmpty is a constant string error message for when the token in a request is empty but required.
 	AccessDenied = "Unauthorized" // AccessDenied is a constant string error message for when the access was denied to make the API request.
-	
+	ItemNotFound = "Item not found in database" // ItemNotFound is a constant string error message for when the item barcode was not found in the database.
+
 	UsernameDoesNotExist = "Username does not exist" // UsernameDoesNotExist is a constant string error message for when an invalid username is being passed in a request.
 	UsernamePasswordDoNotMatch = "Username and password do not match" // UsernamePasswordDoNotMatch is a constant string error message for when the username does not match the hash in the request.
 	UserLoginSuccess = "User log in success" // UserLoginSuccess is a constant string success message for when the username and hash match in the requests.

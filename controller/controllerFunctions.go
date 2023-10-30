@@ -2,7 +2,14 @@
 package controller
 
 import (
-        "github.com/gofiber/fiber/v2"
+	"WIG-Server/components"
+	"WIG-Server/db"
+	"WIG-Server/messages"
+	"WIG-Server/models"
+
+	"errors"
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 /*
@@ -29,6 +36,32 @@ validateToken checks if a users UID and token match and are valid.
 
 @return error - An error that occured during the process or if the token does not match
 */
-func validateToken(c *fiber.Ctx, uid string, token string){
+func validateToken(c *fiber.Ctx, uid string, token string) error{
+// Check if UID and token exist
+        if uid == "" {
+                return returnError(c, 400, messages.UIDEmpty)
+        }
 
+        if token == "" {
+                return returnError(c, 400, messages.TokenEmpty)
+        }
+
+        // Query for UID
+        var user models.User
+        result := db.DB.Where("user_uid = ?", uid).First(&user)
+
+        // Check if UID was found
+        if result.Error == gorm.ErrRecordNotFound {
+                return returnError(c, 404, messages.RecordNotFound)
+
+        } else if result.Error != nil {
+                return returnError(c, 400, messages.ErrorWithConnection)
+	}
+
+        // Validate token
+        if !components.ValidateToken(user.Username, user.Hash, token) {
+                return returnError(c, 400, messages.ErrorToken)
+                }
+	
+	return errors.New(messages.TokenPass)
 }
