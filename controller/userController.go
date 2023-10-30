@@ -7,7 +7,8 @@ import (
 	"WIG-Server/components"
 	"github.com/gofiber/fiber/v2"
 	"WIG-Server/models"
-	db "WIG-Server/config"
+	"WIG-Server/db"
+
 	"WIG-Server/messages"
 	"gorm.io/gorm"
 	"regexp"

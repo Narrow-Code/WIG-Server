@@ -7,7 +7,7 @@ package main
 
 import (
 	"WIG-Server/routes"
-	db "WIG-Server/config"
+	"WIG-Server/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
         "os"

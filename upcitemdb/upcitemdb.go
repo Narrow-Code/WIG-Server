@@ -1,7 +1,7 @@
 package upcitemdb
 
 import (
-	db "WIG-Server/config"
+	"WIG-Server/db"
 	"WIG-Server/models"
 	"compress/gzip"
 	"encoding/json"

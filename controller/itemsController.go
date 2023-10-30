@@ -4,7 +4,7 @@ package controller
 
 import (
         "github.com/gofiber/fiber/v2"
-        db "WIG-Server/config"
+        "WIG-Server/db"
 	"WIG-Server/models"
         "WIG-Server/messages"
 	"WIG-Server/upcitemdb"
