@@ -1,14 +1,16 @@
 /* Package controller provides functions for handling HTTP requests and implementing business logic between the database and application.
-*/
+ */
 package controller
 
 import (
-        "github.com/gofiber/fiber/v2"
-        "WIG-Server/db"
+	"WIG-Server/db"
+	"WIG-Server/messages"
 	"WIG-Server/models"
-        "WIG-Server/messages"
 	"WIG-Server/upcitemdb"
-        "gorm.io/gorm"
+	"strconv"
+
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func GetBarcode(c *fiber.Ctx) error {
@@ -26,6 +28,7 @@ func GetBarcode(c *fiber.Ctx) error {
 	if err == nil {
 		return validateToken(c, data["uid"], data["token"])
 	}
+	uid := data["uid"]
 
 	// Get barcode parameter
         barcode:= c.Query("barcode")
@@ -50,13 +53,45 @@ func GetBarcode(c *fiber.Ctx) error {
         	return returnError(c, 404, messages.ItemNotFound)
     	}
 
+	// Search Ownership by barcode
+	var ownerships []models.Ownership
+	result = db.DB.Where("item_barcode = ? AND item_owner = ?", barcode, uid).Find(&ownerships)
+
+	num, err := strconv.Atoi(uid)
+	if err != nil {
+		return returnError(c, 400, "Error converting UID")
+	}
+
+	// If no ownership exists, create ownership
+	if len(ownerships) == 0 {
+		ownership := models.Ownership{
+               		ItemOwner:uint(num),
+			ItemBarcode:barcode,
+			ItemQuantity:0,
+   		}
+		
+		db.DB.Create(&ownership)
+		ownerships = append(ownerships, ownership)
+
+		return c.Status(200).JSON(
+			fiber.Map{
+				"success":true,
+				"message":"Created new ownership",
+				"title":item.Name,
+				"brand":item.Brand,
+				"image":item.Image,
+				"owner":ownership.ItemOwner})
+	}
+
+
+
+	// If ownerships exist, return list of them TODO FIX THIS RETURN
 	return c.Status(200).JSON(
                         fiber.Map{
                                 "success":true,
                                 "message":"Item found",       
 				"title":item.Name,
 				"brand":item.Brand,
-				"image":item.Image,
-				"description":item.ItemDesc})
+				"image":item.Image})
 }
 

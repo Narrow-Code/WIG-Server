@@ -126,6 +126,7 @@ func PostLogin(c *fiber.Ctx) error {
 			return returnError(c, 400, messages.UsernamePasswordDoNotMatch)
 		}
 	}
+
 	// Generate token
 	token := components.GenerateToken(user.Username, user.Hash)
 	

@@ -32,7 +32,7 @@ func Connect() {
 
 	connection := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbuser, dbpassword, dbhost, dbname)
 	var db, err = gorm.Open(mysql.Open(connection), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+		Logger: logger.Default.LogMode(logger.Info),
 			})
 
 	if err != nil {

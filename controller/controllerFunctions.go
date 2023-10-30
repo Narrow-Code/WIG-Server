@@ -37,7 +37,7 @@ validateToken checks if a users UID and token match and are valid.
 @return error - An error that occured during the process or if the token does not match
 */
 func validateToken(c *fiber.Ctx, uid string, token string) error{
-// Check if UID and token exist
+	// Check if UID and token exist
         if uid == "" {
                 return returnError(c, 400, messages.UIDEmpty)
         }
