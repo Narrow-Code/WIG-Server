@@ -6,6 +6,7 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/messages"
 	"WIG-Server/models"
+	"WIG-Server/structs"
 	"WIG-Server/upcitemdb"
 	"strconv"
 
@@ -55,6 +56,7 @@ func GetBarcode(c *fiber.Ctx) error {
 
 	// Search Ownership by barcode
 	var ownerships []models.Ownership
+
 	result = db.DB.Where("item_barcode = ? AND item_owner = ?", barcode, uid).Find(&ownerships)
 
 	num, err := strconv.Atoi(uid)
@@ -67,11 +69,10 @@ func GetBarcode(c *fiber.Ctx) error {
 		ownership := models.Ownership{
                		ItemOwner:uint(num),
 			ItemBarcode:barcode,
-			ItemQuantity:0,
+			ItemQuantity:1,
    		}
 		
 		db.DB.Create(&ownership)
-		ownerships = append(ownerships, ownership)
 
 		return c.Status(200).JSON(
 			fiber.Map{
@@ -83,15 +84,34 @@ func GetBarcode(c *fiber.Ctx) error {
 				"owner":ownership.ItemOwner})
 	}
 
-
-
 	// If ownerships exist, return list of them TODO FIX THIS RETURN
+	
+	var ownershipResponses []structs.OwnershipResponse
+	for _, ownership := range ownerships {
+		ownershipResponse := structs.OwnershipResponse{
+			OwnershipUID: ownership.OwnershipUID,
+			ItemBarcode: ownership.ItemBarcode,
+			CustomItemName: ownership.CustomItemName,
+			CustItemImg: ownership.CustItemImg,
+			OwnedCustDesc: ownership.OwnedCustDesc,
+			ItemLocation: ownership.ItemLocation,
+			ItemQR: ownership.ItemQR,
+			ItemTags: ownership.ItemTags,
+			ItemQuantity: ownership.ItemQuantity,
+			ItemCheckedOut: ownership.ItemCheckedOut,
+			ItemBorrower: ownership.ItemBorrower,
+		}
+		ownershipResponses = append(ownershipResponses, ownershipResponse)	
+	}
+
 	return c.Status(200).JSON(
                         fiber.Map{
                                 "success":true,
                                 "message":"Item found",       
-				"title":item.Name,
+				"item":item.Name,
 				"brand":item.Brand,
-				"image":item.Image})
+				"image":item.Image,
+				"owner":uid,
+				"ownership":ownershipResponses})
 }
 
