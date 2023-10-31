@@ -18,4 +18,5 @@ func Setup(app *fiber.App){
 	app.Post("/users/login", controller.PostLogin)
 	app.Post("/users/login/check", controller.PostLoginCheck)
 	app.Get("/items/barcode", controller.GetBarcode)
+	app.Put("/items/:type", controller.ChangeQuantity)
 }

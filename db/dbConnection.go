@@ -58,5 +58,44 @@ func AutoMigrate(connection *gorm.DB) {
 		&models.Location{},
 		&models.Ownership{},
 	)
+
+	// Check if Borrower table is empty
+    	var borrowerCount int64
+    	connection.Model(&models.Borrower{}).Count(&borrowerCount)
+
+   	if borrowerCount == 0 {
+        	// Create a default Borrower record
+        	defaultBorrower := models.Borrower{
+            		BorrowerUID: 1,
+            		BorrowerName:    "Default Borrower",}
+        	connection.Create(&defaultBorrower)
+    	}
+
+	// Check if User table is empty
+	var userCount int64
+	connection.Model(&models.User{}).Count(&userCount)
+
+	if userCount == 0 {
+		// Create a default User record
+		defaultUser := models.User{
+			UserUID: 1,
+			Username: "Default User",}
+		connection.Create(&defaultUser)
+	}
+
+    	// Check if Location table is empty
+    	var locationCount int64
+    	connection.Model(&models.Location{}).Count(&locationCount)
+
+    	if locationCount == 0 {
+        	// Create a default Location record
+        	defaultLocation := models.Location{
+            		LocationUID: 1,
+            		LocationName:    "Default Location",
+			LocationOwner: 1,}
+        connection.Create(&defaultLocation)
+    }
+
 }
+
 

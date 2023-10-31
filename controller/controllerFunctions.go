@@ -6,8 +6,10 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/messages"
 	"WIG-Server/models"
+	"WIG-Server/structs"
 
 	"errors"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -64,4 +66,19 @@ func validateToken(c *fiber.Ctx, uid string, token string) error{
                 }
 	
 	return errors.New(messages.TokenPass)
+}
+
+func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
+	return structs.OwnershipResponse{
+                        OwnershipUID: ownership.OwnershipUID,                                    
+                        ItemBarcode: ownership.ItemBarcode,
+                        CustomItemName: ownership.CustomItemName,
+                        CustItemImg: ownership.CustItemImg,
+                        OwnedCustDesc: ownership.OwnedCustDesc,
+                        ItemLocation: ownership.ItemLocation,
+                        ItemQR: ownership.ItemQR,
+                        ItemTags: ownership.ItemTags,
+                        ItemQuantity: ownership.ItemQuantity,
+                        ItemCheckedOut: ownership.ItemCheckedOut,
+                        ItemBorrower: ownership.ItemBorrower,} 	
 }
