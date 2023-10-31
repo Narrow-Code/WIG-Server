@@ -102,6 +102,10 @@ func CheckQR(c *fiber.Ctx) error {
         if err == nil {
                 return validateToken(c, uid, data["token"])
         }
+
+	if qr == "" {
+		return returnError(c, 400, "QR code is required") // TODO add to messages
+	}
   
         // Check if qr exists as location
         var location models.Location
