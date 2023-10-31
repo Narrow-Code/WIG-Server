@@ -7,6 +7,7 @@ import (
 	"WIG-Server/messages"
 	"WIG-Server/models"
 	"WIG-Server/structs"
+	"fmt"
 
 	"errors"
 
@@ -81,4 +82,59 @@ func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
                         ItemQuantity: ownership.ItemQuantity,
                         ItemCheckedOut: ownership.ItemCheckedOut,
                         ItemBorrower: ownership.ItemBorrower,} 	
+}
+
+func CheckQR(c *fiber.Ctx) error {
+	// Parse request into data map
+        var data map[string]string
+        err := c.BodyParser(&data)
+
+        // Error with JSON request
+        if err != nil {
+                return returnError(c, 400, messages.ErrorParsingRequest)
+        }
+
+        uid := data["uid"]
+        qr := c.Query("qr")
+
+	// Validate Token
+        err = validateToken(c, uid, data["token"])                                      
+        if err == nil {
+                return validateToken(c, uid, data["token"])
+        }
+  
+        // Check if qr exists as location
+        var location models.Location
+        result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, uid).First(&location)
+
+	fmt.Println(location.LocationUID)
+
+	if location.LocationUID != 0 {
+		return c.Status(200).JSON(
+			fiber.Map{
+				"success":true,
+ 				"message":"LOCATION"}) // TODO make message 
+	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return returnError(c, 400, messages.ErrorWithConnection)
+	}
+
+	// Check if qr exists as ownership
+	var ownership models.Ownership
+	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, uid).First(&ownership)
+	
+	fmt.Println(ownership.OwnershipUID)
+
+	if ownership.OwnershipUID != 0 {
+		return c.Status(200).JSON(
+			fiber.Map{
+				"success":true,
+				"message":"OWNERSHIP"}) // TODO make message
+	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return returnError(c, 400, messages.ErrorWithConnection)
+	}
+
+	return c.Status(200).JSON(
+		fiber.Map{
+			"success":true,
+			"message":"NEW"}) // TODO make message
 }

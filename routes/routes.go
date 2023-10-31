@@ -17,6 +17,7 @@ func Setup(app *fiber.App){
 	app.Get("/users/salt", controller.GetSalt)
 	app.Post("/users/login", controller.PostLogin)
 	app.Post("/users/login/check", controller.PostLoginCheck)
-	app.Get("/items/barcode", controller.GetBarcode)
+	app.Post("/items/barcode", controller.GetBarcode)
 	app.Put("/items/:type", controller.ChangeQuantity)
+	app.Post("code/check", controller.CheckQR)
 }
