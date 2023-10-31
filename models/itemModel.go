@@ -11,5 +11,4 @@ type Item struct {
 	Name	 	string	`json:"item_name" gorm:"column:item_name"`
 	Brand 		string 	`json:"item_brand" gorm:"column:item_brand"`
 	Image	 	string 	`json:"item_img" gorm:"column:item_img"`
-	ItemDesc 	string 	`json:"item_description" gorm:"column:item_description"`
 }

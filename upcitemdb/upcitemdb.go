@@ -63,10 +63,6 @@ func GetBarcode(barcode string) {
                 		newItem.Brand = brand.(string)
             		}
 
-            		if desc, exists := itemData["description"]; exists {
-               			newItem.ItemDesc = desc.(string)
-            		}
-
             		if images, exists := itemData["images"]; exists && len(images.([]interface{})) > 0 {
                 		newItem.Image = images.([]interface{})[0].(string)
             		}
