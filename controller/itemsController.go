@@ -42,7 +42,7 @@ func GetBarcode(c *fiber.Ctx) error {
 	var item models.Item
         result := db.DB.Where("barcode = ?", barcode).First(&item)
         
-        // If item isn't found, check api and add to cache
+        // If item isn't found, check api and add to 
         if result.Error == gorm.ErrRecordNotFound {
 		upcitemdb.GetBarcode(barcode)
 		result = db.DB.Where("barcode = ?", barcode).First(&item)               
@@ -65,7 +65,7 @@ func GetBarcode(c *fiber.Ctx) error {
 	// Convert uid to int
 	uidInt, err := strconv.Atoi(uid)
 	if err != nil {
-		return returnError(c, 400, "Error converting UID") // TODO make message
+		return returnError(c, 400, messages.ConversionError)
 	}
 
 	// If no ownership exists, create ownership
@@ -128,7 +128,7 @@ func ChangeQuantity(c *fiber.Ctx) error {
 
 	amount, err := strconv.Atoi(amountStr)
 		if err != nil {
-    		return returnError(c, 400, "Error converting int") // TODO make message
+    		return returnError(c, 400, messages.ConversionError) 
 	}
 
         // Validate Token

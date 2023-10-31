@@ -8,7 +8,6 @@ import (
 	"WIG-Server/models"
 	"WIG-Server/structs"
 	"fmt"
-
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
@@ -104,7 +103,7 @@ func CheckQR(c *fiber.Ctx) error {
         }
 
 	if qr == "" {
-		return returnError(c, 400, "QR code is required") // TODO add to messages
+		return returnError(c, 400, messages.QRMissing)
 	}
   
         // Check if qr exists as location
@@ -117,7 +116,7 @@ func CheckQR(c *fiber.Ctx) error {
 		return c.Status(200).JSON(
 			fiber.Map{
 				"success":true,
- 				"message":"LOCATION"}) // TODO make message 
+ 				"message":messages.Location}) 
 	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return returnError(c, 400, messages.ErrorWithConnection)
 	}
@@ -132,7 +131,7 @@ func CheckQR(c *fiber.Ctx) error {
 		return c.Status(200).JSON(
 			fiber.Map{
 				"success":true,
-				"message":"OWNERSHIP"}) // TODO make message
+				"message":messages.Ownership})
 	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return returnError(c, 400, messages.ErrorWithConnection)
 	}
@@ -140,5 +139,5 @@ func CheckQR(c *fiber.Ctx) error {
 	return c.Status(200).JSON(
 		fiber.Map{
 			"success":true,
-			"message":"NEW"}) // TODO make message
+			"message":messages.New})
 }

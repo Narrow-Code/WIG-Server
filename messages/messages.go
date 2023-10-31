@@ -8,6 +8,7 @@ const (
 	ErrorWithConnection = "Connection error" // ErrorWithConnection is a constant string error message for whenever there is a connectivity issue.
 	RecordNotFound = "Record was not found" // RecordNotFound is a constant string error message for when a record is not found within a database.
 	UIDEmpty = "No UID found" // UIDEmpty is a constant string error message for when the UID in a request is empty but required.
+	QRMissing = "No QR found" // QRMissing is a constant string error message for when the QR in a request is empty but required.
 	TokenEmpty = "No token found" // TokenEmpty is a constant string error message for when the token in a request is empty but required.
 	AccessDenied = "Unauthorized" // AccessDenied is a constant string error message for when the access was denied to make the API request.
 	ItemNotFound = "Item not found in database" // ItemNotFound is a constant string error message for when the item barcode was not found in the database.
@@ -28,4 +29,9 @@ const (
 	SignupSuccess = "User added successfully" // SignupSuccess is a constant string success message for when the user is successesfully added to the database.
 	ErrorUsernameRequirements = "Username does not match criteria" // ErrorUsernameRequirements is a constant string error message for when the username in the request does not match the criteria.
 	ErrorEmailRequirements = "Not a valid email address" // ErrorEmailRequirements is a constant string error message for when the email in the request does not match the criteria.
+	Location = "LOCATION" // Location is a constant string success message for when the QR code is stored as a location.
+	Ownership = "OWNERSHIP" // Ownership is a constant string success message for when the QR code is stored as an ownership.
+	New = "NEW" // New is a constant string success message for when the QR code has not been stored in the database.
+
+	ConversionError = "There was an error converting from string to int" // UIDConversionError is a constant string error message for when there was an error message converting string to int
 )
