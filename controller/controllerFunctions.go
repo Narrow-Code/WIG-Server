@@ -29,6 +29,12 @@ func returnError(c *fiber.Ctx, code int, message string) error {
 		"message":message})
 }
 
+func returnSuccess (c *fiber.Ctx, message string) error {
+	return c.Status(200).JSON(fiber.Map{
+		"success":true,
+		"message":message})
+}
+
 /*
 validateToken checks if a users UID and token match and are valid.
 

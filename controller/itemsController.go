@@ -233,7 +233,7 @@ func DeleteOwnership(c *fiber.Ctx) error {
 	}
 
 	// Ownership successfully deleted
-	return returnError(c, 200, "Ownership deleted successfully")
+	return returnSuccess(c, "Ownership deleted successfully")
 }
 
 func EditOwnership(c *fiber.Ctx) error {
@@ -278,6 +278,6 @@ func EditOwnership(c *fiber.Ctx) error {
 
 	db.DB.Save(&ownership)
 
-	return returnError(c, 200, changeField + " was updated")
+	return returnSuccess(c, changeField + " was updated")
 
 }
