@@ -32,6 +32,13 @@ func GetBarcode(c *fiber.Ctx) error {
 	uid := data["uid"]
 	barcode := c.Query("barcode")
 
+	// Check if barcode is numerical
+	barcodeCheck, err := strconv.Atoi(barcode)
+
+	if err != nil || barcodeCheck < 0 {
+		return returnError(c, 400, "Barcode must be of int value")
+	}
+
 	// Validate Token
 	err = validateToken(c, uid, data["token"])	
 	if err == nil {
