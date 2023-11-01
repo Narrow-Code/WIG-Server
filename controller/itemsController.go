@@ -191,3 +191,93 @@ func ChangeQuantity(c *fiber.Ctx) error {
                                 "message":"Item found",       
                                	"ownership": ownershipResponse})
 }
+
+func DeleteOwnership(c *fiber.Ctx) error {
+        // Parse request into data map
+        var data map[string]string
+        err := c.BodyParser(&data)
+  
+        // Error with JSON request
+	if err != nil {
+		return returnError(c, 400, messages.ErrorParsingRequest)
+	}
+  
+        userUID := data["uid"]
+	ownershipUID := c.Query("ownershipUID")
+	
+        // Validate Token
+        err = validateToken(c, userUID, data["token"])      
+        if err == nil {
+                return validateToken(c, userUID, data["token"])
+        }
+
+	// Search for ownership UID and pair with user UID to make sure they match
+	var ownership models.Ownership
+	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
+
+	// If item is not found
+	if result.Error == gorm.ErrRecordNotFound {
+                return returnError(c, 404, messages.ItemNotFound)              
+        }
+
+        // If there is a connection error
+        if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+                return returnError(c, 400, messages.ErrorWithConnection)
+        }
+	
+	db.DB.Delete(&ownership)
+
+	// Check for errors after the delete operation
+	if result := db.DB.Delete(&ownership); result.Error != nil {
+    		return returnError(c, 500, messages.ErrorDeletingOwnership)
+	}
+
+	// Ownership successfully deleted
+	return returnError(c, 200, "Ownership deleted successfully")
+}
+
+func EditOwnership(c *fiber.Ctx) error {
+        // Parse request into data map
+        var data map[string]string
+        err := c.BodyParser(&data)
+  
+        // Error with JSON request
+	if err != nil {
+		return returnError(c, 400, messages.ErrorParsingRequest)
+	}
+  
+        userUID := data["uid"]
+	ownershipUID := c.Query("ownershipUID")
+	changeField := c.Params("field")
+	
+        // Validate Token
+        err = validateToken(c, userUID, data["token"])      
+        if err == nil {
+                return validateToken(c, userUID, data["token"])
+        }
+
+	// Search for ownership UID and pair with user UID to make sure they match
+	var ownership models.Ownership
+	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
+
+	// If item is not found
+	if result.Error == gorm.ErrRecordNotFound {
+                return returnError(c, 404, messages.ItemNotFound)              
+        }
+
+        // If there is a connection error
+        if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+                return returnError(c, 400, messages.ErrorWithConnection)
+        }
+	
+	// Add new fields
+	if changeField == "name" { ownership.CustomItemName = data["custom_item_name"]}
+	if changeField == "img" { ownership.CustItemImg = data["custom_item_img"]}
+	if changeField == "description" { ownership.OwnedCustDesc = data["custom_item_description"]}
+	if changeField == "tags" { ownership.ItemTags = data["item_tags"]}
+
+	db.DB.Save(&ownership)
+
+	return returnError(c, 200, changeField + " was updated")
+
+}

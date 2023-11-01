@@ -18,6 +18,8 @@ func Setup(app *fiber.App){
 	app.Post("/users/login", controller.PostLogin)
 	app.Post("/users/login/check", controller.PostLoginCheck)
 	app.Post("/items/barcode", controller.GetBarcode)
-	app.Put("/items/:type", controller.ChangeQuantity)
-	app.Post("code/check", controller.CheckQR)
+	app.Put("/ownership/:type", controller.ChangeQuantity)
+	app.Post("/code/check", controller.CheckQR)
+	app.Delete("/ownership/delete", controller.DeleteOwnership)
+	app.Put("/ownership/edit/:field", controller.EditOwnership)
 }
