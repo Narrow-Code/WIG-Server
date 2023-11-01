@@ -34,4 +34,5 @@ const (
 	New = "NEW" // New is a constant string success message for when the QR code has not been stored in the database.
 
 	ConversionError = "There was an error converting from string to int" // UIDConversionError is a constant string error message for when there was an error message converting string to int
+	NegativeError = "Cannot pass a negative argument" // NegativeError is a constant string error message for when a negative argument is passed as a parameter.
 )

@@ -131,6 +131,10 @@ func ChangeQuantity(c *fiber.Ctx) error {
     		return returnError(c, 400, messages.ConversionError) 
 	}
 
+	if amount < 0 {
+		return returnError(c, 400, messages.NegativeError)
+	}
+
         // Validate Token
         err = validateToken(c, userUID, data["token"])      
         if err == nil {
