@@ -60,7 +60,7 @@ func validateToken(c *fiber.Ctx, uid string, token string) error{
 
         // Check if UID was found
         if result.Error == gorm.ErrRecordNotFound {
-                return returnError(c, 404, messages.RecordNotFound)
+                return returnError(c, 404, "UID " + messages.RecordNotFound)
 
         } else if result.Error != nil {
                 return returnError(c, 400, messages.ErrorWithConnection)
@@ -72,6 +72,36 @@ func validateToken(c *fiber.Ctx, uid string, token string) error{
                 }
 	
 	return errors.New(messages.TokenPass)
+}
+
+func validateToken2(c *fiber.Ctx, uid string, token string) (int, error){
+	// Check if UID and token exist
+        if uid == "" {
+                return 400, errors.New(messages.UIDEmpty)
+        }
+
+        if token == "" {
+                return 400, errors.New(messages.TokenEmpty)
+        }
+
+        // Query for UID
+        var user models.User
+        result := db.DB.Where("user_uid = ?", uid).First(&user)
+
+        // Check if UID was found
+        if result.Error == gorm.ErrRecordNotFound {
+                return 404, errors.New("UID " + messages.RecordNotFound)
+
+        } else if result.Error != nil {
+                return 400, errors.New(messages.ErrorWithConnection)
+	}
+
+        // Validate token
+        if !components.ValidateToken(user.Username, user.Hash, token) {
+                return 400, errors.New(messages.ErrorToken)
+                }
+	
+	return 200, nil
 }
 
 func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {

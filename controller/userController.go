@@ -74,9 +74,9 @@ func PostLoginCheck(c *fiber.Ctx) error {
         }
 
 	// Validate Token
-	err = validateToken(c, data["uid"], data["token"])	
-	if err == nil {
-		return validateToken(c, data["uid"], data["token"])
+	code, err := validateToken2(c, data["uid"], data["token"])	
+	if err != nil {
+		return returnError(c, code, err.Error())
 	}
 
 	// Token matches
