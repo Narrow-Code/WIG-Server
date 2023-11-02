@@ -23,9 +23,14 @@ func CreateLocation(c *fiber.Ctx) error {
 	}
   
         userUID := data["uid"]	
-	locationQR := data["location_qr"]
-	locationName := data["location_name"]
+	locationQR := c.Query("location_qr")
+	locationName := c.Query("location_name")
 	locationType := c.Params("type")
+	
+	// Check location type exists
+	if locationType != "bin" && locationType != "bag" && locationType != "location" {
+		return returnError(c, 400, "Location type is invalid") // TODO make message 
+	}
 
 	// convert uid to int
 	userUIDInt, err := strconv.ParseUint(userUID, 10, 64)
@@ -72,7 +77,7 @@ func CreateLocation(c *fiber.Ctx) error {
         if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
                 return returnError(c, 400, messages.ErrorWithConnection)
 	}
-
+	 
 	// create location
 	location = models.Location{
 		LocationName: locationName,
@@ -123,8 +128,6 @@ func SetLocation(c *fiber.Ctx) error{
 	if location.LocationQR != locationQR {
 		return returnError(c, 400, "Location does not exist") // TODO make message
 	}
-	
-        // If there is a connection error
         if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
                 return returnError(c, 400, messages.ErrorWithConnection)
         }

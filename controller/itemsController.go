@@ -271,10 +271,10 @@ func EditOwnership(c *fiber.Ctx) error {
         }
 	
 	// Add new fields
-	if changeField == "name" { ownership.CustomItemName = data["custom_item_name"]}
-	if changeField == "img" { ownership.CustItemImg = data["custom_item_img"]}
-	if changeField == "description" { ownership.OwnedCustDesc = data["custom_item_description"]}
-	if changeField == "tags" { ownership.ItemTags = data["item_tags"]}
+	if changeField == "name" { ownership.CustomItemName = c.Query("custom_item_name")}
+	if changeField == "img" { ownership.CustItemImg = c.Query("custom_item_img")}
+	if changeField == "description" { ownership.OwnedCustDesc = c.Query("custom_item_description")}
+	if changeField == "tags" { ownership.ItemTags = c.Query("item_tags")}
 
 	db.DB.Save(&ownership)
 
