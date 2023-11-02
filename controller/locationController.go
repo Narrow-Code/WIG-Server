@@ -4,11 +4,8 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/messages"
 	"WIG-Server/models"
-	"fmt"
 	"strconv"
-
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
 
@@ -16,12 +13,9 @@ func CreateLocation(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
   
-        // Error with JSON request
-	if err != nil {
-		return returnError(c, 400, messages.ErrorParsingRequest)
-	}
-  
+	// Initialize variables
         userUID := data["uid"]	
 	locationQR := c.Query("location_qr")
 	locationName := c.Query("location_name")
@@ -34,50 +28,27 @@ func CreateLocation(c *fiber.Ctx) error {
 
 	// convert uid to int
 	userUIDInt, err := strconv.ParseUint(userUID, 10, 64)
-		if err != nil {
-    		return returnError(c, 400, messages.ConversionError) 
-	}
+	if err != nil {return returnError(c, 400, messages.ConversionError)}
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {
-		return returnError(c, code, err.Error())
-	}
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// Check for valid entries
-	if locationQR == "" {
-		return returnError(c, 400, "QR Location required") // TODO MAKE MESSAGE
-	} 
+	// Check for empty fields 
+	if locationQR == "" {return returnError(c, 400, "QR Location required")} // TODO make message 
+	if locationName == "" {return returnError(c, 400, "Location name required")} // TODO make message
 	
-	if locationName == "" {
-		return returnError(c, 400, "Location name required") // TODO MAKE MESSAGE
-	} 
-	
-	// Check if QR code exists in users data
+	// Validate location QR code is not in use
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
+	code, err = RecordInUse("Location QR", result)
+	if err != nil {return returnError(c, code, err.Error())}
 
-	if location.LocationQR == locationQR {
-		return returnError(c, 400, "Location already exists") // TODO make message
-	}
-	
-        // If there is a connection error
-        if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-                return returnError(c, 400, messages.ErrorWithConnection)
-        }
-
-	// check if location name exists
+	// Valide location name is not in use
 	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, userUID).First(&location)
-	
-	if location.LocationName == locationName {
-		return returnError(c, 400, "Location already exists") // TODO make message
-	}
+	code, err = RecordInUse("Location Name", result)
+	if err != nil {return returnError(c, code, err.Error())}
 
-        // If there is a connection error
-        if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-                return returnError(c, 400, messages.ErrorWithConnection)
-	}
-	 
 	// create location
 	location = models.Location{
 		LocationName: locationName,
@@ -86,10 +57,8 @@ func CreateLocation(c *fiber.Ctx) error {
 		LocationQR: locationQR,
 	}
 
-	// add to database
-	db.DB.Create(&location)	
+	db.DB.Create(&location)
 
-	// fix returnSuccess
 	return returnSuccess(c, "location added successfully") // TODO make message
 }
 
@@ -97,59 +66,31 @@ func SetLocation(c *fiber.Ctx) error{
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
   
-        // Error with JSON request
-	if err != nil {
-		return returnError(c, 400, messages.ErrorParsingRequest)
-	}
-  
+	// Initialize variables
         userUID := data["uid"]	
 	locationQR := data["location_qr"]
 	ownershipUID := c.Query("ownershipUID")
 
-	fmt.Println(ownershipUID)
-
-	// convert uid to int
-	ownershipUIDInt, err := strconv.ParseUint(ownershipUID, 10, 64)
-		if err != nil {
-    		return returnError(c, 400, messages.ConversionError) 
-	}
-
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {
-		return returnError(c, code, err.Error())
-	}
-	// Check if QR code exists in users data
+	if err != nil {return returnError(c, code, err.Error())}
+
+	// Validate the QR code
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
+	code, err = RecordExists("Location QR", result)
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// If not return error
-	if location.LocationQR != locationQR {
-		return returnError(c, 400, "Location does not exist") // TODO make message
-	}
-        if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-                return returnError(c, 400, messages.ErrorWithConnection)
-        }
-
-	// Check if ownership exists
+	// Validate the ownership
 	var ownership models.Ownership
 	result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
+	code, err = RecordExists("Ownership", result)
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// If not return error
-	if ownership.OwnershipUID != uint(ownershipUIDInt) {
-		return returnError(c, 400, "Ownership does not exist") // TODO make message
-	}
-	
-        // If there is a connection error
-        if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-                return returnError(c, 400, messages.ErrorWithConnection)
-        }
-
-	// ownership.location = locationUID
+	// Set the location and save
 	ownership.ItemLocation = location.LocationUID
-	
-	// save to db
 	db.DB.Save(&ownership)
 
 	// return success

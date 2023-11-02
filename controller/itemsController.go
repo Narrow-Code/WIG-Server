@@ -9,7 +9,6 @@ import (
 	"WIG-Server/structs"
 	"WIG-Server/upcitemdb"
 	"strconv"
-
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -122,66 +121,44 @@ func ChangeQuantity(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
   
-        // Error with JSON request
-	if err != nil {
-		return returnError(c, 400, messages.ErrorParsingRequest)
-	}
-  
+	// Initialize variables
         userUID := data["uid"]
 	ownershipUID := c.Query("ownershipUID")
 	amountStr := c.Query("amount")
 	changeType := c.Params("type")
 
+	// Convert amount to int
 	amount, err := strconv.Atoi(amountStr)
-		if err != nil {
-    		return returnError(c, 400, messages.ConversionError) 
-	}
-
-	if amount < 0 {
-		return returnError(c, 400, messages.NegativeError)
-	}
+	if err != nil {return returnError(c, 400, messages.ConversionError)}
+	if amount < 0 {return returnError(c, 400, messages.NegativeError)}
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {
-		return returnError(c, code, err.Error())
-	}
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// Search for ownership UID and pair with user UID to make sure they match
+	// Valide and retreive the ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
+	code, err = RecordExists("Ownership", result)
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// If item is not found
-	if result.Error == gorm.ErrRecordNotFound {
-                return returnError(c, 404, messages.ItemNotFound)              
-        }
-
-        // If there is a connection error
-        if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-                return returnError(c, 400, messages.ErrorWithConnection)
-        }
-
-	if changeType == "increment" {
-		// Add the incremental value to quantity
-		ownership.ItemQuantity = ownership.ItemQuantity + amount 
-	} else if changeType == "decrement" {
-		ownership.ItemQuantity = ownership.ItemQuantity - amount
-		if ownership.ItemQuantity < 0 {
-			ownership.ItemQuantity = 0
-		}
-	} else if changeType == "set" {
-		if amount < 0 {
-			return returnError(c, 400, "Cannot set negative numbers")
-		}
-		ownership.ItemQuantity = amount
+	// Check type of change
+	switch changeType {
+	case "increment":
+		ownership.ItemQuantity += amount
+	case "decrement":
+		ownership.ItemQuantity -= amount
+		if ownership.ItemQuantity < 0 {ownership.ItemQuantity = 0}
+	case "set":
+		ownership.ItemQuantity = amount;
+	default:
+		return returnError(c, 400, "Invalid change type") // TODO message
 	}
-	
 
-	// Save new amount to the database
+	// Save new amount to the database and create response
 	db.DB.Save(&ownership)
-
-	// Create ownership response
 	ownershipResponse := getOwnershipReponse(ownership)
 
 	// Return success
@@ -196,34 +173,21 @@ func DeleteOwnership(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
   
-        // Error with JSON request
-	if err != nil {
-		return returnError(c, 400, messages.ErrorParsingRequest)
-	}
-  
+	// Initialize variables
         userUID := data["uid"]
 	ownershipUID := c.Query("ownershipUID")
 	
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {
-		return returnError(c, code, err.Error())
-	}
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// Search for ownership UID and pair with user UID to make sure they match
+	// Validate ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
-
-	// If item is not found
-	if result.Error == gorm.ErrRecordNotFound {
-                return returnError(c, 404, messages.ItemNotFound)              
-        }
-
-        // If there is a connection error
-        if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-                return returnError(c, 400, messages.ErrorWithConnection)
-        }
+	code, err = RecordExists("Ownership", result)
+	if err != nil {return returnError(c, code, err.Error())}
 	
 	db.DB.Delete(&ownership)
 
@@ -240,44 +204,31 @@ func EditOwnership(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
   
-        // Error with JSON request
-	if err != nil {
-		return returnError(c, 400, messages.ErrorParsingRequest)
-	}
-  
+	// Initialize variables
         userUID := data["uid"]
 	ownershipUID := c.Query("ownershipUID")
 	changeField := c.Params("field")
 	
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {
-		return returnError(c, code, err.Error())
-	}
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// Search for ownership UID and pair with user UID to make sure they match
+	// Validate ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
-
-	// If item is not found
-	if result.Error == gorm.ErrRecordNotFound {
-                return returnError(c, 404, messages.ItemNotFound)              
-        }
-
-        // If there is a connection error
-        if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-                return returnError(c, 400, messages.ErrorWithConnection)
-        }
+	code, err = RecordExists("Ownership", result)
+	if err != nil {return returnError(c, code, err.Error())}
 	
 	// Add new fields
-	if changeField == "name" { ownership.CustomItemName = c.Query("custom_item_name")}
-	if changeField == "img" { ownership.CustItemImg = c.Query("custom_item_img")}
-	if changeField == "description" { ownership.OwnedCustDesc = c.Query("custom_item_description")}
-	if changeField == "tags" { ownership.ItemTags = c.Query("item_tags")}
+	if changeField == "name" {ownership.CustomItemName = c.Query("custom_item_name")}
+	if changeField == "img" {ownership.CustItemImg = c.Query("custom_item_img")}
+	if changeField == "description" {ownership.OwnedCustDesc = c.Query("custom_item_description")}
+	if changeField == "tags" {ownership.ItemTags = c.Query("item_tags")}
 
 	db.DB.Save(&ownership)
 
-	return returnSuccess(c, changeField + " was updated")
-
+	// Ownership successfully updated
+	return returnSuccess(c, changeField + " updated")
 }
