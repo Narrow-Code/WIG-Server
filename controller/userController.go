@@ -219,14 +219,9 @@ func PostSignup(c *fiber.Ctx) error {
 		EmailConfirm: "false",
 	}
 
-	// TODO get error for failure?
-
 	db.DB.Create(&user)
 
-	return c.Status(200).JSON(fiber.Map{
-		"success": true,
-		"message":messages.SignupSuccess,
-	})
+	return returnSuccess(c, messages.SignupSuccess) 
 
 	// TODO Send verification email
 }
