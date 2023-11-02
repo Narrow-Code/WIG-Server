@@ -9,9 +9,7 @@ import (
 	"net"
 	"regexp"
 	"strings"
-
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
 // The regex expression to check username requirements
@@ -130,8 +128,8 @@ func PostSignup(c *fiber.Ctx) error {
 
 	// Query for email in database
 	result = db.DB.Where("email = ?", data["email"]).First(&user)
-	if result.Error != nil && result.Error != gorm.ErrRecordNotFound{return returnError(c, 400, result.Error.Error())}
-	if result.RowsAffected != 0 {return returnError(c, 400, messages.EmailInUse)}
+	code, err = RecordInUse("Email", result)
+	if err != nil {return returnError(c, code, err.Error())}
 
 	// Check username requirements
 	if !usernameRegex.MatchString(data["username"]){return returnError(c, 400, messages.ErrorUsernameRequirements)}
