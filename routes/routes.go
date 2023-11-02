@@ -22,4 +22,5 @@ func Setup(app *fiber.App){
 	app.Post("/code/check", controller.CheckQR)
 	app.Delete("/ownership/delete", controller.DeleteOwnership)
 	app.Put("/ownership/edit/:field", controller.EditOwnership)
+	app.Post("/location/create/:type", controller.CreateLocation)
 }

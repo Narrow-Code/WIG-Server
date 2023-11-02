@@ -217,7 +217,6 @@ func PostSignup(c *fiber.Ctx) error {
 		Salt: data["salt"],
 		Hash: data["hash"],
 		EmailConfirm: "false",
-
 	}
 
 	// TODO get error for failure?
