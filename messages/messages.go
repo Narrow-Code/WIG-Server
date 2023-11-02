@@ -37,4 +37,6 @@ const (
 	NegativeError = "Cannot pass a negative argument" // NegativeError is a constant string error message for when a negative argument is passed as a parameter.
 	BarcodeIntError = "Barcode must be of int value" // BarcodeIntError is a constant string error message for when a non-int value is passed to the barcode argument.
 	ErrorDeletingOwnership = "There was an error deleting ownership" // ErrorDeletingOwnership is a constant string errormessage for when there was an error deleting an ownership from the database.
+	DoesNotExist = " does not exist" // DoesNotExist is a constant string error message, meant to be appended after a field type to show that it the field does not exist.
+	RecordInUse = " is in use" // RecordInUse is a constant string error message, meant to be appended after a field type to show that a field is already in use.
 )

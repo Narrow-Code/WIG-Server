@@ -139,3 +139,24 @@ func CheckQR(c *fiber.Ctx) error {
 
 	return returnSuccess(c, messages.New)
 }
+
+func RecordExists(field string, result *gorm.DB) (int, error) {
+
+	if result.Error == gorm.ErrRecordNotFound {
+		return 404, errors.New(field + messages.DoesNotExist)
+	} else if result.Error != nil {
+		return 400, errors.New(result.Error.Error())
+	}
+	return 200, nil
+}
+
+func RecordInUse(field string, result *gorm.DB) (int, error) {	
+	
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return 400, errors.New(result.Error.Error())
+	}
+ 	if result.RowsAffected != 0 {
+		return 400, errors.New(field + messages.RecordInUse)
+	}
+	return 200, nil
+}

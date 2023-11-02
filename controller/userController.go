@@ -3,15 +3,15 @@ package controller
 
 import (
 	"WIG-Server/components"
-	"github.com/gofiber/fiber/v2"
-	"WIG-Server/models"
 	"WIG-Server/db"
-
 	"WIG-Server/messages"
-	"gorm.io/gorm"
-	"regexp"
+	"WIG-Server/models"
 	"net"
+	"regexp"
 	"strings"
+
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 // The regex expression to check username requirements
@@ -30,30 +30,19 @@ It checks for existing username and returns the salt.
 func GetSalt(c *fiber.Ctx) error {
 	// Get parameters
 	username:= c.Query("username")
+        if username == "" {return returnError(c, 400, messages.UsernameEmpty)}
 	
-	// Check if parameters are empty
-        if username == "" {
-		return returnError(c, 400, messages.UsernameEmpty)
-	}
-	
-	// Query for username
+	// Query database for username
 	var user models.User
 	result := db.DB.Where("username = ?", username).First(&user)
-	
-	// Check if user is found
-	if result.Error == gorm.ErrRecordNotFound {
-		return returnError(c, 404, messages.UsernameDoesNotExist)
+	code, err := RecordExists("Username", result)
+	if err != nil {return returnError(c, code, err.Error())}
 
-	} else if result.Error != nil {
-		return returnError(c, 400, messages.ErrorWithConnection)
-
-	} else {
-		return c.Status(200).JSON(
-                        fiber.Map{
-                                "success":true,
-                                "message":messages.SaltReturned,          
-                                "salt":user.Salt})
-	}
+	return c.Status(200).JSON(
+                  fiber.Map{
+                       "success":true,
+                       "message":messages.SaltReturned,          
+                       "salt":user.Salt})
 }
 
 /*
@@ -67,24 +56,14 @@ func PostLoginCheck(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
-
-        // Error with JSON request
-        if err != nil {
-                return returnError(c, 400, messages.ErrorParsingRequest)
-        }
+        if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {
-		return returnError(c, code, err.Error())
-	}
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// Token matches
-	return c.Status(200).JSON(
-		fiber.Map{
-			"success":true,
-			"message":messages.TokenPass})
-		
+	// Return success
+	return returnSuccess(c, messages.TokenPass) 
 }
 
 /*
@@ -98,38 +77,23 @@ func PostLogin(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
 
-	// Error with JSON request
-	if err != nil {
-		return returnError(c, 400, messages.ErrorParsingRequest)
-	}
+	// Check for empty fields
+	if data["username"] == "" {return returnError(c, 400, messages.UsernameEmpty)}
+	if data["hash"] == "" {return returnError(c, 400, messages.HashMissing)}
 
-	// Check if username and hash match
-        var user models.User
-
-	if data["username"] == "" {
-		return returnError(c, 400, messages.UsernameEmpty)
-	}
-
-	if data["hash"] == "" {
-		return returnError(c, 400, messages.HashMissing)
-	}
-
+	// Check that user exists
+	var user models.User
         result := db.DB.Where("username = ?", data["username"]).First(&user)
+	code, err := RecordExists("Username", result)
+	if err != nil {return returnError(c, code, err.Error())}
 
-	if result.Error == gorm.ErrRecordNotFound {
-                return returnError(c, 404, messages.UsernameDoesNotExist)
-        } else if result.Error != nil {
-                return returnError(c, 400, messages.ErrorWithConnection)
-        } else {
-		if data["hash"] != user.Hash {
-			return returnError(c, 400, messages.UsernamePasswordDoNotMatch)
-		}
-	}
-
-	// Generate token
+	// Check if hash matches then generate token
+	if data["hash"] != user.Hash {return returnError(c, 400, messages.UsernamePasswordDoNotMatch)}
 	token := components.GenerateToken(user.Username, user.Hash)
 	
+	// Retrun success
 	return c.Status(200).JSON(
 		fiber.Map{
 			"success":true,
@@ -150,67 +114,35 @@ func PostSignup(c *fiber.Ctx) error {
 	// Parse request into data map 
 	var data map[string]string	
 	err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
 
-	// Error with JSON request
-	if err != nil {
-		return returnError(c, 400, messages.ErrorParsingRequest)
-			}
-
-	// Username empty error
-	if data["username"] == "" {
-		return returnError(c, 400, messages.UsernameEmpty) 
-	}
-
-	// Email empty error
-	if data["email"] == "" {
-		return returnError(c, 400, messages.EmailEmpty)
-		}
-	
-	// Salt empty error
-	if data["salt"] == "" {
-		return returnError(c, 400, messages.SaltMissing)
-		}
-
-	// Hash empty error
-	if data["hash"] == "" {
-		return returnError(c, 400, messages.HashMissing)
-		}
+	// Check for empty fields
+	if data["username"] == "" {return returnError(c, 400, messages.UsernameEmpty)}
+	if data["email"] == "" {return returnError(c, 400, messages.EmailEmpty)}
+	if data["salt"] == "" {return returnError(c, 400, messages.SaltMissing)}
+	if data["hash"] == "" {return returnError(c, 400, messages.HashMissing)}
 
 	// Query for username in database
 	var user models.User
-	userResult := db.DB.Where("username = ?", data["username"]).First(&user)
- 
-	if userResult.RowsAffected != 0 {
-		return returnError(c, 400, messages.UsernameInUse)
-		}
+	result := db.DB.Where("username = ?", data["username"]).First(&user)
+	code, err := RecordInUse("Username", result)
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// Query for email
-	emailResult := db.DB.Where("email = ?", data["email"]).First(&user)
-
-	// Error with connection
-	if emailResult.RowsAffected != 0 {
-		return returnError(c, 400, messages.EmailInUse)
-		}
+	// Query for email in database
+	result = db.DB.Where("email = ?", data["email"]).First(&user)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound{return returnError(c, 400, result.Error.Error())}
+	if result.RowsAffected != 0 {return returnError(c, 400, messages.EmailInUse)}
 
 	// Check username requirements
-	if !usernameRegex.MatchString(data["username"]) {
-		return returnError(c, 400, messages.ErrorUsernameRequirements)
-	}
+	if !usernameRegex.MatchString(data["username"]){return returnError(c, 400, messages.ErrorUsernameRequirements)}
+	if !emailRegex.MatchString(data["email"]) {return returnError(c, 400, messages.ErrorEmailRequirements)} 
 	
-	// Check email validity
-	if !emailRegex.MatchString(data["email"]) {
-                return returnError(c, 400, messages.ErrorEmailRequirements)
-	} else {
-		// Run DNS check on Email
-		domain := strings.Split(data["email"], "@")[1]
-		_, err := net.LookupMX(domain)
-		
-		if err != nil {
-			return returnError(c, 400, messages.ErrorEmailRequirements)
-	}
+	// Run DNS check on Email
+	domain := strings.Split(data["email"], "@")[1]
+	_, err = net.LookupMX(domain)
+	if err != nil {return returnError(c, 400, messages.ErrorEmailRequirements)}
 
-	}
-	// Set up fields
+	// Set user model
 	user = models.User{
 		Username: data["username"],
 		Email: data["email"],
@@ -221,7 +153,7 @@ func PostSignup(c *fiber.Ctx) error {
 
 	db.DB.Create(&user)
 
-	return returnSuccess(c, messages.SignupSuccess) 
+	// TODO send verification email
 
-	// TODO Send verification email
+	return returnSuccess(c, messages.SignupSuccess) 
 }
