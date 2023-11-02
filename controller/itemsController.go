@@ -40,9 +40,9 @@ func GetBarcode(c *fiber.Ctx) error {
 	}
 
 	// Validate Token
-	err = validateToken(c, uid, data["token"])	
-	if err == nil {
-		return validateToken(c, uid, data["token"])
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {
+		return returnError(c, code, err.Error())
 	}
 
 	// Check if item exists in cache
@@ -142,11 +142,11 @@ func ChangeQuantity(c *fiber.Ctx) error {
 		return returnError(c, 400, messages.NegativeError)
 	}
 
-        // Validate Token
-        err = validateToken(c, userUID, data["token"])      
-        if err == nil {
-                return validateToken(c, userUID, data["token"])
-        }
+	// Validate Token
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {
+		return returnError(c, code, err.Error())
+	}
 
 	// Search for ownership UID and pair with user UID to make sure they match
 	var ownership models.Ownership
@@ -205,11 +205,11 @@ func DeleteOwnership(c *fiber.Ctx) error {
         userUID := data["uid"]
 	ownershipUID := c.Query("ownershipUID")
 	
-        // Validate Token
-        err = validateToken(c, userUID, data["token"])      
-        if err == nil {
-                return validateToken(c, userUID, data["token"])
-        }
+	// Validate Token
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {
+		return returnError(c, code, err.Error())
+	}
 
 	// Search for ownership UID and pair with user UID to make sure they match
 	var ownership models.Ownership
@@ -250,11 +250,11 @@ func EditOwnership(c *fiber.Ctx) error {
 	ownershipUID := c.Query("ownershipUID")
 	changeField := c.Params("field")
 	
-        // Validate Token
-        err = validateToken(c, userUID, data["token"])      
-        if err == nil {
-                return validateToken(c, userUID, data["token"])
-        }
+	// Validate Token
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {
+		return returnError(c, code, err.Error())
+	}
 
 	// Search for ownership UID and pair with user UID to make sure they match
 	var ownership models.Ownership

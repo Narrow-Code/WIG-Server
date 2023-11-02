@@ -33,11 +33,11 @@ func CreateLocation(c *fiber.Ctx) error {
     		return returnError(c, 400, messages.ConversionError) 
 	}
 
-        // Validate Token
-        err = validateToken(c, userUID, data["token"])      
-        if err == nil {
-                return validateToken(c, userUID, data["token"])
-        }
+	// Validate Token
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {
+		return returnError(c, code, err.Error())
+	}
 
 	// Check for valid entries
 	if locationQR == "" {
@@ -110,12 +110,11 @@ func SetLocation(c *fiber.Ctx) error{
     		return returnError(c, 400, messages.ConversionError) 
 	}
 
-        // Validate Token
-        err = validateToken(c, userUID, data["token"])      
-        if err == nil {
-                return validateToken(c, userUID, data["token"])
-        }
-
+	// Validate Token
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {
+		return returnError(c, code, err.Error())
+	}
 	// Check if QR code exists in users data
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)

@@ -44,37 +44,7 @@ validateToken checks if a users UID and token match and are valid.
 
 @return error - An error that occured during the process or if the token does not match
 */
-func validateToken(c *fiber.Ctx, uid string, token string) error{
-	// Check if UID and token exist
-        if uid == "" {
-                return returnError(c, 400, messages.UIDEmpty)
-        }
-
-        if token == "" {
-                return returnError(c, 400, messages.TokenEmpty)
-        }
-
-        // Query for UID
-        var user models.User
-        result := db.DB.Where("user_uid = ?", uid).First(&user)
-
-        // Check if UID was found
-        if result.Error == gorm.ErrRecordNotFound {
-                return returnError(c, 404, "UID " + messages.RecordNotFound)
-
-        } else if result.Error != nil {
-                return returnError(c, 400, messages.ErrorWithConnection)
-	}
-
-        // Validate token
-        if !components.ValidateToken(user.Username, user.Hash, token) {
-                return returnError(c, 400, messages.ErrorToken)
-                }
-	
-	return errors.New(messages.TokenPass)
-}
-
-func validateToken2(c *fiber.Ctx, uid string, token string) (int, error){
+func validateToken(c *fiber.Ctx, uid string, token string) (int, error){
 	// Check if UID and token exist
         if uid == "" {
                 return 400, errors.New(messages.UIDEmpty)
@@ -133,10 +103,10 @@ func CheckQR(c *fiber.Ctx) error {
         qr := c.Query("qr")
 
 	// Validate Token
-        err = validateToken(c, uid, data["token"])                                      
-        if err == nil {
-                return validateToken(c, uid, data["token"])
-        }
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {
+		return returnError(c, code, err.Error())
+	}
 
 	if qr == "" {
 		return returnError(c, 400, messages.QRMissing)
