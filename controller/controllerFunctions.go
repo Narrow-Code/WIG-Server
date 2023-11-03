@@ -8,6 +8,8 @@ import (
 	"WIG-Server/models"
 	"WIG-Server/structs"
 	"errors"
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -191,4 +193,19 @@ func RecordNotInUse(field string, result *gorm.DB) (int, error) {
 		return 400, errors.New(field + messages.RecordInUse)
 	}
 	return 200, nil
+}
+
+func CreateOwnership(uid string, barcode string) error{
+	// Convert uid to int
+	uidInt, err := strconv.Atoi(uid)
+	if err != nil {return errors.New(messages.ConversionError)}
+	
+	ownership := models.Ownership{
+               	ItemOwner:uint(uidInt),
+		ItemBarcode:barcode,
+   	}
+		
+	db.DB.Create(&ownership)
+
+	return nil
 }

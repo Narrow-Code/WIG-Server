@@ -27,19 +27,19 @@ func GetBarcode(c *fiber.Ctx) error {
 	// Initialize variables
 	uid := data["uid"]
 	barcode := c.Query("barcode")
-
-	// Check if barcode is numerical
-	barcodeCheck, err := strconv.Atoi(barcode)
-	if err != nil || barcodeCheck < 0 {return returnError(c, 400, "Barcode must be of int value")}
-
+	
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
 	if err != nil {return returnError(c, code, err.Error())}
 
+	// Validate barcode
+	if barcode == "" {return returnError(c, 400, "Barcode required")} // TODO add message
+	barcodeCheck, err := strconv.Atoi(barcode)
+	if err != nil || barcodeCheck < 0 {return returnError(c, 400, "Barcode must be of int value")}
+
 	// Check if item exists in local database
 	var item models.Item
-        result := db.DB.Where("barcode = ?", barcode).First(&item)
-        
+        result := db.DB.Where("barcode = ?", barcode).First(&item) 
 
         // If item isn't found, check api and add to 
         if result.Error == gorm.ErrRecordNotFound {
@@ -52,30 +52,14 @@ func GetBarcode(c *fiber.Ctx) error {
                 return returnError(c, 400, messages.ErrorWithConnection)
         }
 	
-	// If the barcode is empty retrun error
-	if item.Barcode == "" {
-        	return returnError(c, 404, messages.ItemNotFound)
-    	}
-
 	// Search Ownership by barcode
 	var ownerships []models.Ownership
 	result = db.DB.Where("item_barcode = ? AND item_owner = ?", barcode, uid).Find(&ownerships)
 
-	// Convert uid to int
-	uidInt, err := strconv.Atoi(uid)
-	if err != nil {
-		return returnError(c, 400, messages.ConversionError)
-	}
-
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
-		ownership := models.Ownership{
-               		ItemOwner:uint(uidInt),
-			ItemBarcode:barcode,
-			ItemQuantity:1,
-   		}
-		db.DB.Create(&ownership)
-
+		err = CreateOwnership(uid, barcode)
+		if err != nil {return returnError(c, 400, err.Error())}
 		return c.Status(200).JSON(
 			fiber.Map{
 				"success":true,
@@ -84,7 +68,7 @@ func GetBarcode(c *fiber.Ctx) error {
 				"barcode":item.Barcode,
 				"brand":item.Brand,
 				"image":item.Image,
-				"owner":ownership.ItemOwner})
+				"owner":uid})
 	}
 
 	// If ownerships exist, return as slice

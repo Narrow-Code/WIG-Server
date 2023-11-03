@@ -16,7 +16,7 @@ type Ownership struct {
 	ItemLocation 	uint 	`json:"item_location" gorm:"column:item_location;default:1"`
 	ItemQR	 	string 	`json:"item_qr" gorm:"column:item_qr"`
 	ItemTags	string 	`json:"item_tags" gorm:"column:item_tags"`
-	ItemQuantity	int 	`json:"item_quantity" gorm:"column:item_quantity"`
+	ItemQuantity	int 	`json:"item_quantity" gorm:"column:item_quantity;default:1"`
 	ItemCheckedOut	string	`json:"item_checked_out" gorm:"column:item_checked_out"`
 	ItemBorrower	uint 	`json:"item_borrower" gorm:"column:item_borrower;default:1"`
 	User            User    `gorm:"foreignkey:item_owner"`
