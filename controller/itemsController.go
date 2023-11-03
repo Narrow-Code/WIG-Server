@@ -22,32 +22,25 @@ func GetBarcode(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
+        if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
 
-        // Error with JSON request
-        if err != nil {
-                return returnError(c, 400, messages.ErrorParsingRequest)
-        }
-
+	// Initialize variables
 	uid := data["uid"]
 	barcode := c.Query("barcode")
 
 	// Check if barcode is numerical
 	barcodeCheck, err := strconv.Atoi(barcode)
-
-	if err != nil || barcodeCheck < 0 {
-		return returnError(c, 400, "Barcode must be of int value")
-	}
+	if err != nil || barcodeCheck < 0 {return returnError(c, 400, "Barcode must be of int value")}
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {
-		return returnError(c, code, err.Error())
-	}
+	if err != nil {return returnError(c, code, err.Error())}
 
-	// Check if item exists in cache
+	// Check if item exists in local database
 	var item models.Item
         result := db.DB.Where("barcode = ?", barcode).First(&item)
         
+
         // If item isn't found, check api and add to 
         if result.Error == gorm.ErrRecordNotFound {
 		upcitemdb.GetBarcode(barcode)

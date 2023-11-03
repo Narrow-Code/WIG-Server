@@ -123,12 +123,12 @@ func PostSignup(c *fiber.Ctx) error {
 	// Query for username in database
 	var user models.User
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
-	code, err := RecordInUse("Username", result)
+	code, err := RecordNotInUse("Username", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Query for email in database
 	result = db.DB.Where("email = ?", data["email"]).First(&user)
-	code, err = RecordInUse("Email", result)
+	code, err = RecordNotInUse("Email", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Check username requirements

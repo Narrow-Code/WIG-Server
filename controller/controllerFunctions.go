@@ -8,19 +8,17 @@ import (
 	"WIG-Server/models"
 	"WIG-Server/structs"
 	"errors"
-
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 /*
-returnError returns the given error code, success status and message through fiber to the application.
+returnError returns the given error code, a 'false' success status and message through fiber to the application.
 
-@param c c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
+@param c The fiber context containing the HTTP request and response objects.
 @param code The error code to return via fiber
-@param The error message to retrun via fiber
-
-@return error - An error, if any, that occurred during the registration process.
+@param message The error message to return via fiber
+@return error - An error, if any, that occurred during the process.
 */
 func returnError(c *fiber.Ctx, code int, message string) error {
 	return c.Status(code).JSON(fiber.Map{
@@ -28,6 +26,13 @@ func returnError(c *fiber.Ctx, code int, message string) error {
 		"message":message})
 }
 
+/*
+returnSuccess returns a 200 success code, a 'true' success status and a message through fiber to the application.
+
+@param c The fiber context containing the HTTP request and response objects.
+@param message The success message to return via fiber.
+@return error - An error, if any, that occurred during the process.
+*/
 func returnSuccess (c *fiber.Ctx, message string) error {
 	return c.Status(200).JSON(fiber.Map{
 		"success":true,
@@ -40,7 +45,6 @@ validateToken checks if a users UID and token match and are valid.
 @param c *fiber.Ctx - The fier context containing the HTTP request and response objects.
 @param UID The users UID
 @param token The users authentication token
-
 @return error - An error that occured during the process or if the token does not match
 */
 func validateToken(c *fiber.Ctx, uid string, token string) (int, error){
@@ -73,6 +77,12 @@ func validateToken(c *fiber.Ctx, uid string, token string) (int, error){
 	return 200, nil
 }
 
+/*
+getOwnershipReponse takes an ownership struct and sets up the ownership response.
+
+@param ownership The Ownership to convert to an ownership response
+@return structs.OwnershipResponse The converted ownership response
+*/
 func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
 	return structs.OwnershipResponse{
                         OwnershipUID: ownership.OwnershipUID,                                    
@@ -88,6 +98,12 @@ func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
                         ItemBorrower: ownership.ItemBorrower,} 	
 }
 
+/*
+CheckQR takes a QR code as parameter, and checks whether it is an item, location or a unused QR.
+
+@param c *fiber.Ctx - The fier context containing the HTTP request and response objects.
+@return error - An error that occured during the process or if the token does not match
+*/
 func CheckQR(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
@@ -140,6 +156,14 @@ func CheckQR(c *fiber.Ctx) error {
 	return returnSuccess(c, messages.New)
 }
 
+/*
+RecordExists checks a gorm.DB error message to see if a record existed in the database.
+
+@param field A string representing the field that is getting checked.
+@param result The gorm.DB result that may hold the error message.
+@return int The HTTP error code to return
+@return The error message to return
+*/
 func RecordExists(field string, result *gorm.DB) (int, error) {
 
 	if result.Error == gorm.ErrRecordNotFound {
@@ -150,7 +174,15 @@ func RecordExists(field string, result *gorm.DB) (int, error) {
 	return 200, nil
 }
 
-func RecordInUse(field string, result *gorm.DB) (int, error) {	
+/*
+RecordNotInUse checks a gorm.DB error message to see if a record is in use in the database.
+
+@param field A string representing the field that is getting checked.
+@param result The gorm.DB result that may hold the error message.
+@return int The HTTP error code to return
+@return The error message to return
+*/
+func RecordNotInUse(field string, result *gorm.DB) (int, error) {	
 	
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return 400, errors.New(result.Error.Error())
