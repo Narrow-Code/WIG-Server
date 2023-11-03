@@ -58,7 +58,7 @@ func GetBarcode(c *fiber.Ctx) error {
 
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
-		err = CreateOwnership(uid, barcode)
+		err = createOwnership(uid, barcode)
 		if err != nil {return returnError(c, 400, err.Error())}
 		return c.Status(200).JSON(
 			fiber.Map{
@@ -118,7 +118,7 @@ func ChangeQuantity(c *fiber.Ctx) error {
 	// Valide and retreive the ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
-	code, err = RecordExists("Ownership", result)
+	code, err = recordExists("Ownership", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Check type of change
@@ -163,7 +163,7 @@ func DeleteOwnership(c *fiber.Ctx) error {
 	// Validate ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
-	code, err = RecordExists("Ownership", result)
+	code, err = recordExists("Ownership", result)
 	if err != nil {return returnError(c, code, err.Error())}
 	
 	db.DB.Delete(&ownership)
@@ -195,7 +195,7 @@ func EditOwnership(c *fiber.Ctx) error {
 	// Validate ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
-	code, err = RecordExists("Ownership", result)
+	code, err = recordExists("Ownership", result)
 	if err != nil {return returnError(c, code, err.Error())}
 	
 	// Add new fields
@@ -209,3 +209,5 @@ func EditOwnership(c *fiber.Ctx) error {
 	// Ownership successfully updated
 	return returnSuccess(c, changeField + " updated")
 }
+
+

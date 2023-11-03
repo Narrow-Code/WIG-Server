@@ -110,50 +110,30 @@ func CheckQR(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
+        if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
 
-        // Error with JSON request
-        if err != nil {
-                return returnError(c, 400, messages.ErrorParsingRequest)
-        }
-
+	// Initialize variables
         uid := data["uid"]
         qr := c.Query("qr")
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {
-		return returnError(c, code, err.Error())
-	}
+	if err != nil {return returnError(c, code, err.Error())}
 
-	if qr == "" {
-		return returnError(c, 400, messages.QRMissing)
-	}
+	// Check for empty fields
+	if qr == "" {return returnError(c, 400, messages.QRMissing)}
   
         // Check if qr exists as location
         var location models.Location
         result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, uid).First(&location)
-
-	if location.LocationUID != 0 {
-		return c.Status(200).JSON(
-			fiber.Map{
-				"success":true,
- 				"message":messages.Location}) 
-	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return returnError(c, 400, messages.ErrorWithConnection)
-	}
+	if location.LocationUID != 0 {return returnSuccess(c, messages.Location)
+	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return returnError(c, 400, messages.ErrorWithConnection)}
 
 	// Check if qr exists as ownership
 	var ownership models.Ownership
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, uid).First(&ownership)
-	
-	if ownership.OwnershipUID != 0 {
-		return c.Status(200).JSON(
-			fiber.Map{
-				"success":true,
-				"message":messages.Ownership})
-	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return returnError(c, 400, messages.ErrorWithConnection)
-	}
+	if ownership.OwnershipUID != 0 {return returnSuccess(c, messages.Ownership)}
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return returnError(c, 400, messages.ErrorWithConnection)}
 
 	return returnSuccess(c, messages.New)
 }
@@ -166,13 +146,11 @@ RecordExists checks a gorm.DB error message to see if a record existed in the da
 @return int The HTTP error code to return
 @return The error message to return
 */
-func RecordExists(field string, result *gorm.DB) (int, error) {
+func recordExists(field string, result *gorm.DB) (int, error) {
 
-	if result.Error == gorm.ErrRecordNotFound {
-		return 404, errors.New(field + messages.DoesNotExist)
-	} else if result.Error != nil {
-		return 400, errors.New(result.Error.Error())
-	}
+	if result.Error == gorm.ErrRecordNotFound {return 404, errors.New(field + messages.DoesNotExist)}
+	if result.Error != nil {return 400, errors.New(result.Error.Error())}
+	
 	return 200, nil
 }
 
@@ -184,18 +162,15 @@ RecordNotInUse checks a gorm.DB error message to see if a record is in use in th
 @return int The HTTP error code to return
 @return The error message to return
 */
-func RecordNotInUse(field string, result *gorm.DB) (int, error) {	
+func recordNotInUse(field string, result *gorm.DB) (int, error) {	
 	
-	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return 400, errors.New(result.Error.Error())
-	}
- 	if result.RowsAffected != 0 {
-		return 400, errors.New(field + messages.RecordInUse)
-	}
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return 400, errors.New(result.Error.Error())}
+ 	if result.RowsAffected != 0 {return 400, errors.New(field + messages.RecordInUse)}
+	
 	return 200, nil
 }
 
-func CreateOwnership(uid string, barcode string) error{
+func createOwnership(uid string, barcode string) error{
 	// Convert uid to int
 	uidInt, err := strconv.Atoi(uid)
 	if err != nil {return errors.New(messages.ConversionError)}

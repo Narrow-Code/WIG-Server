@@ -41,12 +41,12 @@ func CreateLocation(c *fiber.Ctx) error {
 	// Validate location QR code is not in use
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
-	code, err = RecordNotInUse("Location QR", result)
+	code, err = recordNotInUse("Location QR", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Valide location name is not in use
 	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, userUID).First(&location)
-	code, err = RecordNotInUse("Location Name", result)
+	code, err = recordNotInUse("Location Name", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// create location
@@ -70,7 +70,7 @@ func SetLocation(c *fiber.Ctx) error{
   
 	// Initialize variables
         userUID := data["uid"]	
-	locationQR := data["location_qr"]
+	locationQR := c.Query("location_qr")
 	ownershipUID := c.Query("ownershipUID")
 
 	// Validate Token
@@ -80,13 +80,13 @@ func SetLocation(c *fiber.Ctx) error{
 	// Validate the QR code
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
-	code, err = RecordExists("Location QR", result)
+	code, err = recordExists("Location QR", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Validate the ownership
 	var ownership models.Ownership
 	result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
-	code, err = RecordExists("Ownership", result)
+	code, err = recordExists("Ownership", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Set the location and save

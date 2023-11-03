@@ -33,7 +33,7 @@ func GetSalt(c *fiber.Ctx) error {
 	// Query database for username
 	var user models.User
 	result := db.DB.Where("username = ?", username).First(&user)
-	code, err := RecordExists("Username", result)
+	code, err := recordExists("Username", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	return c.Status(200).JSON(
@@ -84,7 +84,7 @@ func PostLogin(c *fiber.Ctx) error {
 	// Check that user exists
 	var user models.User
         result := db.DB.Where("username = ?", data["username"]).First(&user)
-	code, err := RecordExists("Username", result)
+	code, err := recordExists("Username", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Check if hash matches then generate token
@@ -123,12 +123,12 @@ func PostSignup(c *fiber.Ctx) error {
 	// Query for username in database
 	var user models.User
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
-	code, err := RecordNotInUse("Username", result)
+	code, err := recordNotInUse("Username", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Query for email in database
 	result = db.DB.Where("email = ?", data["email"]).First(&user)
-	code, err = RecordNotInUse("Email", result)
+	code, err = recordNotInUse("Email", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Check username requirements
