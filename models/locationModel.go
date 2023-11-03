@@ -14,6 +14,7 @@ type Location struct {
 	LocationLocation *uint `json:"location_location" gorm:"column:location_location;default:1"`
 	LocationQR 	string 	`json:"location_qr" gorm:"column:location_qr"`
 	LocationTags	string 	`json:"location_tags" gorm:"column:location_tags"`
+	LocationDescription string `json:"location_description" gorm:"column:location_description"` 
 	User		User	`gorm:"foreignkey:location_owner"`
 	Location	*Location `gorm:"foreignkey:location_location"`
 }

@@ -26,7 +26,7 @@ func CreateLocation(c *fiber.Ctx) error {
 		return returnError(c, 400, "Location type is invalid") // TODO make message 
 	}
 
-	// convert uid to int
+	// convert uid to uint
 	userUIDInt, err := strconv.ParseUint(userUID, 10, 64)
 	if err != nil {return returnError(c, 400, messages.ConversionError)}
 
@@ -62,7 +62,7 @@ func CreateLocation(c *fiber.Ctx) error {
 	return returnSuccess(c, "location added successfully") // TODO make message
 }
 
-func SetLocation(c *fiber.Ctx) error{
+func SetLocationLocation(c *fiber.Ctx) error{
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -70,29 +70,32 @@ func SetLocation(c *fiber.Ctx) error{
   
 	// Initialize variables
         userUID := data["uid"]	
-	locationQR := c.Query("location_qr")
-	ownershipUID := c.Query("ownershipUID")
+	locationUID := c.Query("location_uid")
+	setLocationUID := c.Query("set_location_uid")
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
 	if err != nil {return returnError(c, code, err.Error())}
 
+	// Verify locations are not the same
+	if locationUID == setLocationUID{return returnError(c, 400, "Cannot set location as self")} // TODO message
+
 	// Validate the QR code
 	var location models.Location
-	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
+	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, userUID).First(&location)
 	code, err = recordExists("Location QR", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Validate the ownership
-	var ownership models.Ownership
-	result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
-	code, err = recordExists("Ownership", result)
+	var setLocation models.Location
+	result = db.DB.Where("location_uid = ? AND location_owner = ?", setLocationUID, userUID).First(&setLocation)
+	code, err = recordExists("Location", result)
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Set the location and save
-	ownership.ItemLocation = location.LocationUID
-	db.DB.Save(&ownership)
+	location.LocationLocation = &setLocation.LocationUID
+	db.DB.Save(&location)
 
 	// return success
-	return returnSuccess(c, "Ownership set in " + location.LocationName) // TODO make message
+	return returnSuccess(c, location.LocationName + " set in " + setLocation.LocationName) // TODO make message
 }

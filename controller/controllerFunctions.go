@@ -170,10 +170,10 @@ func recordNotInUse(field string, result *gorm.DB) (int, error) {
 	return 200, nil
 }
 
-func createOwnership(uid string, barcode string) error{
+func createOwnership(uid string, barcode string) (models.Ownership, error){
 	// Convert uid to int
 	uidInt, err := strconv.Atoi(uid)
-	if err != nil {return errors.New(messages.ConversionError)}
+	if err != nil {return models.Ownership{}, errors.New(messages.ConversionError)}
 	
 	ownership := models.Ownership{
                	ItemOwner:uint(uidInt),
@@ -182,5 +182,5 @@ func createOwnership(uid string, barcode string) error{
 		
 	db.DB.Create(&ownership)
 
-	return nil
+	return ownership, nil
 }

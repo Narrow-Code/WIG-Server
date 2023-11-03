@@ -58,7 +58,7 @@ func GetBarcode(c *fiber.Ctx) error {
 
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
-		err = createOwnership(uid, barcode)
+		_, err = createOwnership(uid, barcode)
 		if err != nil {return returnError(c, 400, err.Error())}
 		return c.Status(200).JSON(
 			fiber.Map{
@@ -208,6 +208,65 @@ func EditOwnership(c *fiber.Ctx) error {
 
 	// Ownership successfully updated
 	return returnSuccess(c, changeField + " updated")
+}
+
+func CreateOwnership(c *fiber.Ctx) error {
+        // Parse request into data map
+        var data map[string]string
+        err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
+  
+	// Initialize variables
+        userUID := data["uid"]
+	barcode := c.Query("barcode")
+	
+	// Validate Token
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {return returnError(c, code, err.Error())}
+	
+	ownership, err := createOwnership(userUID, barcode)
+	if err!= nil{return returnError(c, code, err.Error())}
+
+	return c.Status(200).JSON(
+                        fiber.Map{
+                                "success":true,
+                                "message":"Ownership created", // TODO messages       
+                               	"ownershipUID": ownership.OwnershipUID})
+}
+
+func SetOwnershipLocation(c *fiber.Ctx) error{
+        // Parse request into data map
+        var data map[string]string
+        err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
+  
+	// Initialize variables
+        userUID := data["uid"]	
+	locationQR := c.Query("location_qr")
+	ownershipUID := c.Query("ownershipUID")
+
+	// Validate Token
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {return returnError(c, code, err.Error())}
+
+	// Validate the QR code
+	var location models.Location
+	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
+	code, err = recordExists("Location QR", result)
+	if err != nil {return returnError(c, code, err.Error())}
+
+	// Validate the ownership
+	var ownership models.Ownership
+	result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
+	code, err = recordExists("Ownership", result)
+	if err != nil {return returnError(c, code, err.Error())}
+
+	// Set the location and save
+	ownership.ItemLocation = location.LocationUID
+	db.DB.Save(&ownership)
+
+	// return success
+	return returnSuccess(c, "Ownership set in " + location.LocationName) // TODO make message
 }
 
 
