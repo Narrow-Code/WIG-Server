@@ -99,3 +99,35 @@ func SetLocationLocation(c *fiber.Ctx) error{
 	// return success
 	return returnSuccess(c, location.LocationName + " set in " + setLocation.LocationName) // TODO make message
 }
+
+func EditLocation(c *fiber.Ctx) error {
+        // Parse request into data map
+        var data map[string]string
+        err := c.BodyParser(&data)
+	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
+
+	// Initialize variables
+        userUID := data["uid"]
+	locationUID := c.Query("locationUID")
+
+	// Validate Token
+	code, err := validateToken(c, data["uid"], data["token"])	
+	if err != nil {return returnError(c, code, err.Error())}
+
+	// Validate ownership
+	var location models.Location
+	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, userUID).First(&location)
+	code, err = recordExists("Ownership", result)
+	if err != nil {return returnError(c, code, err.Error())}
+
+	// Add new fields
+	location.LocationName = c.Query("location_name")
+	location.LocationDescription = c.Query("location_description")
+	location.LocationTags = c.Query("location_tags")
+
+	db.DB.Save(&location)
+
+	// Ownership successfully updated
+	return returnSuccess(c, "Ownership updated") // TODO message
+}
+

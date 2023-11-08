@@ -8,7 +8,6 @@ import (
 	"WIG-Server/models"
 	"WIG-Server/structs"
 	"WIG-Server/upcitemdb"
-	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -181,38 +180,31 @@ func DeleteOwnership(c *fiber.Ctx) error {
 
 func EditOwnership(c *fiber.Ctx) error {
         // Parse request into data map
-	fmt.Println("Start edit ownership")
         var data map[string]string
         err := c.BodyParser(&data)
 	if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
-	fmt.Println("Request parsed")
 
 	// Initialize variables
         userUID := data["uid"]
 	ownershipUID := c.Query("ownershipUID")
-	fmt.Println("Variables initialized")
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
 	if err != nil {return returnError(c, code, err.Error())}
-	fmt.Println("Token validated")
 
 	// Validate ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
 	code, err = recordExists("Ownership", result)
 	if err != nil {return returnError(c, code, err.Error())}
-	fmt.Println("Ownership validated")
 
 	// Add new fields
 	ownership.CustomItemName = c.Query("custom_item_name")
 	ownership.CustItemImg = c.Query("custom_item_img")
 	ownership.OwnedCustDesc = c.Query("custom_item_description")
 	ownership.ItemTags = c.Query("item_tags")
-	fmt.Println("Fields added")
 
 	db.DB.Save(&ownership)
-	fmt.Println("DB saved")
 
 	// Ownership successfully updated
 	return returnSuccess(c, "Ownership updated") // TODO message
