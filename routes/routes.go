@@ -18,12 +18,15 @@ func Setup(app *fiber.App){
 	app.Post("/users/login", controller.PostLogin)
 	app.Post("/users/login/check", controller.PostLoginCheck)
 	app.Post("/items/barcode", controller.GetBarcode)
-	app.Put("/ownership/:type", controller.ChangeQuantity)
+
 	app.Post("/code/check", controller.CheckQR)
+
+	app.Put("/ownership/quantity/:type", controller.ChangeQuantity)
 	app.Delete("/ownership/delete", controller.DeleteOwnership)
-	app.Put("/ownership/edit/:field", controller.EditOwnership)
-	app.Post("/location/create/:type", controller.CreateLocation)
+	app.Put("/ownership/edit", controller.EditOwnership)
 	app.Put("/ownership/location/set", controller.SetOwnershipLocation)
 	app.Post("/ownership/create", controller.CreateOwnership)
+
+	app.Post("/location/create/:type", controller.CreateLocation)
 	app.Put("/location/location/set", controller.SetLocationLocation)
 }
