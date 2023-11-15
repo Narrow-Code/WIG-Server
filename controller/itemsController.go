@@ -67,7 +67,7 @@ func GetBarcode(c *fiber.Ctx) error {
 			fiber.Map{
 				"success":true,
 				"message":"Created new ownership",
-				"title":item.Name,
+				"item":item.Name,
 				"barcode":item.Barcode,
 				"brand":item.Brand,
 				"image":item.Image,
