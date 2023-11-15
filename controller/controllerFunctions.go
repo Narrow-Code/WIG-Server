@@ -86,13 +86,30 @@ getOwnershipReponse takes an ownership struct and sets up the ownership response
 @return structs.OwnershipResponse The converted ownership response
 */
 func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
-	return structs.OwnershipResponse{
+	
+	var location models.Location
+	var result = db.DB.Where("location_uid = ?", ownership.ItemLocation).Find(&location)
+
+	if result != nil {
+		return structs.OwnershipResponse{
                         OwnershipUID: ownership.OwnershipUID,                                    
-                        ItemBarcode: ownership.ItemBarcode,
                         CustomItemName: ownership.CustomItemName,
                         CustItemImg: ownership.CustItemImg,
                         OwnedCustDesc: ownership.OwnedCustDesc,
-                        ItemLocation: ownership.ItemLocation,
+                        ItemLocation: "Not found",
+                        ItemQR: ownership.ItemQR,
+                        ItemTags: ownership.ItemTags,
+                        ItemQuantity: ownership.ItemQuantity,
+                        ItemCheckedOut: ownership.ItemCheckedOut,
+                        ItemBorrower: ownership.ItemBorrower,} 
+	}
+
+	return structs.OwnershipResponse{
+                        OwnershipUID: ownership.OwnershipUID,                                    
+                        CustomItemName: ownership.CustomItemName,
+                        CustItemImg: ownership.CustItemImg,
+                        OwnedCustDesc: ownership.OwnedCustDesc,
+                        ItemLocation: location.LocationName,
                         ItemQR: ownership.ItemQR,
                         ItemTags: ownership.ItemTags,
                         ItemQuantity: ownership.ItemQuantity,

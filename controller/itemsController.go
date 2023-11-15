@@ -59,8 +59,10 @@ func GetBarcode(c *fiber.Ctx) error {
 
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
-		_, err = createOwnership(uid, barcode)
+		ownership, err := createOwnership(uid, barcode)
 		if err != nil {return returnError(c, 400, err.Error())}
+
+		ownershipResponse := getOwnershipReponse(ownership)
 		return c.Status(200).JSON(
 			fiber.Map{
 				"success":true,
@@ -69,7 +71,8 @@ func GetBarcode(c *fiber.Ctx) error {
 				"barcode":item.Barcode,
 				"brand":item.Brand,
 				"image":item.Image,
-				"owner":uid})
+				"owner":uid,
+				"ownership":ownershipResponse})
 	}
 
 	// If ownerships exist, return as slice
@@ -84,6 +87,7 @@ func GetBarcode(c *fiber.Ctx) error {
                                 "success":true,
                                 "message":"Item found",       
 				"item":item.Name,
+				"barcode":item.Barcode,
 				"brand":item.Brand,
 				"image":item.Image,
 				"owner":uid,
