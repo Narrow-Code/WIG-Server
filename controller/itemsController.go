@@ -45,7 +45,10 @@ func GetBarcode(c *fiber.Ctx) error {
         // If item isn't found, check api and add to 
         if result.Error == gorm.ErrRecordNotFound {
 		upcitemdb.GetBarcode(barcode)
-		result = db.DB.Where("barcode = ?", barcode).First(&item)               
+		result = db.DB.Where("barcode = ?", barcode).First(&item)
+		if result.Error == gorm.ErrRecordNotFound {
+			return returnError(c, 400, "Item not found")
+		}
         }
 
 	// If there is a connection error
