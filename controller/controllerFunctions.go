@@ -88,28 +88,22 @@ getOwnershipReponse takes an ownership struct and sets up the ownership response
 func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
 	
 	var location models.Location
-	var result = db.DB.Where("location_uid = ?", ownership.ItemLocation).Find(&location)
+	result := db.DB.Where("location_uid = ?", ownership.ItemLocation).Find(&location)
+	var locationName string
 
-	if result != nil {
-		return structs.OwnershipResponse{
-                        OwnershipUID: ownership.OwnershipUID,                                    
-                        CustomItemName: ownership.CustomItemName,
-                        CustItemImg: ownership.CustItemImg,
-                        OwnedCustDesc: ownership.OwnedCustDesc,
-                        ItemLocation: "Not found",
-                        ItemQR: ownership.ItemQR,
-                        ItemTags: ownership.ItemTags,
-                        ItemQuantity: ownership.ItemQuantity,
-                        ItemCheckedOut: ownership.ItemCheckedOut,
-                        ItemBorrower: ownership.ItemBorrower,} 
+	if result.Error == gorm.ErrRecordNotFound {
+        	locationName = "Not found" // TODO messages
+	} else {
+		locationName = location.LocationName
 	}
+
 
 	return structs.OwnershipResponse{
                         OwnershipUID: ownership.OwnershipUID,                                    
                         CustomItemName: ownership.CustomItemName,
                         CustItemImg: ownership.CustItemImg,
                         OwnedCustDesc: ownership.OwnedCustDesc,
-                        ItemLocation: location.LocationName,
+                        ItemLocation: locationName,
                         ItemQR: ownership.ItemQR,
                         ItemTags: ownership.ItemTags,
                         ItemQuantity: ownership.ItemQuantity,
