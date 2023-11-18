@@ -112,44 +112,6 @@ func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
 }
 
 /*
-CheckQR takes a QR code as parameter, and checks whether it is an item, location or a unused QR.
-
-@param c *fiber.Ctx - The fier context containing the HTTP request and response objects.
-@return error - An error that occured during the process or if the token does not match
-*/
-func ScanCheckQR(c *fiber.Ctx) error {
-	// Parse request into data map
-        var data map[string]string
-        err := c.BodyParser(&data)
-        if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
-
-	// Initialize variables
-        uid := data["uid"]
-        qr := c.Query("qr")
-
-	// Validate Token
-	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {return returnError(c, code, err.Error())}
-
-	// Check for empty fields
-	if qr == "" {return returnError(c, 400, messages.QRMissing)}
-  
-        // Check if qr exists as location
-        var location models.Location
-        result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, uid).First(&location)
-	if location.LocationUID != 0 {return returnSuccess(c, messages.Location)
-	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return returnError(c, 400, messages.ErrorWithConnection)}
-
-	// Check if qr exists as ownership
-	var ownership models.Ownership
-	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, uid).First(&ownership)
-	if ownership.OwnershipUID != 0 {return returnSuccess(c, messages.Ownership)}
-	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return returnError(c, 400, messages.ErrorWithConnection)}
-
-	return returnSuccess(c, messages.New)
-}
-
-/*
 RecordExists checks a gorm.DB error message to see if a record existed in the database.
 
 @param field A string representing the field that is getting checked.
