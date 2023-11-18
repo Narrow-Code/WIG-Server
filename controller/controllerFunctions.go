@@ -117,7 +117,7 @@ CheckQR takes a QR code as parameter, and checks whether it is an item, location
 @param c *fiber.Ctx - The fier context containing the HTTP request and response objects.
 @return error - An error that occured during the process or if the token does not match
 */
-func CheckQR(c *fiber.Ctx) error {
+func ScanGetCheckQR(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)

@@ -19,7 +19,7 @@ GetBarcode handles the functionality of returning any ownerships and items back 
 
 @param c *fiber.Ctx
 */
-func GetBarcode(c *fiber.Ctx) error {
+func ScanPostBarcode(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -103,7 +103,7 @@ IncrementOwnership increases the ownerships quantity by the designated value
 
 @param c *fiber.Ctx
 */
-func ChangeQuantity(c *fiber.Ctx) error {
+func OwnershipQuantity(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -155,7 +155,7 @@ func ChangeQuantity(c *fiber.Ctx) error {
                                	"ownership": ownershipResponse})
 }
 
-func DeleteOwnership(c *fiber.Ctx) error {
+func OwnershipDelete(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -186,7 +186,7 @@ func DeleteOwnership(c *fiber.Ctx) error {
 	return returnSuccess(c, "Ownership deleted successfully")
 }
 
-func EditOwnership(c *fiber.Ctx) error {
+func OwnershipEdit(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -204,6 +204,7 @@ func EditOwnership(c *fiber.Ctx) error {
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
 	code, err = recordExists("Ownership", result)
+	
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Add new fields
@@ -218,7 +219,7 @@ func EditOwnership(c *fiber.Ctx) error {
 	return returnSuccess(c, "Ownership updated") // TODO message
 }
 
-func CreateOwnership(c *fiber.Ctx) error {
+func OwnershipCreate(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -242,7 +243,7 @@ func CreateOwnership(c *fiber.Ctx) error {
                                	"ownershipUID": ownership.OwnershipUID})
 }
 
-func SetOwnershipLocation(c *fiber.Ctx) error{
+func OwnershipSetLocation(c *fiber.Ctx) error{
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)

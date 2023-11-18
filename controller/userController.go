@@ -25,7 +25,7 @@ It checks for existing username and returns the salt.
 @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
 @return error - An error, if any, that occurred during the registration process.
 */
-func GetSalt(c *fiber.Ctx) error {
+func UserSalt(c *fiber.Ctx) error {
 	// Get parameters
 	username:= c.Query("username")
         if username == "" {return returnError(c, 400, messages.UsernameEmpty)}
@@ -50,7 +50,7 @@ It checks if the user is logged in at initial start of application, making sure 
 @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
 @return error - An error, if any, that occured during the registration procces.
 */
-func PostLoginCheck(c *fiber.Ctx) error {
+func UserValidate(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -71,7 +71,7 @@ If successful, it returns a JSON response with a success message and access toke
 @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
 @return error - An error, if any, that occurred during the registration process.
 */
-func PostLogin(c *fiber.Ctx) error {
+func UserLogin(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -108,7 +108,7 @@ It performs various checks such as data validation and database uniqueness befor
 @param c *fiber.Ctx - The Fiber context containing the HTTP request and response objects.
 @return error - An error, if any, that occurred during the registration process.
 */
-func PostSignup(c *fiber.Ctx) error {
+func UserSignup(c *fiber.Ctx) error {
 	// Parse request into data map 
 	var data map[string]string	
 	err := c.BodyParser(&data)

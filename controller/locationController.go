@@ -9,7 +9,7 @@ import (
 )
 
 
-func CreateLocation(c *fiber.Ctx) error {	
+func LocationCreate(c *fiber.Ctx) error {	
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -62,7 +62,7 @@ func CreateLocation(c *fiber.Ctx) error {
 	return returnSuccess(c, "location added successfully") // TODO make message
 }
 
-func SetLocationLocation(c *fiber.Ctx) error{
+func LocationSetLocation(c *fiber.Ctx) error{
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
@@ -100,7 +100,7 @@ func SetLocationLocation(c *fiber.Ctx) error{
 	return returnSuccess(c, location.LocationName + " set in " + setLocation.LocationName) // TODO make message
 }
 
-func EditLocation(c *fiber.Ctx) error {
+func LocationEdit(c *fiber.Ctx) error {
         // Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
