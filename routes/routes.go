@@ -13,21 +13,25 @@ import(
 * @param app *fiber.App - The Fiber application instance on which the routes will be configured.
 */
 func Setup(app *fiber.App){
-	app.Post("/users/signup", controller.PostSignup)
-	app.Get("/users/salt", controller.GetSalt)
-	app.Post("/users/login", controller.PostLogin)
-	app.Post("/users/login/check", controller.PostLoginCheck)
-	app.Post("/items/barcode", controller.GetBarcode)
+	// User Routes
+	app.Post("/user/signup", controller.PostSignup)
+	app.Get("/user/salt", controller.GetSalt)
+	app.Post("/user/login", controller.PostLogin)
+	app.Get("/user/validate", controller.PostLoginCheck)
 
-	app.Post("/code/check", controller.CheckQR)
-
-	app.Put("/ownership/quantity/:type", controller.ChangeQuantity)
-	app.Delete("/ownership/delete", controller.DeleteOwnership)
-	app.Put("/ownership/edit", controller.EditOwnership)
-	app.Put("/ownership/location/set", controller.SetOwnershipLocation)
+	// Scanner Routes
+	app.Post("/scan/barcode", controller.GetBarcode)
+	app.Get("/scan/check-type", controller.CheckQR)
+	
+	// Ownership Routes
 	app.Post("/ownership/create", controller.CreateOwnership)
+	app.Put("/ownership/quantity/:type", controller.ChangeQuantity)
+	app.Put("/ownership/edit", controller.EditOwnership)
+	app.Put("/ownership/set-location", controller.SetOwnershipLocation)
+	app.Delete("/ownership/delete", controller.DeleteOwnership)
 
+	// Location Routes
 	app.Post("/location/create/:type", controller.CreateLocation)
-	app.Put("/location/location/set", controller.SetLocationLocation)
-	app.Post("/location/edit", controller.EditLocation)
+	app.Put("/location/set-location", controller.SetLocationLocation)
+	app.Put("/location/edit", controller.EditLocation)
 }
