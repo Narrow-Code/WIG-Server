@@ -19,7 +19,7 @@ GetBarcode handles the functionality of returning any ownerships and items back 
 
 @param c *fiber.Ctx
 */
-func ScanPostBarcode(c *fiber.Ctx) error {
+func ScanBarcode(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
