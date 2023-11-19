@@ -2,7 +2,7 @@
 * The messages package holds constant error and success messages for easy access.
 */
 package messages
-
+// TODO this is a test commit
 const (
 	ErrorParsingRequest = "There was an error parsing JSON request." // Error message for when the JSON request could not be parsed.
 	ErrorWithConnection = "Connection error" // Error message for whenever there is a connectivity issue.
