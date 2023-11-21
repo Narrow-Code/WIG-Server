@@ -32,9 +32,9 @@ func ScanBarcode(c *fiber.Ctx) error {
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Validate barcode
-	if barcode == "" {return returnError(c, 400, "Barcode required")} // TODO add message
+	if barcode == "" {return returnError(c, 400, messages.BarcodeMissing)}
 	barcodeCheck, err := strconv.Atoi(barcode)
-	if err != nil || barcodeCheck < 0 {return returnError(c, 400, "Barcode must be of int value")}
+	if err != nil || barcodeCheck < 0 {return returnError(c, 400, messages.BarcodeIntError)}
 
 	// Check if item exists in local database
 	var item models.Item
@@ -45,7 +45,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 		upcitemdb.GetBarcode(barcode)
 		result = db.DB.Where("barcode = ?", barcode).First(&item)
 		if result.Error == gorm.ErrRecordNotFound {
-			return returnError(c, 400, "Item not found")
+			return returnError(c, 400, messages.ItemNotFound)
 		}
         }
 

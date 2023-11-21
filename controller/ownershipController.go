@@ -52,7 +52,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	case "set":
 		ownership.ItemQuantity = amount;
 	default:
-		return returnError(c, 400, "Invalid change type") // TODO message
+		return returnError(c, 400, messages.InvalidChangeType)
 	}
 
 	// Save new amount to the database and create response
@@ -95,7 +95,7 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	}
 
 	// Ownership successfully deleted
-	return returnSuccess(c, "Ownership deleted successfully")
+	return returnSuccess(c, messages.OwnershipDelete)
 }
 
 func OwnershipEdit(c *fiber.Ctx) error {
@@ -128,7 +128,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	db.DB.Save(&ownership)
 
 	// Ownership successfully updated
-	return returnSuccess(c, "Ownership updated") // TODO message
+	return returnSuccess(c, messages.OwnershipUpdated) 
 }
 
 func OwnershipCreate(c *fiber.Ctx) error {
@@ -151,7 +151,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	return c.Status(200).JSON(
                         fiber.Map{
                                 "success":true,
-                                "message":"Ownership created", // TODO messages       
+                                "message":messages.OwnershipCreated,       
                                	"ownershipUID": ownership.OwnershipUID})
 }
 

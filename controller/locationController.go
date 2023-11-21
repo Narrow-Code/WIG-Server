@@ -23,7 +23,7 @@ func LocationCreate(c *fiber.Ctx) error {
 	
 	// Check location type exists
 	if locationType != "bin" && locationType != "bag" && locationType != "location" {
-		return returnError(c, 400, "Location type is invalid") // TODO make message 
+		return returnError(c, 400, messages.LocationTypeInvalid) 
 	}
 
 	// convert uid to uint
@@ -35,8 +35,8 @@ func LocationCreate(c *fiber.Ctx) error {
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Check for empty fields 
-	if locationQR == "" {return returnError(c, 400, "QR Location required")} // TODO make message 
-	if locationName == "" {return returnError(c, 400, "Location name required")} // TODO make message
+	if locationQR == "" {return returnError(c, 400, messages.LocationQRRequired)} 
+	if locationName == "" {return returnError(c, 400, messages.LocationNameRequired)} 
 	
 	// Validate location QR code is not in use
 	var location models.Location
@@ -59,7 +59,7 @@ func LocationCreate(c *fiber.Ctx) error {
 
 	db.DB.Create(&location)
 
-	return returnSuccess(c, "location added successfully") // TODO make message
+	return returnSuccess(c, messages.LocationAdded)
 }
 
 func LocationSetLocation(c *fiber.Ctx) error{
@@ -78,7 +78,7 @@ func LocationSetLocation(c *fiber.Ctx) error{
 	if err != nil {return returnError(c, code, err.Error())}
 
 	// Verify locations are not the same
-	if locationUID == setLocationUID{return returnError(c, 400, "Cannot set location as self")} // TODO message
+	if locationUID == setLocationUID{return returnError(c, 400, messages.LocationSelfError)}
 
 	// Validate the QR code
 	var location models.Location
@@ -97,7 +97,7 @@ func LocationSetLocation(c *fiber.Ctx) error{
 	db.DB.Save(&location)
 
 	// return success
-	return returnSuccess(c, location.LocationName + " set in " + setLocation.LocationName) // TODO make message
+	return returnSuccess(c, location.LocationName + " set in " + setLocation.LocationName)
 }
 
 func LocationEdit(c *fiber.Ctx) error {
@@ -128,6 +128,6 @@ func LocationEdit(c *fiber.Ctx) error {
 	db.DB.Save(&location)
 
 	// Ownership successfully updated
-	return returnSuccess(c, "Ownership updated") // TODO message
+	return returnSuccess(c, messages.LocationUpdated)
 }
 
