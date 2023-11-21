@@ -2,17 +2,19 @@
 * Package config provides functionalities for configuring and connecting to the database.
 *
 * It includes functions to establish a connection, perform auto migrations, and manage the database connection instance.
-*/
+ */
 package db
 
 import (
 	"WIG-Server/models"
+	"fmt"
+	"os"
+	"strconv"
+
 	"github.com/joho/godotenv"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"gorm.io/driver/mysql"
-	"os"
-	"fmt"
 )
 
 // DB holds the database connection instance.
@@ -98,4 +100,11 @@ func AutoMigrate(connection *gorm.DB) {
 
 }
 
-
+func GetPort() string {
+	godotenv.Load()
+        var port = os.Getenv("PORT")
+	if port == "" {
+		port = "80"
+	}
+	return port
+}
