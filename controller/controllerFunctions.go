@@ -92,7 +92,7 @@ func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
 	var locationName string
 
 	if result.Error == gorm.ErrRecordNotFound {
-        	locationName = "Not found" // TODO messages
+        	locationName = messages.LocationNotFound
 	} else {
 		locationName = location.LocationName
 	}
