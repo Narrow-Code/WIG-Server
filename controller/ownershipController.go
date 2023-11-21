@@ -145,7 +145,9 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	code, err := validateToken(c, data["uid"], data["token"])	
 	if err != nil {return returnError(c, code, err.Error())}
 	
-	ownership, err := createOwnership(userUID, barcode)
+	// TODO have search for item
+
+	ownership, err := createOwnership(userUID, barcode) // TODO fix to uint
 	if err!= nil{return returnError(c, code, err.Error())}
 
 	return c.Status(200).JSON(

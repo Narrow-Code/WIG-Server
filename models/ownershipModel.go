@@ -9,7 +9,7 @@ package models
 type Ownership struct {
 	OwnershipUID 	uint 	`json:"ownership_uid" gorm:"primary_key;column:ownership_uid"`
 	ItemOwner 	uint 	`json:"item_owner" gorm:"column:item_owner"`
-	ItemBarcode 	string	`json:"item_barcode" gorm:"column:item_barcode"`
+	ItemNumber	uint	`json:"item_number" gorm:"column:item_number"`
 	CustomItemName	string 	`json:"custom_item_name" gorm:"column:custom_item_name"`
 	CustItemImg	string	`json:"custom_item_img" gorm:"column:custom_item_img"`
 	OwnedCustDesc	string 	`json:"custom_item_description" gorm:"column:custom_item_description"`
@@ -21,6 +21,6 @@ type Ownership struct {
 	ItemBorrower	uint 	`json:"item_borrower" gorm:"column:item_borrower;default:1"`
 	User            User    `gorm:"foreignkey:item_owner"`
 	Location	Location `gorm:"foreignkey:item_location"`
-	Item		Item	`gorm:"foreignkey:item_barcode"`
+	Item		Item	`gorm:"foreignkey:item_number"`
 	Borrower	Borrower `gorm:"foreignkey:item_borrower"`
 }
