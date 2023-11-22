@@ -15,7 +15,6 @@ returnSuccess returns a 200 success code, a 'true' success status and a message 
 */
 func Success (c *fiber.Ctx, message string, dtos ...dto.DataTransmission) error {
 	responseMap := fiber.Map{
-		"success":true,
 		"message":message,
 	}
 
@@ -36,6 +35,5 @@ returnError returns the given error code, a 'false' success status and message t
 */
 func Error(c *fiber.Ctx, code int, message string) error {
 	return c.Status(code).JSON(fiber.Map{
-		"success":false,
 		"message":message})
 }

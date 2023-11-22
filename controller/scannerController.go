@@ -59,42 +59,24 @@ func ScanBarcode(c *fiber.Ctx) error {
 	var ownerships []models.Ownership
 	result = db.DB.Where("item_barcode = ? AND item_owner = ?", barcode, uid).Find(&ownerships)
 
+	var ownershipResponses []dto.OwnershipResponse
+
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
 		ownership, err := createOwnership(uid, item.ItemUid)
 		if err != nil {return utils.Error(c, 400, err.Error())}
-		
-		var ownershipResponses []dto.OwnershipResponse
-		ownershipResponses = append(ownershipResponses, getOwnershipReponse(ownership))
-		return c.Status(200).JSON(
-			fiber.Map{
-				"success":true,
-				"message":"Created new ownership",
-				"item":item.Name,
-				"barcode":item.Barcode,
-				"brand":item.Brand,
-				"image":item.Image,
-				"owner":uid,
-				"ownership":ownershipResponses})
+		ownerships = append(ownerships, ownership)
 	}
 
-	// If ownerships exist, return as slice
-	var ownershipResponses []dto.OwnershipResponse
 	for _, ownership := range ownerships {
 		ownershipResponse := getOwnershipReponse(ownership)
 		ownershipResponses = append(ownershipResponses, ownershipResponse)	
 	}
 
-	return c.Status(200).JSON(
-                        fiber.Map{
-                                "success":true,
-                                "message":"Item found",       
-				"item":item.Name,
-				"barcode":item.Barcode,
-				"brand":item.Brand,
-				"image":item.Image,
-				"owner":uid,
-				"ownership":ownershipResponses})
+	itemName := dto.DTO("item", item.Name)
+	ownership := dto.DTO("ownership", ownershipResponses)
+
+	return utils.Success(c, "Item found", itemName, ownership)
 }
 
 /*
