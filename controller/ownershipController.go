@@ -139,15 +139,16 @@ func OwnershipCreate(c *fiber.Ctx) error {
   
 	// Initialize variables
         userUID := data["uid"]
-	barcode := c.Query("barcode")
 	
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
 	if err != nil {return returnError(c, code, err.Error())}
 	
-	// TODO have search for item
+	// convert uid to uint
+	itemUID, err := strconv.ParseUint(c.Query("item_uid"), 10, 64)
+	if err != nil {return returnError(c, 400, messages.ConversionError)}
 
-	ownership, err := createOwnership(userUID, barcode) // TODO fix to uint
+	ownership, err := createOwnership(userUID, uint(itemUID))
 	if err!= nil{return returnError(c, code, err.Error())}
 
 	return c.Status(200).JSON(
@@ -189,7 +190,5 @@ func OwnershipSetLocation(c *fiber.Ctx) error{
 	db.DB.Save(&ownership)
 
 	// return success
-	return returnSuccess(c, "Ownership set in " + location.LocationName) // TODO make message
+	return returnSuccess(c, "Ownership set in " + location.LocationName)
 }
-
-
