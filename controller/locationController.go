@@ -61,7 +61,7 @@ func LocationCreate(c *fiber.Ctx) error {
 
 	db.DB.Create(&location)
 
-	return returnSuccess(c, messages.LocationAdded)
+	return utils.NewSuccess(c, messages.LocationAdded)
 }
 
 func LocationSetLocation(c *fiber.Ctx) error{
@@ -99,7 +99,7 @@ func LocationSetLocation(c *fiber.Ctx) error{
 	db.DB.Save(&location)
 
 	// return success
-	return returnSuccess(c, location.LocationName + " set in " + setLocation.LocationName)
+	return utils.NewSuccess(c, location.LocationName + " set in " + setLocation.LocationName)
 }
 
 func LocationEdit(c *fiber.Ctx) error {
@@ -130,6 +130,6 @@ func LocationEdit(c *fiber.Ctx) error {
 	db.DB.Save(&location)
 
 	// Ownership successfully updated
-	return returnSuccess(c, messages.LocationUpdated)
+	return utils.NewSuccess(c, messages.LocationUpdated)
 }
 

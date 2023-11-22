@@ -4,7 +4,7 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/messages"
 	"WIG-Server/models"
-	"WIG-Server/structs"
+	"WIG-Server/dto"
 	"WIG-Server/upcitemdb"
 	"WIG-Server/utils"
 	"strconv"
@@ -64,7 +64,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 		ownership, err := createOwnership(uid, item.ItemUid)
 		if err != nil {return utils.NewError(c, 400, err.Error())}
 		
-		var ownershipResponses []structs.OwnershipResponse
+		var ownershipResponses []dto.OwnershipResponse
 		ownershipResponses = append(ownershipResponses, getOwnershipReponse(ownership))
 		return c.Status(200).JSON(
 			fiber.Map{
@@ -79,7 +79,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 	}
 
 	// If ownerships exist, return as slice
-	var ownershipResponses []structs.OwnershipResponse
+	var ownershipResponses []dto.OwnershipResponse
 	for _, ownership := range ownerships {
 		ownershipResponse := getOwnershipReponse(ownership)
 		ownershipResponses = append(ownershipResponses, ownershipResponse)	
@@ -123,16 +123,16 @@ func ScanCheckQR(c *fiber.Ctx) error {
         // Check if qr exists as location
         var location models.Location
         result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, uid).First(&location)
-	if location.LocationUID != 0 {return returnSuccess(c, messages.Location)
+	if location.LocationUID != 0 {return utils.NewSuccess(c, messages.Location)
 	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return utils.NewError(c, 400, messages.ErrorWithConnection)}
 
 	// Check if qr exists as ownership
 	var ownership models.Ownership
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, uid).First(&ownership)
-	if ownership.OwnershipUID != 0 {return returnSuccess(c, messages.Ownership)}
+	if ownership.OwnershipUID != 0 {return utils.NewSuccess(c, messages.Ownership)}
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return utils.NewError(c, 400, messages.ErrorWithConnection)}
 
-	return returnSuccess(c, messages.New)
+	return utils.NewSuccess(c, messages.New)
 }
 
 

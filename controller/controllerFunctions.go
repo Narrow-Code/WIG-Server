@@ -6,26 +6,13 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/messages"
 	"WIG-Server/models"
-	"WIG-Server/structs"
+	"WIG-Server/dto"
 	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
-
-/*
-returnSuccess returns a 200 success code, a 'true' success status and a message through fiber to the application.
-
-@param c The fiber context containing the HTTP request and response objects.
-@param message The success message to return via fiber.
-@return error - An error, if any, that occurred during the process.
-*/
-func returnSuccess (c *fiber.Ctx, message string) error {
-	return c.Status(200).JSON(fiber.Map{
-		"success":true,
-		"message":message})
-}
 
 /*
 validateToken checks if a users UID and token match and are valid.
@@ -71,7 +58,7 @@ getOwnershipReponse takes an ownership struct and sets up the ownership response
 @param ownership The Ownership to convert to an ownership response
 @return structs.OwnershipResponse The converted ownership response
 */
-func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
+func getOwnershipReponse(ownership models.Ownership) dto.OwnershipResponse {
 	
 	var location models.Location
 	result := db.DB.Where("location_uid = ?", ownership.ItemLocation).Find(&location)
@@ -84,7 +71,7 @@ func getOwnershipReponse(ownership models.Ownership) structs.OwnershipResponse {
 	}
 
 
-	return structs.OwnershipResponse{
+	return dto.OwnershipResponse{
                         OwnershipUID: ownership.OwnershipUID,                                    
                         CustomItemName: ownership.CustomItemName,
                         CustItemImg: ownership.CustItemImg,

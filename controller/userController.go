@@ -61,7 +61,7 @@ func UserValidate(c *fiber.Ctx) error {
 	if err != nil {return utils.NewError(c, code, err.Error())}
 
 	// Return success
-	return returnSuccess(c, messages.TokenPass) 
+	return utils.NewSuccess(c, messages.TokenPass) 
 }
 
 /*
@@ -153,5 +153,5 @@ func UserSignup(c *fiber.Ctx) error {
 
 	// TODO send verification email
 
-	return returnSuccess(c, messages.SignupSuccess) 
+	return utils.NewSuccess(c, messages.SignupSuccess) 
 }

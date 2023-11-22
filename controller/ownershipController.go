@@ -96,7 +96,7 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	}
 
 	// Ownership successfully deleted
-	return returnSuccess(c, messages.OwnershipDelete)
+	return utils.NewSuccess(c, messages.OwnershipDelete)
 }
 
 func OwnershipEdit(c *fiber.Ctx) error {
@@ -129,7 +129,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	db.DB.Save(&ownership)
 
 	// Ownership successfully updated
-	return returnSuccess(c, messages.OwnershipUpdated) 
+	return utils.NewSuccess(c, messages.OwnershipUpdated) 
 }
 
 func OwnershipCreate(c *fiber.Ctx) error {
@@ -191,5 +191,5 @@ func OwnershipSetLocation(c *fiber.Ctx) error{
 	db.DB.Save(&ownership)
 
 	// return success
-	return returnSuccess(c, "Ownership set in " + location.LocationName)
+	return utils.NewSuccess(c, "Ownership set in " + location.LocationName)
 }

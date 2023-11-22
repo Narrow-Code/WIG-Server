@@ -1,5 +1,5 @@
 // structs package holds all response structs for api calls
-package structs
+package dto
 
 type OwnershipResponse struct {
 	OwnershipUID    uint    `json:"ownership_uid"`
