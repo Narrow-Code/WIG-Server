@@ -23,7 +23,7 @@ func AppAuthHeaderCheck() fiber.Handler {
 		headerValue := c.Get("AppAuth")
 		
 		if headerValue != os.Getenv("APP_SECRET"){
-			return utils.NewError(c, 400, messages.AccessDenied)
+			return utils.Error(c, 400, messages.AccessDenied)
 		}
 		
 		return c.Next()
