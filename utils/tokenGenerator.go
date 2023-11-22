@@ -1,7 +1,7 @@
 /*
 * Package components provides functions that may be regularly used throughout the WIG-Application
 */
-package components
+package utils
 
 import (
 	"github.com/joho/godotenv"

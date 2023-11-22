@@ -6,6 +6,7 @@ import (
 	"WIG-Server/models"
 	"WIG-Server/structs"
 	"WIG-Server/upcitemdb"
+	"WIG-Server/utils"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,7 +22,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
-        if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
+        if err != nil {return utils.NewError(c, 400, messages.ErrorParsingRequest)}
 
 	// Initialize variables
 	uid := data["uid"]
@@ -29,12 +30,12 @@ func ScanBarcode(c *fiber.Ctx) error {
 	
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {return returnError(c, code, err.Error())}
+	if err != nil {return utils.NewError(c, code, err.Error())}
 
 	// Validate barcode
-	if barcode == "" {return returnError(c, 400, messages.BarcodeMissing)}
+	if barcode == "" {return utils.NewError(c, 400, messages.BarcodeMissing)}
 	barcodeCheck, err := strconv.Atoi(barcode)
-	if err != nil || barcodeCheck < 0 {return returnError(c, 400, messages.BarcodeIntError)}
+	if err != nil || barcodeCheck < 0 {return utils.NewError(c, 400, messages.BarcodeIntError)}
 
 	// Check if item exists in local database
 	var item models.Item
@@ -45,13 +46,13 @@ func ScanBarcode(c *fiber.Ctx) error {
 		upcitemdb.GetBarcode(barcode)
 		result = db.DB.Where("barcode = ?", barcode).First(&item)
 		if result.Error == gorm.ErrRecordNotFound {
-			return returnError(c, 400, messages.ItemNotFound)
+			return utils.NewError(c, 400, messages.ItemNotFound)
 		}
         }
 
 	// If there is a connection error
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-                return returnError(c, 400, messages.ErrorWithConnection)
+                return utils.NewError(c, 400, messages.ErrorWithConnection)
         }
 	
 	// Search Ownership by barcode
@@ -61,7 +62,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
 		ownership, err := createOwnership(uid, item.ItemUid)
-		if err != nil {return returnError(c, 400, err.Error())}
+		if err != nil {return utils.NewError(c, 400, err.Error())}
 		
 		var ownershipResponses []structs.OwnershipResponse
 		ownershipResponses = append(ownershipResponses, getOwnershipReponse(ownership))
@@ -106,7 +107,7 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	// Parse request into data map
         var data map[string]string
         err := c.BodyParser(&data)
-        if err != nil {return returnError(c, 400, messages.ErrorParsingRequest)}
+        if err != nil {return utils.NewError(c, 400, messages.ErrorParsingRequest)}
 
 	// Initialize variables
         uid := data["uid"]
@@ -114,22 +115,22 @@ func ScanCheckQR(c *fiber.Ctx) error {
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {return returnError(c, code, err.Error())}
+	if err != nil {return utils.NewError(c, code, err.Error())}
 
 	// Check for empty fields
-	if qr == "" {return returnError(c, 400, messages.QRMissing)}
+	if qr == "" {return utils.NewError(c, 400, messages.QRMissing)}
   
         // Check if qr exists as location
         var location models.Location
         result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, uid).First(&location)
 	if location.LocationUID != 0 {return returnSuccess(c, messages.Location)
-	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return returnError(c, 400, messages.ErrorWithConnection)}
+	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return utils.NewError(c, 400, messages.ErrorWithConnection)}
 
 	// Check if qr exists as ownership
 	var ownership models.Ownership
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, uid).First(&ownership)
 	if ownership.OwnershipUID != 0 {return returnSuccess(c, messages.Ownership)}
-	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return returnError(c, 400, messages.ErrorWithConnection)}
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {return utils.NewError(c, 400, messages.ErrorWithConnection)}
 
 	return returnSuccess(c, messages.New)
 }
