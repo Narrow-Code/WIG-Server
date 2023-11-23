@@ -1,8 +1,8 @@
 package dto
 
 type DataTransmission struct {
-	Name	 string
-	Data	 interface{}
+	Name string
+	Data interface{}
 }
 
 func DTO(name string, data interface{}) DataTransmission {

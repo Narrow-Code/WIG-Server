@@ -13,9 +13,9 @@ returnSuccess returns a 200 success code, a 'true' success status and a message 
 @param message The success message to return via fiber.
 @return error - An error, if any, that occurred during the process.
 */
-func Success (c *fiber.Ctx, message string, dtos ...dto.DataTransmission) error {
+func Success(c *fiber.Ctx, message string, dtos ...dto.DataTransmission) error {
 	responseMap := fiber.Map{
-		"message":message,
+		"message": message,
 	}
 
 	for _, dto := range dtos {
@@ -35,5 +35,5 @@ returnError returns the given error code, a 'false' success status and message t
 */
 func Error(c *fiber.Ctx, code int, message string) error {
 	return c.Status(code).JSON(fiber.Map{
-		"message":message})
+		"message": message})
 }

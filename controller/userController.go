@@ -2,14 +2,15 @@
 package controller
 
 import (
-	"WIG-Server/utils"
-	"WIG-Server/dto"
 	"WIG-Server/db"
+	"WIG-Server/dto"
 	"WIG-Server/messages"
 	"WIG-Server/models"
+	"WIG-Server/utils"
 	"net"
 	"regexp"
 	"strings"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -28,17 +29,21 @@ It checks for existing username and returns the salt.
 */
 func UserSalt(c *fiber.Ctx) error {
 	// Get parameters
-	username:= c.Query("username")
-        if username == "" {return utils.Error(c, 400, messages.UsernameEmpty)}
-	
+	username := c.Query("username")
+	if username == "" {
+		return utils.Error(c, 400, messages.UsernameEmpty)
+	}
+
 	// Query database for username
 	var user models.User
 	result := db.DB.Where("username = ?", username).First(&user)
 	code, err := recordExists("Username", result)
-	if err != nil {return utils.Error(c, code, err.Error())}
+	if err != nil {
+		return utils.Error(c, code, err.Error())
+	}
 
 	salt := dto.DTO("salt", user.Salt)
-	
+
 	return utils.Success(c, messages.SaltReturned, salt)
 }
 
@@ -51,16 +56,20 @@ It checks if the user is logged in at initial start of application, making sure 
 */
 func UserValidate(c *fiber.Ctx) error {
 	// Parse request into data map
-        var data map[string]string
-        err := c.BodyParser(&data)
-        if err != nil {return utils.Error(c, 400, messages.ErrorParsingRequest)}
+	var data map[string]string
+	err := c.BodyParser(&data)
+	if err != nil {
+		return utils.Error(c, 400, messages.ErrorParsingRequest)
+	}
 
 	// Validate Token
-	code, err := validateToken(c, data["uid"], data["token"])	
-	if err != nil {return utils.Error(c, code, err.Error())}
+	code, err := validateToken(c, data["uid"], data["token"])
+	if err != nil {
+		return utils.Error(c, code, err.Error())
+	}
 
 	// Return success
-	return utils.Success(c, messages.TokenPass) 
+	return utils.Success(c, messages.TokenPass)
 }
 
 /*
@@ -71,23 +80,33 @@ If successful, it returns a JSON response with a success message and access toke
 @return error - An error, if any, that occurred during the registration process.
 */
 func UserLogin(c *fiber.Ctx) error {
-        // Parse request into data map
-        var data map[string]string
-        err := c.BodyParser(&data)
-	if err != nil {return utils.Error(c, 400, messages.ErrorParsingRequest)}
+	// Parse request into data map
+	var data map[string]string
+	err := c.BodyParser(&data)
+	if err != nil {
+		return utils.Error(c, 400, messages.ErrorParsingRequest)
+	}
 
 	// Check for empty fields
-	if data["username"] == "" {return utils.Error(c, 400, messages.UsernameEmpty)}
-	if data["hash"] == "" {return utils.Error(c, 400, messages.HashMissing)}
+	if data["username"] == "" {
+		return utils.Error(c, 400, messages.UsernameEmpty)
+	}
+	if data["hash"] == "" {
+		return utils.Error(c, 400, messages.HashMissing)
+	}
 
 	// Check that user exists
 	var user models.User
-        result := db.DB.Where("username = ?", data["username"]).First(&user)
+	result := db.DB.Where("username = ?", data["username"]).First(&user)
 	code, err := recordExists("Username", result)
-	if err != nil {return utils.Error(c, code, err.Error())}
+	if err != nil {
+		return utils.Error(c, code, err.Error())
+	}
 
 	// Check if hash matches then generate token
-	if data["hash"] != user.Hash {return utils.Error(c, 400, messages.UsernamePasswordDoNotMatch)}
+	if data["hash"] != user.Hash {
+		return utils.Error(c, 400, messages.UsernamePasswordDoNotMatch)
+	}
 	token := dto.DTO("token", utils.GenerateToken(user.Username, user.Hash))
 	uid := dto.DTO("uid", user.UserUID)
 
@@ -103,48 +122,68 @@ It performs various checks such as data validation and database uniqueness befor
 @return error - An error, if any, that occurred during the registration process.
 */
 func UserSignup(c *fiber.Ctx) error {
-	// Parse request into data map 
-	var data map[string]string	
+	// Parse request into data map
+	var data map[string]string
 	err := c.BodyParser(&data)
-	if err != nil {return utils.Error(c, 400, messages.ErrorParsingRequest)}
+	if err != nil {
+		return utils.Error(c, 400, messages.ErrorParsingRequest)
+	}
 
 	// Check for empty fields
-	if data["username"] == "" {return utils.Error(c, 400, messages.UsernameEmpty)}
-	if data["email"] == "" {return utils.Error(c, 400, messages.EmailEmpty)}
-	if data["salt"] == "" {return utils.Error(c, 400, messages.SaltMissing)}
-	if data["hash"] == "" {return utils.Error(c, 400, messages.HashMissing)}
+	if data["username"] == "" {
+		return utils.Error(c, 400, messages.UsernameEmpty)
+	}
+	if data["email"] == "" {
+		return utils.Error(c, 400, messages.EmailEmpty)
+	}
+	if data["salt"] == "" {
+		return utils.Error(c, 400, messages.SaltMissing)
+	}
+	if data["hash"] == "" {
+		return utils.Error(c, 400, messages.HashMissing)
+	}
 
 	// Query for username in database
 	var user models.User
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
 	code, err := recordNotInUse("Username", result)
-	if err != nil {return utils.Error(c, code, err.Error())}
+	if err != nil {
+		return utils.Error(c, code, err.Error())
+	}
 
 	// Query for email in database
 	result = db.DB.Where("email = ?", data["email"]).First(&user)
 	code, err = recordNotInUse("Email", result)
-	if err != nil {return utils.Error(c, code, err.Error())}
+	if err != nil {
+		return utils.Error(c, code, err.Error())
+	}
 
 	// Check username requirements
-	if !usernameRegex.MatchString(data["username"]){return utils.Error(c, 400, messages.ErrorUsernameRequirements)}
-	if !emailRegex.MatchString(data["email"]) {return utils.Error(c, 400, messages.ErrorEmailRequirements)} 
-	
+	if !usernameRegex.MatchString(data["username"]) {
+		return utils.Error(c, 400, messages.ErrorUsernameRequirements)
+	}
+	if !emailRegex.MatchString(data["email"]) {
+		return utils.Error(c, 400, messages.ErrorEmailRequirements)
+	}
+
 	// Run DNS check on Email
 	domain := strings.Split(data["email"], "@")[1]
 	_, err = net.LookupMX(domain)
-	if err != nil {return utils.Error(c, 400, messages.ErrorEmailRequirements)}
+	if err != nil {
+		return utils.Error(c, 400, messages.ErrorEmailRequirements)
+	}
 
 	// Set user model
 	user = models.User{
 		Username: data["username"],
-		Email: data["email"],
-		Salt: data["salt"],
-		Hash: data["hash"],
+		Email:    data["email"],
+		Salt:     data["salt"],
+		Hash:     data["hash"],
 	}
 
 	db.DB.Create(&user)
 
 	// TODO send verification email
 
-	return utils.Success(c, messages.SignupSuccess) 
+	return utils.Success(c, messages.SignupSuccess)
 }

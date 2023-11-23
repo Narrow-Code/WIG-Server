@@ -18,14 +18,14 @@ import (
 func AppAuthHeaderCheck() fiber.Handler {
 	// Get AppAuth secret
 	godotenv.Load()
-        
-	return func(c *fiber.Ctx) error{
+
+	return func(c *fiber.Ctx) error {
 		headerValue := c.Get("AppAuth")
-		
-		if headerValue != os.Getenv("APP_SECRET"){
+
+		if headerValue != os.Getenv("APP_SECRET") {
 			return utils.Error(c, 400, messages.AccessDenied)
 		}
-		
+
 		return c.Next()
 	}
 
