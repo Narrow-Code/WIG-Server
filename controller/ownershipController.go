@@ -58,14 +58,13 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 
 	// Save new amount to the database and create response
 	db.DB.Save(&ownership)
-	ownershipResponse := getOwnershipReponse(ownership)
 
 	// Return success
 	return c.Status(200).JSON(
                         fiber.Map{
                                 "success":true,
                                 "message":"Item found",       
-                               	"ownership": ownershipResponse})
+                               	"ownership": ownership})
 }
 
 func OwnershipDelete(c *fiber.Ctx) error {

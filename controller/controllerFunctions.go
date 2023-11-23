@@ -53,38 +53,6 @@ func validateToken(c *fiber.Ctx, uid string, token string) (int, error){
 }
 
 /*
-getOwnershipReponse takes an ownership struct and sets up the ownership response.
-
-@param ownership The Ownership to convert to an ownership response
-@return structs.OwnershipResponse The converted ownership response
-*/
-func getOwnershipReponse(ownership models.Ownership) dto.OwnershipResponse {
-	
-	var location models.Location
-	result := db.DB.Where("location_uid = ?", ownership.ItemLocation).Find(&location)
-	var locationName string
-
-	if result.Error == gorm.ErrRecordNotFound {
-        	locationName = messages.LocationNotFound
-	} else {
-		locationName = location.LocationName
-	}
-
-
-	return dto.OwnershipResponse{
-                        OwnershipUID: ownership.OwnershipUID,                                    
-                        CustomItemName: ownership.CustomItemName,
-                        CustItemImg: ownership.CustItemImg,
-                        OwnedCustDesc: ownership.OwnedCustDesc,
-                        ItemLocation: locationName,
-                        ItemQR: ownership.ItemQR,
-                        ItemTags: ownership.ItemTags,
-                        ItemQuantity: ownership.ItemQuantity,
-                        ItemCheckedOut: ownership.ItemCheckedOut,
-                        ItemBorrower: ownership.ItemBorrower,} 	
-}
-
-/*
 RecordExists checks a gorm.DB error message to see if a record existed in the database.
 
 @param field A string representing the field that is getting checked.
