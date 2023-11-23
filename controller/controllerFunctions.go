@@ -6,7 +6,6 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/messages"
 	"WIG-Server/models"
-	"WIG-Server/dto"
 	"errors"
 	"strconv"
 
