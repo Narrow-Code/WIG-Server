@@ -59,8 +59,6 @@ func ScanBarcode(c *fiber.Ctx) error {
 	var ownerships []models.Ownership
 	result = db.DB.Where("item_barcode = ? AND item_owner = ?", barcode, uid).Find(&ownerships)
 
-	var ownershipResponses []dto.OwnershipResponse
-
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
 		ownership, err := createOwnership(uid, item.ItemUid)
@@ -68,13 +66,8 @@ func ScanBarcode(c *fiber.Ctx) error {
 		ownerships = append(ownerships, ownership)
 	}
 
-	for _, ownership := range ownerships {
-		ownershipResponse := getOwnershipReponse(ownership)
-		ownershipResponses = append(ownershipResponses, ownershipResponse)	
-	}
-
 	itemName := dto.DTO("item", item.Name)
-	ownership := dto.DTO("ownership", ownershipResponses)
+	ownership := dto.DTO("ownership", ownerships)
 
 	return utils.Success(c, "Item found", itemName, ownership)
 }
