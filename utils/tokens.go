@@ -37,19 +37,3 @@ func GenerateToken(username string, hash string) string {
 	return tokenStr
 }
 
-/*
-* validateToken checks to see if a users token matches the protocol.
-*
-* @param username The username of the user
-* @param hash The hashed password of the user
-* @param token The authentication token to verify
-*
-* @return bool - True if the token matches, false if not
- */
-func ValidateToken(username string, hash string, token string) bool {
-	if token == GenerateToken(username, hash) {
-		return true
-	} else {
-		return false
-	}
-}

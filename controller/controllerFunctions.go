@@ -45,11 +45,12 @@ func validateToken(c *fiber.Ctx, uid string, token string) (int, error) {
 	}
 
 	// Validate token
-	if !utils.ValidateToken(user.Username, user.Hash, token) {
-		return 400, errors.New(messages.ErrorToken)
+	if token == utils.GenerateToken(user.Username, user.Hash) {
+		return 200, nil
+	} else {
+	return 400, errors.New(messages.ErrorToken)
 	}
 
-	return 200, nil
 }
 
 /*
