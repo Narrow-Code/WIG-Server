@@ -4,7 +4,6 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/messages"
 	"WIG-Server/models"
-	"WIG-Server/utils"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,7 +14,7 @@ func LocationCreate(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -26,27 +25,27 @@ func LocationCreate(c *fiber.Ctx) error {
 
 	// Check location type exists
 	if locationType != "bin" && locationType != "bag" && locationType != "location" {
-		return utils.Error(c, 400, messages.LocationTypeInvalid)
+		return Error(c, 400, messages.LocationTypeInvalid)
 	}
 
 	// convert uid to uint
 	userUIDInt, err := strconv.ParseUint(userUID, 10, 64)
 	if err != nil {
-		return utils.Error(c, 400, messages.ConversionError)
+		return Error(c, 400, messages.ConversionError)
 	}
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Check for empty fields
 	if locationQR == "" {
-		return utils.Error(c, 400, messages.LocationQRRequired)
+		return Error(c, 400, messages.LocationQRRequired)
 	}
 	if locationName == "" {
-		return utils.Error(c, 400, messages.LocationNameRequired)
+		return Error(c, 400, messages.LocationNameRequired)
 	}
 
 	// Validate location QR code is not in use
@@ -54,14 +53,14 @@ func LocationCreate(c *fiber.Ctx) error {
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
 	code, err = recordNotInUse("Location QR", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Valide location name is not in use
 	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, userUID).First(&location)
 	code, err = recordNotInUse("Location Name", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// create location
@@ -74,7 +73,7 @@ func LocationCreate(c *fiber.Ctx) error {
 
 	db.DB.Create(&location)
 
-	return utils.Success(c, messages.LocationAdded)
+	return Success(c, messages.LocationAdded)
 }
 
 func LocationSetLocation(c *fiber.Ctx) error {
@@ -82,7 +81,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -93,12 +92,12 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Verify locations are not the same
 	if locationUID == setLocationUID {
-		return utils.Error(c, 400, messages.LocationSelfError)
+		return Error(c, 400, messages.LocationSelfError)
 	}
 
 	// Validate the QR code
@@ -106,7 +105,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, userUID).First(&location)
 	code, err = recordExists("Location QR", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Validate the ownership
@@ -114,7 +113,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	result = db.DB.Where("location_uid = ? AND location_owner = ?", setLocationUID, userUID).First(&setLocation)
 	code, err = recordExists("Location", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Set the location and save
@@ -122,7 +121,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	db.DB.Save(&location)
 
 	// return success
-	return utils.Success(c, location.LocationName+" set in "+setLocation.LocationName)
+	return Success(c, location.LocationName+" set in "+setLocation.LocationName)
 }
 
 func LocationEdit(c *fiber.Ctx) error {
@@ -130,7 +129,7 @@ func LocationEdit(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -140,7 +139,7 @@ func LocationEdit(c *fiber.Ctx) error {
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Validate ownership
@@ -148,7 +147,7 @@ func LocationEdit(c *fiber.Ctx) error {
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, userUID).First(&location)
 	code, err = recordExists("Ownership", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Add new fields
@@ -159,5 +158,5 @@ func LocationEdit(c *fiber.Ctx) error {
 	db.DB.Save(&location)
 
 	// Ownership successfully updated
-	return utils.Success(c, messages.LocationUpdated)
+	return Success(c, messages.LocationUpdated)
 }

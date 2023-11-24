@@ -6,7 +6,7 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/messages"
 	"WIG-Server/models"
-	"WIG-Server/utils"
+
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -22,7 +22,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -34,16 +34,16 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	// Convert amount to int
 	amount, err := strconv.Atoi(amountStr)
 	if err != nil {
-		return utils.Error(c, 400, messages.ConversionError)
+		return Error(c, 400, messages.ConversionError)
 	}
 	if amount < 0 {
-		return utils.Error(c, 400, messages.NegativeError)
+		return Error(c, 400, messages.NegativeError)
 	}
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Valide and retreive the ownership
@@ -51,7 +51,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
 	code, err = recordExists("Ownership", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Check type of change
@@ -66,7 +66,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	case "set":
 		ownership.ItemQuantity = amount
 	default:
-		return utils.Error(c, 400, messages.InvalidChangeType)
+		return Error(c, 400, messages.InvalidChangeType)
 	}
 
 	// Save new amount to the database and create response
@@ -85,7 +85,7 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -95,7 +95,7 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Validate ownership
@@ -103,18 +103,18 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
 	code, err = recordExists("Ownership", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	db.DB.Delete(&ownership)
 
 	// Check for errors after the delete operation
 	if result := db.DB.Delete(&ownership); result.Error != nil {
-		return utils.Error(c, 500, messages.ErrorDeletingOwnership)
+		return Error(c, 500, messages.ErrorDeletingOwnership)
 	}
 
 	// Ownership successfully deleted
-	return utils.Success(c, messages.OwnershipDelete)
+	return Success(c, messages.OwnershipDelete)
 }
 
 func OwnershipEdit(c *fiber.Ctx) error {
@@ -122,7 +122,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -132,7 +132,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Validate ownership
@@ -141,7 +141,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	code, err = recordExists("Ownership", result)
 
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Add new fields
@@ -153,7 +153,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	db.DB.Save(&ownership)
 
 	// Ownership successfully updated
-	return utils.Success(c, messages.OwnershipUpdated)
+	return Success(c, messages.OwnershipUpdated)
 }
 
 func OwnershipCreate(c *fiber.Ctx) error {
@@ -161,7 +161,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -170,18 +170,18 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// convert uid to uint
 	itemUID, err := strconv.ParseUint(c.Query("item_uid"), 10, 64)
 	if err != nil {
-		return utils.Error(c, 400, messages.ConversionError)
+		return Error(c, 400, messages.ConversionError)
 	}
 
 	ownership, err := createOwnership(userUID, uint(itemUID))
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	return c.Status(200).JSON(
@@ -196,7 +196,7 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -207,7 +207,7 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Validate the QR code
@@ -215,7 +215,7 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
 	code, err = recordExists("Location QR", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Validate the ownership
@@ -223,7 +223,7 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
 	code, err = recordExists("Ownership", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Set the location and save
@@ -231,5 +231,5 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	db.DB.Save(&ownership)
 
 	// return success
-	return utils.Success(c, "Ownership set in "+location.LocationName)
+	return Success(c, "Ownership set in "+location.LocationName)
 }

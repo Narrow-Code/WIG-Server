@@ -2,11 +2,9 @@ package controller
 
 import (
 	"WIG-Server/db"
-	"WIG-Server/dto"
 	"WIG-Server/messages"
 	"WIG-Server/models"
 	"WIG-Server/upcitemdb"
-	"WIG-Server/utils"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -23,7 +21,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -33,16 +31,16 @@ func ScanBarcode(c *fiber.Ctx) error {
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Validate barcode
 	if barcode == "" {
-		return utils.Error(c, 400, messages.BarcodeMissing)
+		return Error(c, 400, messages.BarcodeMissing)
 	}
 	barcodeCheck, err := strconv.Atoi(barcode)
 	if err != nil || barcodeCheck < 0 {
-		return utils.Error(c, 400, messages.BarcodeIntError)
+		return Error(c, 400, messages.BarcodeIntError)
 	}
 
 	// Check if item exists in local database
@@ -54,13 +52,13 @@ func ScanBarcode(c *fiber.Ctx) error {
 		upcitemdb.GetBarcode(barcode)
 		result = db.DB.Where("barcode = ?", barcode).First(&item)
 		if result.Error == gorm.ErrRecordNotFound {
-			return utils.Error(c, 400, messages.ItemNotFound)
+			return Error(c, 400, messages.ItemNotFound)
 		}
 	}
 
 	// If there is a connection error
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return utils.Error(c, 400, messages.ErrorWithConnection)
+		return Error(c, 400, messages.ErrorWithConnection)
 	}
 
 	// Search Ownership by barcode
@@ -71,15 +69,15 @@ func ScanBarcode(c *fiber.Ctx) error {
 	if len(ownerships) == 0 {
 		ownership, err := createOwnership(uid, item.ItemUid)
 		if err != nil {
-			return utils.Error(c, 400, err.Error())
+			return Error(c, 400, err.Error())
 		}
 		ownerships = append(ownerships, ownership)
 	}
 
-	itemName := dto.DTO("item", item.Name)
-	ownership := dto.DTO("ownership", ownerships)
+	itemName := DTO("item", item.Name)
+	ownership := DTO("ownership", ownerships)
 
-	return utils.Success(c, "Item found", itemName, ownership)
+	return Success(c, "Item found", itemName, ownership)
 }
 
 /*
@@ -93,7 +91,7 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Initialize variables
@@ -103,32 +101,32 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Check for empty fields
 	if qr == "" {
-		return utils.Error(c, 400, messages.QRMissing)
+		return Error(c, 400, messages.QRMissing)
 	}
 
 	// Check if qr exists as location
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, uid).First(&location)
 	if location.LocationUID != 0 {
-		return utils.Success(c, messages.Location)
+		return Success(c, messages.Location)
 	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return utils.Error(c, 400, messages.ErrorWithConnection)
+		return Error(c, 400, messages.ErrorWithConnection)
 	}
 
 	// Check if qr exists as ownership
 	var ownership models.Ownership
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, uid).First(&ownership)
 	if ownership.OwnershipUID != 0 {
-		return utils.Success(c, messages.Ownership)
+		return Success(c, messages.Ownership)
 	}
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return utils.Error(c, 400, messages.ErrorWithConnection)
+		return Error(c, 400, messages.ErrorWithConnection)
 	}
 
-	return utils.Success(c, messages.New)
+	return Success(c, messages.New)
 }

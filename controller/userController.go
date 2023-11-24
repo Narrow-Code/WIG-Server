@@ -3,7 +3,6 @@ package controller
 
 import (
 	"WIG-Server/db"
-	"WIG-Server/dto"
 	"WIG-Server/messages"
 	"WIG-Server/models"
 	"WIG-Server/utils"
@@ -31,7 +30,7 @@ func UserSalt(c *fiber.Ctx) error {
 	// Get parameters
 	username := c.Query("username")
 	if username == "" {
-		return utils.Error(c, 400, messages.UsernameEmpty)
+		return Error(c, 400, messages.UsernameEmpty)
 	}
 
 	// Query database for username
@@ -39,12 +38,12 @@ func UserSalt(c *fiber.Ctx) error {
 	result := db.DB.Where("username = ?", username).First(&user)
 	code, err := recordExists("Username", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
-	salt := dto.DTO("salt", user.Salt)
+	salt := DTO("salt", user.Salt)
 
-	return utils.Success(c, messages.SaltReturned, salt)
+	return Success(c, messages.SaltReturned, salt)
 }
 
 /*
@@ -59,17 +58,17 @@ func UserValidate(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Validate Token
 	code, err := validateToken(c, data["uid"], data["token"])
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Return success
-	return utils.Success(c, messages.TokenPass)
+	return Success(c, messages.TokenPass)
 }
 
 /*
@@ -84,15 +83,15 @@ func UserLogin(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Check for empty fields
 	if data["username"] == "" {
-		return utils.Error(c, 400, messages.UsernameEmpty)
+		return Error(c, 400, messages.UsernameEmpty)
 	}
 	if data["hash"] == "" {
-		return utils.Error(c, 400, messages.HashMissing)
+		return Error(c, 400, messages.HashMissing)
 	}
 
 	// Check that user exists
@@ -100,17 +99,17 @@ func UserLogin(c *fiber.Ctx) error {
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
 	code, err := recordExists("Username", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Check if hash matches then generate token
 	if data["hash"] != user.Hash {
-		return utils.Error(c, 400, messages.UsernamePasswordDoNotMatch)
+		return Error(c, 400, messages.UsernamePasswordDoNotMatch)
 	}
-	token := dto.DTO("token", utils.GenerateToken(user.Username, user.Hash))
-	uid := dto.DTO("uid", user.UserUID)
+	token := DTO("token", utils.GenerateToken(user.Username, user.Hash))
+	uid := DTO("uid", user.UserUID)
 
-	return utils.Success(c, messages.UserLoginSuccess, token, uid)
+	return Success(c, messages.UserLoginSuccess, token, uid)
 }
 
 /*
@@ -126,21 +125,21 @@ func UserSignup(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, messages.ErrorParsingRequest)
 	}
 
 	// Check for empty fields
 	if data["username"] == "" {
-		return utils.Error(c, 400, messages.UsernameEmpty)
+		return Error(c, 400, messages.UsernameEmpty)
 	}
 	if data["email"] == "" {
-		return utils.Error(c, 400, messages.EmailEmpty)
+		return Error(c, 400, messages.EmailEmpty)
 	}
 	if data["salt"] == "" {
-		return utils.Error(c, 400, messages.SaltMissing)
+		return Error(c, 400, messages.SaltMissing)
 	}
 	if data["hash"] == "" {
-		return utils.Error(c, 400, messages.HashMissing)
+		return Error(c, 400, messages.HashMissing)
 	}
 
 	// Query for username in database
@@ -148,29 +147,29 @@ func UserSignup(c *fiber.Ctx) error {
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
 	code, err := recordNotInUse("Username", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Query for email in database
 	result = db.DB.Where("email = ?", data["email"]).First(&user)
 	code, err = recordNotInUse("Email", result)
 	if err != nil {
-		return utils.Error(c, code, err.Error())
+		return Error(c, code, err.Error())
 	}
 
 	// Check username requirements
 	if !usernameRegex.MatchString(data["username"]) {
-		return utils.Error(c, 400, messages.ErrorUsernameRequirements)
+		return Error(c, 400, messages.ErrorUsernameRequirements)
 	}
 	if !emailRegex.MatchString(data["email"]) {
-		return utils.Error(c, 400, messages.ErrorEmailRequirements)
+		return Error(c, 400, messages.ErrorEmailRequirements)
 	}
 
 	// Run DNS check on Email
 	domain := strings.Split(data["email"], "@")[1]
 	_, err = net.LookupMX(domain)
 	if err != nil {
-		return utils.Error(c, 400, messages.ErrorEmailRequirements)
+		return Error(c, 400, messages.ErrorEmailRequirements)
 	}
 
 	// Set user model
@@ -185,5 +184,5 @@ func UserSignup(c *fiber.Ctx) error {
 
 	// TODO send verification email
 
-	return utils.Success(c, messages.SignupSuccess)
+	return Success(c, messages.SignupSuccess)
 }

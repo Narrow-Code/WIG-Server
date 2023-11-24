@@ -4,8 +4,8 @@
 package messages
 
 const (
-	TokenEmpty   = "No token found"         // Error message for when the token in a request is empty but required.
-	ErrorToken   = "Access denied by token" // Error message for when the users stored token does not match their UID in a request.
+	TokenEmpty   = "no token found"         // Error message for when the token in a request is empty but required.
+	ErrorToken   = "access denied by token" // Error message for when the users stored token does not match their UID in a request.
 	TokenPass    = "Token authenticated"    // Success message for when the users stored token matches their UID in a request.
 	AccessDenied = "Unauthorized"           // Error message for when the access was denied to make the API request.
 

@@ -4,8 +4,8 @@
 package middleware
 
 import (
+	"WIG-Server/controller"
 	"WIG-Server/messages"
-	"WIG-Server/utils"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -23,7 +23,7 @@ func AppAuthHeaderCheck() fiber.Handler {
 		headerValue := c.Get("AppAuth")
 
 		if headerValue != os.Getenv("APP_SECRET") {
-			return utils.Error(c, 400, messages.AccessDenied)
+			return controller.Error(c, 400, messages.AccessDenied)
 		}
 
 		return c.Next()
