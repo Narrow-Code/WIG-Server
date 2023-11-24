@@ -8,6 +8,8 @@ import (
 	"WIG-Server/models"
 	"WIG-Server/utils"
 	"errors"
+	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -23,34 +25,31 @@ validateToken checks if a users UID and token match and are valid.
 @return error - An error that occured during the process or if the token does not match
 */
 func validateToken(c *fiber.Ctx, uid string, token string) (int, error) {
-	// Check if UID and token exist
-	if uid == "" {
-		return 400, errors.New(messages.UIDEmpty)
+	if uid == "" || token == "" {
+		log.Println("controller#validateToken: UID or Token is empty, returning error")
+		return 400, errors.New("UID or Token is empty")
 	}
 
-	if token == "" {
-		return 400, errors.New(messages.TokenEmpty)
-	}
-
-	// Query for UID
+	log.Printf("controller#validateToken: Retrieving user from the database for UID: %s", uid)
 	var user models.User
 	result := db.DB.Where("user_uid = ?", uid).First(&user)
 
-	// Check if UID was found
 	if result.Error == gorm.ErrRecordNotFound {
-		return 404, errors.New("UID " + messages.RecordNotFound)
+		log.Printf("controller#validateToken: UID %s was not found in the database, returning error", uid)
+		return 404, errors.New(fmt.Sprintf("UID %s was not found in the database", uid))
 
 	} else if result.Error != nil {
-		return 400, errors.New(messages.ErrorWithConnection)
+		log.Printf("controller#validateToken: There was an error with the connection, returning error %v", result.Error)
+		return 500, errors.New("Internal server error")
 	}
 
-	// Validate token
 	if token == utils.GenerateToken(user.Username, user.Hash) {
+		log.Printf("controller#ValidateToken: UID %s has been authenticated", uid)
 		return 200, nil
 	} else {
-	return 400, errors.New(messages.ErrorToken)
+		log.Printf("controller#ValidateToken: UID %s is unauthorized by token", uid)
+		return 401, errors.New(fmt.Sprintf("UID %s is unauthorized by token", uid))
 	}
-
 }
 
 /*
@@ -62,14 +61,15 @@ RecordExists checks a gorm.DB error message to see if a record existed in the da
 @return The error message to return
 */
 func recordExists(field string, result *gorm.DB) (int, error) {
-
 	if result.Error == gorm.ErrRecordNotFound {
-		return 404, errors.New(field + messages.DoesNotExist)
+		log.Printf("controller#recordExists: %s was not found in the database, returning error", field)
+		return 404, errors.New(fmt.Sprintf("%s was not found in the database", field))
 	}
 	if result.Error != nil {
+		log.Printf("controller#recordExists: Error checking %s in the database: %v", field, result.Error.Error())
 		return 400, errors.New(result.Error.Error())
 	}
-
+	log.Printf("controller#recordExists: %s was successfully found in the database", field)
 	return 200, nil
 }
 
@@ -82,21 +82,22 @@ RecordNotInUse checks a gorm.DB error message to see if a record is in use in th
 @return The error message to return
 */
 func recordNotInUse(field string, result *gorm.DB) (int, error) {
-
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.Printf("controller#recordNotInUse: Error checking %s usage in the database: %v", field, result.Error)
 		return 400, errors.New(result.Error.Error())
 	}
 	if result.RowsAffected != 0 {
+		log.Printf("controller#recordNotInUse: %s is in use in the database, returning error", field)
 		return 400, errors.New(field + messages.RecordInUse)
 	}
-
+	log.Printf("controller#recordNotInUse: %s is not in use in the database", field)
 	return 200, nil
 }
 
 func createOwnership(uid string, itemUid uint) (models.Ownership, error) {
-	// Convert uid to int
 	uidInt, err := strconv.Atoi(uid)
 	if err != nil {
+		log.Printf("controller#createOwnership: Error converting UID %s to uint", uid)
 		return models.Ownership{}, errors.New(messages.ConversionError)
 	}
 
@@ -105,8 +106,15 @@ func createOwnership(uid string, itemUid uint) (models.Ownership, error) {
 		ItemNumber: itemUid,
 	}
 
-	db.DB.Create(&ownership)
+	result := db.DB.Create(&ownership)
+	if result.Error != nil {
+		log.Printf("controller#createOwnership: Error creating ownership record: %v", result.Error)
+	}
+	if result.RowsAffected == 0 {
+		log.Printf("controller#CreateOwnership: No rows were affected, creation may not have been successful")
+	}
 
+	log.Printf("controller#createOwnership: Ownership record successfully created between user %s and item %d", uid, itemUid)
 	return ownership, nil
 }
 
@@ -125,7 +133,8 @@ func Success(c *fiber.Ctx, message string, dtos ...dto.DTO) error {
 	for _, dto := range dtos {
 		responseMap[dto.Name] = dto.Data
 	}
-
+	
+	log.Printf("controller#Success: Status Code: 200, Response: %v", responseMap)
 	return c.Status(200).JSON(responseMap)
 }
 
@@ -138,10 +147,12 @@ returnError returns the given error code, a 'false' success status and message t
 @return error - An error, if any, that occurred during the process.
 */
 func Error(c *fiber.Ctx, code int, message string) error {
+	log.Printf("controller#Error: Status Code: %d, Response: %v", code, fiber.Map{"message": message})
 	return c.Status(code).JSON(fiber.Map{
 		"message": message})
 }
 
 func DTO(name string, data interface{}) dto.DTO {
+	log.Println("controller#DTO: DTO was created for %s", name)
 	return dto.DTO{Name: name, Data: data}
 }
