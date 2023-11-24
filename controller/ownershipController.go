@@ -72,12 +72,8 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	// Save new amount to the database and create response
 	db.DB.Save(&ownership)
 
-	// Return success
-	return c.Status(200).JSON(
-		fiber.Map{
-			"success":   true,
-			"message":   "Item found",
-			"ownership": ownership})
+	ownershipDTO := DTO("ownership", ownership)
+	return Success(c, "Item found", ownershipDTO)
 }
 
 func OwnershipDelete(c *fiber.Ctx) error {
@@ -184,11 +180,8 @@ func OwnershipCreate(c *fiber.Ctx) error {
 		return Error(c, code, err.Error())
 	}
 
-	return c.Status(200).JSON(
-		fiber.Map{
-			"success":      true,
-			"message":      messages.OwnershipCreated,
-			"ownershipUID": ownership.OwnershipUID})
+	ownershipDTO := DTO("ownershipUID", ownership.OwnershipUID)
+	return Success(c, messages.OwnershipCreated, ownershipDTO)
 }
 
 func OwnershipSetLocation(c *fiber.Ctx) error {

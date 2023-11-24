@@ -74,10 +74,10 @@ func ScanBarcode(c *fiber.Ctx) error {
 		ownerships = append(ownerships, ownership)
 	}
 
-	itemName := DTO("item", item.Name)
-	ownership := DTO("ownership", ownerships)
+	itemDTO := DTO("item", item.Name)
+	ownershipDTO := DTO("ownership", ownerships)
 
-	return Success(c, "Item found", itemName, ownership)
+	return Success(c, "Item found", itemDTO, ownershipDTO)
 }
 
 /*

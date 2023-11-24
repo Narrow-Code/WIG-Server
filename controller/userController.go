@@ -41,9 +41,9 @@ func UserSalt(c *fiber.Ctx) error {
 		return Error(c, code, err.Error())
 	}
 
-	salt := DTO("salt", user.Salt)
+	saltDTO := DTO("salt", user.Salt)
 
-	return Success(c, messages.SaltReturned, salt)
+	return Success(c, messages.SaltReturned, saltDTO)
 }
 
 /*
@@ -106,10 +106,9 @@ func UserLogin(c *fiber.Ctx) error {
 	if data["hash"] != user.Hash {
 		return Error(c, 400, messages.UsernamePasswordDoNotMatch)
 	}
-	token := DTO("token", utils.GenerateToken(user.Username, user.Hash))
-	uid := DTO("uid", user.UserUID)
-
-	return Success(c, messages.UserLoginSuccess, token, uid)
+	tokenDTO := DTO("token", utils.GenerateToken(user.Username, user.Hash))
+	uidDTO := DTO("uid", user.UserUID)
+	return Success(c, messages.UserLoginSuccess, tokenDTO, uidDTO)
 }
 
 /*
