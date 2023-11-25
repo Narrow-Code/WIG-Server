@@ -20,7 +20,9 @@ import (
 func main() {
 	db.Connect()
 	app := fiber.New()
-	app.Use(middleware.AppAuthHeaderCheck())
+	app.Use(middleware.AppAuth())
+	loggedRoutes := app.Group("/app")
+    	loggedRoutes.Use(middleware.ValidateToken())
 	routes.Setup(app)
 	app.Listen(":" + db.GetPort()) 
 }

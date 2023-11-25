@@ -36,7 +36,7 @@ func UserSalt(c *fiber.Ctx) error {
 	// Query database for username
 	var user models.User
 	result := db.DB.Where("username = ?", username).First(&user)
-	code, err := recordExists("Username", result)
+	code, err := RecordExists("Username", result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
@@ -54,20 +54,6 @@ It checks if the user is logged in at initial start of application, making sure 
 @return error - An error, if any, that occured during the registration procces.
 */
 func UserValidate(c *fiber.Ctx) error {
-	// Parse request into data map
-	var data map[string]string
-	err := c.BodyParser(&data)
-	if err != nil {
-		return Error(c, 400, messages.ErrorParsingRequest)
-	}
-
-	// Validate Token
-	code, err := validateToken(c, data["uid"], data["token"])
-	if err != nil {
-		return Error(c, code, err.Error())
-	}
-
-	// Return success
 	return Success(c, messages.TokenPass)
 }
 
@@ -97,7 +83,7 @@ func UserLogin(c *fiber.Ctx) error {
 	// Check that user exists
 	var user models.User
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
-	code, err := recordExists("Username", result)
+	code, err := RecordExists("Username", result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
@@ -106,8 +92,14 @@ func UserLogin(c *fiber.Ctx) error {
 	if data["hash"] != user.Hash {
 		return Error(c, 400, messages.UsernamePasswordDoNotMatch)
 	}
-	tokenDTO := DTO("token", utils.GenerateToken(user.Username, user.Hash))
+	
+	user.Token = utils.GenerateToken(user.Username, user.Hash)
+
+	tokenDTO := DTO("token", user.Token)
 	uidDTO := DTO("uid", user.UserUID)
+
+	db.DB.Save(&user)
+
 	return Success(c, messages.UserLoginSuccess, tokenDTO, uidDTO)
 }
 

@@ -17,22 +17,9 @@ GetBarcode handles the functionality of returning any ownerships and items back 
 @param c *fiber.Ctx
 */
 func ScanBarcode(c *fiber.Ctx) error {
-	// Parse request into data map
-	var data map[string]string
-	err := c.BodyParser(&data)
-	if err != nil {
-		return Error(c, 400, messages.ErrorParsingRequest)
-	}
-
 	// Initialize variables
-	uid := data["uid"]
+	uid := c.Locals("uid").(string)
 	barcode := c.Query("barcode")
-
-	// Validate Token
-	code, err := validateToken(c, data["uid"], data["token"])
-	if err != nil {
-		return Error(c, code, err.Error())
-	}
 
 	// Validate barcode
 	if barcode == "" {
@@ -63,7 +50,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 
 	// Search Ownership by barcode
 	var ownerships []models.Ownership
-	db.DB.Where("item_barcode = ? AND item_owner = ?", barcode, uid).Find(&ownerships)
+	db.DB.Where("item_number = ? AND item_owner = ?", item.ItemUid, uid).Find(&ownerships)
 
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
@@ -71,6 +58,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 		if err != nil {
 			return Error(c, 400, err.Error())
 		}
+		ownership.ItemQuantity = 1
 		ownerships = append(ownerships, ownership)
 	}
 
@@ -87,22 +75,9 @@ CheckQR takes a QR code as parameter, and checks whether it is an item, location
 @return error - An error that occured during the process or if the token does not match
 */
 func ScanCheckQR(c *fiber.Ctx) error {
-	// Parse request into data map
-	var data map[string]string
-	err := c.BodyParser(&data)
-	if err != nil {
-		return Error(c, 400, messages.ErrorParsingRequest)
-	}
-
 	// Initialize variables
-	uid := data["uid"]
+	uid := c.Locals("uid")
 	qr := c.Query("qr")
-
-	// Validate Token
-	code, err := validateToken(c, data["uid"], data["token"])
-	if err != nil {
-		return Error(c, code, err.Error())
-	}
 
 	// Check for empty fields
 	if qr == "" {

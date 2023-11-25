@@ -60,7 +60,7 @@ RecordExists checks a gorm.DB error message to see if a record existed in the da
 @return int The HTTP error code to return
 @return The error message to return
 */
-func recordExists(field string, result *gorm.DB) (int, error) {
+func RecordExists(field string, result *gorm.DB) (int, error) {
 	if result.Error == gorm.ErrRecordNotFound {
 		log.Printf("controller#recordExists: %s was not found in the database, returning error", field)
 		return 404, errors.New(fmt.Sprintf("%s was not found in the database", field))
@@ -153,6 +153,6 @@ func Error(c *fiber.Ctx, code int, message string) error {
 }
 
 func DTO(name string, data interface{}) dto.DTO {
-	log.Println("controller#DTO: DTO was created for %s", name)
+	log.Printf("controller#DTO: DTO was created for %s", name)
 	return dto.DTO{Name: name, Data: data}
 }

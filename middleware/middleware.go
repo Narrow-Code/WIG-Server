@@ -5,8 +5,12 @@ package middleware
 
 import (
 	"WIG-Server/controller"
+	"WIG-Server/db"
 	"WIG-Server/messages"
+	"WIG-Server/models"
+	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -15,7 +19,7 @@ import (
 /*
 * AppAuthHeaderCheck checks that the AppAuth header is valid.
  */
-func AppAuthHeaderCheck() fiber.Handler {
+func AppAuth() fiber.Handler {
 	// Get AppAuth secret
 	godotenv.Load()
 
@@ -28,5 +32,24 @@ func AppAuthHeaderCheck() fiber.Handler {
 
 		return c.Next()
 	}
+}
 
+func ValidateToken() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		token := c.Get("Authorization")
+		fmt.Println("WORKING")
+		if token == "" {
+           		return controller.Error(c, fiber.StatusBadRequest, "Token missing")
+        	}
+	
+		var user models.User
+        	result := db.DB.Where("token = ?", token).First(&user)
+
+        	if result.Error != nil {
+            		return controller.Error(c, fiber.StatusUnauthorized, messages.AccessDenied)
+        	}
+
+		c.Locals("uid", strconv.FormatUint(uint64(user.UserUID), 10))
+		return c.Next()
+	}
 }
