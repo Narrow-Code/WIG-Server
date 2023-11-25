@@ -1,6 +1,3 @@
-/*
-* Package model defines the data models used in the WIG-Server application
- */
 package models
 
 /*
@@ -14,5 +11,5 @@ type User struct {
 	Hash         string `json:"hash" gorm:"column:hash"`
 	EmailConfirm string `json:"email_confirmed" gorm:"column:email_confirm;default:false"`
 	TierLevel    string `json:"tier_level" gorm:"column:tier_level"`
-	Token        string `json:"token" gorm:"column:token"` 
+	Token        string `json:"token" gorm:"column:token"`
 }

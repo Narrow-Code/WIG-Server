@@ -1,4 +1,3 @@
-// Package controller provides functions for handling HTTP requests and implementing business logic between the database and application.
 package controller
 
 import (
