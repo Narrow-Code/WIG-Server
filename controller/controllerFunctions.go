@@ -112,6 +112,5 @@ func Error(c *fiber.Ctx, code int, message string) error {
 }
 
 func DTO(name string, data interface{}) dto.DTO {
-	log.Printf("%s: DTO was created for %s", utils.CallerFunctionName(), name)
 	return dto.DTO{Name: name, Data: data}
 }
