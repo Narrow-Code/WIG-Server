@@ -46,12 +46,12 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	case "increment":
 		ownership.ItemQuantity += amount
 	case "decrement":
-    		if ownership.ItemQuantity == 0 {
+		if ownership.ItemQuantity == 0 {
 		} else {
 			ownership.ItemQuantity -= amount
-    			if ownership.ItemQuantity < 0 {
-        			ownership.ItemQuantity = 0
-    			}	
+			if ownership.ItemQuantity < 0 {
+				ownership.ItemQuantity = 0
+			}
 		}
 	case "set":
 		ownership.ItemQuantity = amount

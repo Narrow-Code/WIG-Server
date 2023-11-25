@@ -4,6 +4,7 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/messages"
 	"WIG-Server/models"
+	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,24 +16,22 @@ func LocationCreate(c *fiber.Ctx) error {
 	locationQR := c.Query("location_qr")
 	locationName := c.Query("location_name")
 	locationType := c.Params("type")
+	log.Printf("controller#LocationCreate: User %s called LocationCreate", userUID)
 
 	// Check location type exists
-	if locationType != "bin" && locationType != "bag" && locationType != "location" {
-		return Error(c, 400, messages.LocationTypeInvalid)
+	if locationType != "bin" && locationType != "bag" && locationType != "area" {
+		return Error(c, 400, "Location type must be bin, bag or area")
 	}
 
 	// convert uid to uint
 	userUIDInt, err := strconv.ParseUint(userUID, 10, 64)
 	if err != nil {
-		return Error(c, 400, messages.ConversionError)
+		return Error(c, 400, "Error converting userUID to uint")
 	}
 
 	// Check for empty fields
-	if locationQR == "" {
-		return Error(c, 400, messages.LocationQRRequired)
-	}
-	if locationName == "" {
-		return Error(c, 400, messages.LocationNameRequired)
+	if locationQR == "" || locationName == "" {
+		return Error(c, 400, "The locationQR or locationName field is empty")
 	}
 
 	// Validate location QR code is not in use

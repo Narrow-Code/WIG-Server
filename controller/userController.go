@@ -73,11 +73,8 @@ func UserLogin(c *fiber.Ctx) error {
 	}
 
 	// Check for empty fields
-	if data["username"] == "" {
-		return Error(c, 400, messages.UsernameEmpty)
-	}
-	if data["hash"] == "" {
-		return Error(c, 400, messages.HashMissing)
+	if data["username"] == "" || data["hash"] == "" {
+		return Error(c, 400, "Username or hash is empty and required")
 	}
 
 	// Check that user exists
@@ -92,7 +89,7 @@ func UserLogin(c *fiber.Ctx) error {
 	if data["hash"] != user.Hash {
 		return Error(c, 400, messages.UsernamePasswordDoNotMatch)
 	}
-	
+
 	user.Token = utils.GenerateToken(user.Username, user.Hash)
 
 	tokenDTO := DTO("token", user.Token)
@@ -120,17 +117,11 @@ func UserSignup(c *fiber.Ctx) error {
 	}
 
 	// Check for empty fields
-	if data["username"] == "" {
-		return Error(c, 400, messages.UsernameEmpty)
+	if data["username"] == "" || data["email"] == "" {
+		return Error(c, 400, "Username or email is empty and required")
 	}
-	if data["email"] == "" {
-		return Error(c, 400, messages.EmailEmpty)
-	}
-	if data["salt"] == "" {
-		return Error(c, 400, messages.SaltMissing)
-	}
-	if data["hash"] == "" {
-		return Error(c, 400, messages.HashMissing)
+	if data["salt"] == "" || data["hash"] == "" {
+		return Error(c, 400, "Sale or hash is empty and required")
 	}
 
 	// Query for username in database

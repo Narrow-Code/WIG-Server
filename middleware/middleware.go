@@ -39,15 +39,15 @@ func ValidateToken() fiber.Handler {
 		token := c.Get("Authorization")
 		fmt.Println("WORKING")
 		if token == "" {
-           		return controller.Error(c, fiber.StatusBadRequest, "Token missing")
-        	}
-	
-		var user models.User
-        	result := db.DB.Where("token = ?", token).First(&user)
+			return controller.Error(c, fiber.StatusBadRequest, "Token missing")
+		}
 
-        	if result.Error != nil {
-            		return controller.Error(c, fiber.StatusUnauthorized, messages.AccessDenied)
-        	}
+		var user models.User
+		result := db.DB.Where("token = ?", token).First(&user)
+
+		if result.Error != nil {
+			return controller.Error(c, fiber.StatusUnauthorized, messages.AccessDenied)
+		}
 
 		c.Locals("uid", strconv.FormatUint(uint64(user.UserUID), 10))
 		return c.Next()
