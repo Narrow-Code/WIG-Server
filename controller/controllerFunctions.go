@@ -3,7 +3,6 @@ package controller
 
 import (
 	"WIG-Server/db"
-	"WIG-Server/dto"
 	"WIG-Server/models"
 	"WIG-Server/utils"
 	"errors"
@@ -83,7 +82,7 @@ returnSuccess returns a 200 success code, a 'true' success status and a message 
 @param message The success message to return via fiber.
 @return error - An error, if any, that occurred during the process.
 */
-func Success(c *fiber.Ctx, message string, dtos ...dto.DTO) error {
+func Success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
 	responseMap := fiber.Map{
 		"message": message,
 	}
@@ -110,6 +109,6 @@ func Error(c *fiber.Ctx, code int, message string) error {
 		"message": message})
 }
 
-func DTO(name string, data interface{}) dto.DTO {
-	return dto.DTO{Name: name, Data: data}
+func DTO(name string, data interface{}) models.DTO {
+	return models.DTO{Name: name, Data: data}
 }
