@@ -2,7 +2,6 @@ package controller
 
 import (
 	"WIG-Server/db"
-	"WIG-Server/messages"
 	"WIG-Server/models"
 	"WIG-Server/upcitemdb"
 	"strconv"
@@ -23,11 +22,11 @@ func ScanBarcode(c *fiber.Ctx) error {
 
 	// Validate barcode
 	if barcode == "" {
-		return Error(c, 400, messages.BarcodeMissing)
+		return Error(c, 400, "Barcode is empty and required")
 	}
 	barcodeCheck, err := strconv.Atoi(barcode)
 	if err != nil || barcodeCheck < 0 {
-		return Error(c, 400, messages.BarcodeIntError)
+		return Error(c, 400, "There was an error converting barcode to an Int")
 	}
 
 	// Check if item exists in local database
@@ -39,13 +38,13 @@ func ScanBarcode(c *fiber.Ctx) error {
 		upcitemdb.GetBarcode(barcode)
 		result = db.DB.Where("barcode = ?", barcode).First(&item)
 		if result.Error == gorm.ErrRecordNotFound {
-			return Error(c, 400, messages.ItemNotFound)
+			return Error(c, 400, "Item was not found in the database")
 		}
 	}
 
 	// If there is a connection error
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return Error(c, 400, messages.ErrorWithConnection)
+		return Error(c, 400, "internal server error")
 	}
 
 	// Search Ownership by barcode
@@ -81,27 +80,27 @@ func ScanCheckQR(c *fiber.Ctx) error {
 
 	// Check for empty fields
 	if qr == "" {
-		return Error(c, 400, messages.QRMissing)
+		return Error(c, 400, "QR is empty and required")
 	}
 
 	// Check if qr exists as location
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, uid).First(&location)
 	if location.LocationUID != 0 {
-		return Success(c, messages.Location)
+		return Success(c, "LOCATION")
 	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return Error(c, 400, messages.ErrorWithConnection)
+		return Error(c, 400, "internal server error")
 	}
 
 	// Check if qr exists as ownership
 	var ownership models.Ownership
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, uid).First(&ownership)
 	if ownership.OwnershipUID != 0 {
-		return Success(c, messages.Ownership)
+		return Success(c, "OWNERSHIP")
 	}
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return Error(c, 400, messages.ErrorWithConnection)
+		return Error(c, 400, "internal server error")
 	}
 
-	return Success(c, messages.New)
+	return Success(c, "NEW")
 }

@@ -2,7 +2,6 @@ package controller
 
 import (
 	"WIG-Server/db"
-	"WIG-Server/messages"
 	"WIG-Server/models"
 
 	"strconv"
@@ -25,10 +24,10 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	// Convert amount to int
 	amount, err := strconv.Atoi(amountStr)
 	if err != nil {
-		return Error(c, 400, messages.ConversionError)
+		return Error(c, 400, "There was an error converting amount to Int")
 	}
 	if amount < 0 {
-		return Error(c, 400, messages.NegativeError)
+		return Error(c, 400, "Amount cannot be negative")
 	}
 
 	// Valide and retreive the ownership
@@ -54,7 +53,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	case "set":
 		ownership.ItemQuantity = amount
 	default:
-		return Error(c, 400, messages.InvalidChangeType)
+		return Error(c, 400, "Change type must be increment, decrement or set")
 	}
 
 	// Save new amount to the database and create response
@@ -81,11 +80,11 @@ func OwnershipDelete(c *fiber.Ctx) error {
 
 	// Check for errors after the delete operation
 	if result := db.DB.Delete(&ownership); result.Error != nil {
-		return Error(c, 500, messages.ErrorDeletingOwnership)
+		return Error(c, 500, "There was an error deleting the ownership")
 	}
 
 	// Ownership successfully deleted
-	return Success(c, messages.OwnershipDelete)
+	return Success(c, "Ownership was successfully deleted")
 }
 
 func OwnershipEdit(c *fiber.Ctx) error {
@@ -111,7 +110,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	db.DB.Save(&ownership)
 
 	// Ownership successfully updated
-	return Success(c, messages.OwnershipUpdated)
+	return Success(c, "Ownership was successfully updated")
 }
 
 func OwnershipCreate(c *fiber.Ctx) error {
@@ -121,7 +120,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	// convert uid to uint
 	itemUID, err := strconv.ParseUint(c.Query("item_uid"), 10, 64)
 	if err != nil {
-		return Error(c, 400, messages.ConversionError)
+		return Error(c, 400, "There was an error converting itemUID to Uint")
 	}
 
 	ownership, err := createOwnership(userUID, uint(itemUID))
@@ -130,7 +129,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	}
 
 	ownershipDTO := DTO("ownershipUID", ownership.OwnershipUID)
-	return Success(c, messages.OwnershipCreated, ownershipDTO)
+	return Success(c, "Ownership was successfully created", ownershipDTO)
 }
 
 func OwnershipSetLocation(c *fiber.Ctx) error {

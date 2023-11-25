@@ -2,7 +2,6 @@ package controller
 
 import (
 	"WIG-Server/db"
-	"WIG-Server/messages"
 	"WIG-Server/models"
 	"log"
 	"strconv"
@@ -59,7 +58,7 @@ func LocationCreate(c *fiber.Ctx) error {
 
 	db.DB.Create(&location)
 
-	return Success(c, messages.LocationAdded)
+	return Success(c, "Location has been added successfully")
 }
 
 func LocationSetLocation(c *fiber.Ctx) error {
@@ -70,7 +69,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 
 	// Verify locations are not the same
 	if locationUID == setLocationUID {
-		return Error(c, 400, messages.LocationSelfError)
+		return Error(c, 400, "Cannot set location in itself")
 	}
 
 	// Validate the QR code
@@ -118,5 +117,5 @@ func LocationEdit(c *fiber.Ctx) error {
 	db.DB.Save(&location)
 
 	// Ownership successfully updated
-	return Success(c, messages.LocationUpdated)
+	return Success(c, "Location updated successfully")
 }

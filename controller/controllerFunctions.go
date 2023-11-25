@@ -4,7 +4,6 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/dto"
-	"WIG-Server/messages"
 	"WIG-Server/models"
 	"WIG-Server/utils"
 	"errors"
@@ -48,7 +47,7 @@ func recordNotInUse(field string, result *gorm.DB) (int, error) {
 		return 400, errors.New(result.Error.Error())
 	}
 	if result.RowsAffected != 0 {
-		return 400, errors.New(field + messages.RecordInUse)
+		return 400, errors.New(field + "Record is in use in the database")
 	}
 	log.Printf("controller#recordNotInUse: %s is not in use in the database", field)
 	return 200, nil
@@ -57,7 +56,7 @@ func recordNotInUse(field string, result *gorm.DB) (int, error) {
 func createOwnership(uid string, itemUid uint) (models.Ownership, error) {
 	uidInt, err := strconv.Atoi(uid)
 	if err != nil {
-		return models.Ownership{}, errors.New(messages.ConversionError)
+		return models.Ownership{}, errors.New("There was an error converting uid to Int")
 	}
 
 	ownership := models.Ownership{

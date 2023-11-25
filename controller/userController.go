@@ -2,7 +2,6 @@ package controller
 
 import (
 	"WIG-Server/db"
-	"WIG-Server/messages"
 	"WIG-Server/models"
 	"WIG-Server/utils"
 	"net"
@@ -29,7 +28,7 @@ func UserSalt(c *fiber.Ctx) error {
 	// Get parameters
 	username := c.Query("username")
 	if username == "" {
-		return Error(c, 400, messages.UsernameEmpty)
+		return Error(c, 400, "Username is empty and required")
 	}
 
 	// Query database for username
@@ -42,7 +41,7 @@ func UserSalt(c *fiber.Ctx) error {
 
 	saltDTO := DTO("salt", user.Salt)
 
-	return Success(c, messages.SaltReturned, saltDTO)
+	return Success(c, "Salt returned successfully", saltDTO)
 }
 
 /*
@@ -53,7 +52,7 @@ It checks if the user is logged in at initial start of application, making sure 
 @return error - An error, if any, that occured during the registration procces.
 */
 func UserValidate(c *fiber.Ctx) error {
-	return Success(c, messages.TokenPass)
+	return Success(c, "Authorized")
 }
 
 /*
@@ -68,7 +67,7 @@ func UserLogin(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, "There was an error parsing JSON")
 	}
 
 	// Check for empty fields
@@ -86,7 +85,7 @@ func UserLogin(c *fiber.Ctx) error {
 
 	// Check if hash matches then generate token
 	if data["hash"] != user.Hash {
-		return Error(c, 400, messages.UsernamePasswordDoNotMatch)
+		return Error(c, 400, "The username and passwords do not match")
 	}
 
 	user.Token = utils.GenerateToken(user.Username, user.Hash)
@@ -96,7 +95,7 @@ func UserLogin(c *fiber.Ctx) error {
 
 	db.DB.Save(&user)
 
-	return Success(c, messages.UserLoginSuccess, tokenDTO, uidDTO)
+	return Success(c, "Login was successful", tokenDTO, uidDTO)
 }
 
 /*
@@ -112,7 +111,7 @@ func UserSignup(c *fiber.Ctx) error {
 	var data map[string]string
 	err := c.BodyParser(&data)
 	if err != nil {
-		return Error(c, 400, messages.ErrorParsingRequest)
+		return Error(c, 400, "There was an error parsing the JSON")
 	}
 
 	// Check for empty fields
@@ -140,17 +139,17 @@ func UserSignup(c *fiber.Ctx) error {
 
 	// Check username requirements
 	if !usernameRegex.MatchString(data["username"]) {
-		return Error(c, 400, messages.ErrorUsernameRequirements)
+		return Error(c, 400, "Username does not match requirements")
 	}
 	if !emailRegex.MatchString(data["email"]) {
-		return Error(c, 400, messages.ErrorEmailRequirements)
+		return Error(c, 400, "Email does not match requirements")
 	}
 
 	// Run DNS check on Email
 	domain := strings.Split(data["email"], "@")[1]
 	_, err = net.LookupMX(domain)
 	if err != nil {
-		return Error(c, 400, messages.ErrorEmailRequirements)
+		return Error(c, 400, "Email domain does not exist")
 	}
 
 	// Set user model
@@ -165,5 +164,5 @@ func UserSignup(c *fiber.Ctx) error {
 
 	// TODO send verification email
 
-	return Success(c, messages.SignupSuccess)
+	return Success(c, "Signup was successful")
 }

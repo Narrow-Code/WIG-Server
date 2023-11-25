@@ -6,7 +6,6 @@ package middleware
 import (
 	"WIG-Server/controller"
 	"WIG-Server/db"
-	"WIG-Server/messages"
 	"WIG-Server/models"
 	"fmt"
 	"os"
@@ -27,7 +26,7 @@ func AppAuth() fiber.Handler {
 		headerValue := c.Get("AppAuth")
 
 		if headerValue != os.Getenv("APP_SECRET") {
-			return controller.Error(c, 400, messages.AccessDenied)
+			return controller.Error(c, 400, "Unauthorized")
 		}
 
 		return c.Next()
@@ -46,7 +45,7 @@ func ValidateToken() fiber.Handler {
 		result := db.DB.Where("token = ?", token).First(&user)
 
 		if result.Error != nil {
-			return controller.Error(c, fiber.StatusUnauthorized, messages.AccessDenied)
+			return controller.Error(c, fiber.StatusUnauthorized, "Unauthorized")
 		}
 
 		c.Locals("uid", strconv.FormatUint(uint64(user.UserUID), 10))
