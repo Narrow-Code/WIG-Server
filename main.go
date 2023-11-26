@@ -22,7 +22,7 @@ func main() {
 	app := fiber.New()
 	app.Use(middleware.AppAuth())
 	loggedRoutes := app.Group("/app")
-    	loggedRoutes.Use(middleware.ValidateToken())
+	loggedRoutes.Use(middleware.ValidateToken())
 	routes.Setup(app)
 	app.Listen(":" + db.GetPort()) 
 }
