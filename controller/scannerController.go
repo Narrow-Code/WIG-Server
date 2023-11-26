@@ -11,9 +11,14 @@ import (
 )
 
 /*
-GetBarcode handles the functionality of returning any ownerships and items back after scanning a barcode.
-
-@param c *fiber.Ctx
+* Takes a barcode and searches to see if an item in the database exists with the barcode.
+* If an item does not exist, it makes API call to upcitemdb.com to search barcode.
+* If the item exists at upcitemdb, it creates a new item with that data.
+* Then after all, it creates an ownership with item and userdata.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
 */
 func ScanBarcode(c *fiber.Ctx) error {
 	// Initialize variables
@@ -68,10 +73,11 @@ func ScanBarcode(c *fiber.Ctx) error {
 }
 
 /*
-CheckQR takes a QR code as parameter, and checks whether it is an item, location or a unused QR.
-
-@param c *fiber.Ctx - The fier context containing the HTTP request and response objects.
-@return error - An error that occured during the process or if the token does not match
+* Takes a QR code as parameters, and checks whether it is an item, location or an unused QR.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
 */
 func ScanCheckQR(c *fiber.Ctx) error {
 	// Initialize variables

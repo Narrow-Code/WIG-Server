@@ -9,6 +9,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+/*
+* Creates a location using a QR code, a location name and the type of location.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
 func LocationCreate(c *fiber.Ctx) error {
 	// Initialize variables
 	userUID := c.Locals("uid").(string)
@@ -61,6 +68,13 @@ func LocationCreate(c *fiber.Ctx) error {
 	return Success(c, "Location has been added successfully")
 }
 
+/*
+* Sets the location of a specific location.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
 func LocationSetLocation(c *fiber.Ctx) error {
 	// Initialize variables
 	userUID := c.Locals("uid").(string)
@@ -96,6 +110,13 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	return Success(c, location.LocationName+" set in "+setLocation.LocationName)
 }
 
+/*
+* Edits the fields of the location.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
 func LocationEdit(c *fiber.Ctx) error {
 	// Initialize variables
 	userUID := c.Locals("uid").(string)

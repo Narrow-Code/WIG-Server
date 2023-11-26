@@ -10,9 +10,11 @@ import (
 )
 
 /*
-IncrementOwnership increases the ownerships quantity by the designated value
-
-@param c *fiber.Ctx
+* Changes the quantity of an ownership, using increment, decrement or setter method.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
 */
 func OwnershipQuantity(c *fiber.Ctx) error {
 	// Initialize variables
@@ -63,6 +65,13 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	return Success(c, "Item found", ownershipDTO)
 }
 
+/*
+* Deletes an ownership from the database.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
 func OwnershipDelete(c *fiber.Ctx) error {
 	// Initialize variables
 	userUID := c.Locals("uid").(string)
@@ -87,6 +96,13 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	return Success(c, "Ownership was successfully deleted")
 }
 
+/*
+* Edits the fields of the ownership in the database.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
 func OwnershipEdit(c *fiber.Ctx) error {
 	// Initialize variables
 	userUID := c.Locals("uid").(string)
@@ -113,6 +129,13 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	return Success(c, "Ownership was successfully updated")
 }
 
+/*
+* Creates an ownership in the database.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
 func OwnershipCreate(c *fiber.Ctx) error {
 	// Initialize variables
 	userUID := c.Locals("uid").(string)
@@ -132,6 +155,13 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	return Success(c, "Ownership was successfully created", ownershipDTO)
 }
 
+/*
+* Sets the locatino of the database.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
 func OwnershipSetLocation(c *fiber.Ctx) error {
 	// Initialize variables
 	userUID := c.Locals("uid").(string)
