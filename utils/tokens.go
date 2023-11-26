@@ -29,7 +29,7 @@ func GenerateToken(username string, hash string) string {
 
 	// Return error if access token generation fails
 	if err != nil {
-		return ""
+		return "error"
 	}
 	return tokenStr
 }

@@ -90,6 +90,10 @@ func UserLogin(c *fiber.Ctx) error {
 
 	user.Token = utils.GenerateToken(user.Username, user.Hash)
 
+	if user.Token == "error" {
+		return Error(c, 400, "There was an error generating user token")
+	}
+
 	tokenDTO := DTO("token", user.Token)
 	uidDTO := DTO("uid", user.UserUID)
 
