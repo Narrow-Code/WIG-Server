@@ -1,8 +1,6 @@
 package models
 
-/*
-* Item represents information about an item.
- */
+// Item represents information about an item.
 type Item struct {
 	ItemUid uint   `json:"item_uid" gorm:"primary_key;column:item_uid"`
 	Barcode string `json:"barcode" gorm:"type:varchar(255);column:barcode"`

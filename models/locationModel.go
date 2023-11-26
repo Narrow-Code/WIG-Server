@@ -1,8 +1,6 @@
 package models
 
-/*
-Location represents information about a location.
-*/
+// Represents information about a location.
 type Location struct {
 	LocationUID         uint      `json:"location_uid" gorm:"primary_key;column:location_uid"`
 	LocationOwner       uint      `json:"location_owner" gorm:"column:location_owner"`

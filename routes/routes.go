@@ -1,6 +1,4 @@
-/*
-* Package routes defines the HTTP routes for the WIG-Server application.
- */
+// Defines the HTTP routes for the WIG-Server application.
 package routes
 
 import (
@@ -10,9 +8,9 @@ import (
 )
 
 /*
-* Setup configures the routes on a Fiber application.
+* Configures the routes on a Fiber application.
 *
-* @param app *fiber.App - The Fiber application instance on which the routes will be configured.
+* @param app The Fiber application instance on which the routes will be configured.
  */
 func Setup(app *fiber.App) {
 	// User Routes

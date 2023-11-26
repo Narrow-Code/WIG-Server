@@ -1,6 +1,4 @@
-/*
-* Package components provides functions that may be regularly used throughout the WIG-Application
- */
+// Provides functions that may be regularly used throughout the WIG-Application.
 package utils
 
 import (
@@ -11,13 +9,12 @@ import (
 )
 
 /*
-* generateToken generates a randomized authentication token for API calls between the WIG-Application and server.
+* Generates a randomized authentication token for API calls between the WIG-Application and server.
 *
-* @param username The username of the user
-* @param hash The hashed password of the user
+* @param username The username.
+* @param hash The hashed password.
 *
-* @return string - The generated authentication token.
-* @return error - An error, if any, during the token generation process.
+* @return string The generated authentication token.
  */
 func GenerateToken(username string, hash string) string {
 	godotenv.Load()
@@ -36,4 +33,3 @@ func GenerateToken(username string, hash string) string {
 	}
 	return tokenStr
 }
-

@@ -1,3 +1,4 @@
+// Handles the API calls with upcitemdb.com.
 package upcitemdb
 
 import (
@@ -10,6 +11,12 @@ import (
 	"net/http"
 )
 
+/*
+* Performs the GET Barcode API call with upcitemdb.com.
+* If an item is retrieved it is then added to the Items table in the database.
+*
+* @param barcode The barcode to retrieve data for.
+*/
 func GetBarcode(barcode string) {
 	url := "https://api.upcitemdb.com/prod/trial/lookup?upc=" + barcode
 

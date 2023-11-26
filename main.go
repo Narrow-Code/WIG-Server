@@ -1,8 +1,4 @@
-/*
-* Package main is the entry point for the WIG-Server application.
-*
-* This package initializes the database connection, sets up routes, and starts the server.
-*/
+// The entry point for the WIG-Server application.
 package main
 
 import (
@@ -13,9 +9,7 @@ import (
 )
 
 /*
-* main is the entry point of the application.
-*
-* It connects to the database, sets up routes, and starts the server.
+* Connects to the database, sets up routes, and starts the backend server.
 */
 func main() {
 	db.Connect()

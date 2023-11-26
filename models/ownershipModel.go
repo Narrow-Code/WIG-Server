@@ -1,8 +1,6 @@
 package models
 
-/*
-* Ownership represents information about ownership.
- */
+// Represents information about ownership.
 type Ownership struct {
 	OwnershipUID   uint     `json:"ownership_uid" gorm:"primary_key;column:ownership_uid"`
 	ItemOwner      uint     `json:"item_owner" gorm:"column:item_owner"`

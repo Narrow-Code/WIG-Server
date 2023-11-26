@@ -1,6 +1,4 @@
-/*
-* The middleware package handles all middle functions between the API calls.
- */
+// The Handles all middle functions between the API calls.
 package middleware
 
 import (
@@ -16,27 +14,28 @@ import (
 )
 
 /*
-* AppAuthHeaderCheck checks that the AppAuth header is valid.
+* Checks that the AppAuth header is valid.
  */
 func AppAuth() fiber.Handler {
-	// Get AppAuth secret
-	godotenv.Load()
-
 	return func(c *fiber.Ctx) error {
+		godotenv.Load()
 		headerValue := c.Get("AppAuth")
-
+		
 		if headerValue != os.Getenv("APP_SECRET") {
 			return controller.Error(c, 400, "Unauthorized")
 		}
-
 		return c.Next()
 	}
 }
 
+/*
+* Checks that the users token is still valid.
+*/
 func ValidateToken() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := c.Get("Authorization")
 		fmt.Println("WORKING")
+		
 		if token == "" {
 			return controller.Error(c, fiber.StatusBadRequest, "Token missing")
 		}
