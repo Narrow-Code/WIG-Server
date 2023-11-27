@@ -7,7 +7,6 @@ import (
 	"WIG-Server/models"
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -20,7 +19,7 @@ func AppAuth() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		godotenv.Load()
 		headerValue := c.Get("AppAuth")
-		
+
 		if headerValue != os.Getenv("APP_SECRET") {
 			return controller.Error(c, 400, "Unauthorized")
 		}
@@ -30,12 +29,12 @@ func AppAuth() fiber.Handler {
 
 /*
 * Checks that the users token is still valid.
-*/
+ */
 func ValidateToken() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := c.Get("Authorization")
 		fmt.Println("WORKING")
-		
+
 		if token == "" {
 			return controller.Error(c, fiber.StatusBadRequest, "Token missing")
 		}
@@ -47,7 +46,7 @@ func ValidateToken() fiber.Handler {
 			return controller.Error(c, fiber.StatusUnauthorized, "Unauthorized")
 		}
 
-		c.Locals("uid", strconv.FormatUint(uint64(user.UserUID), 10))
+		c.Locals("uid", user)
 		return c.Next()
 	}
 }

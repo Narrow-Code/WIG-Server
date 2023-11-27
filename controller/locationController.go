@@ -4,7 +4,6 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"log"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,24 +14,18 @@ import (
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func LocationCreate(c *fiber.Ctx) error {
 	// Initialize variables
-	userUID := c.Locals("uid").(string)
+	user := c.Locals("user").(models.User)
 	locationQR := c.Query("location_qr")
 	locationName := c.Query("location_name")
 	locationType := c.Params("type")
-	log.Printf("controller#LocationCreate: User %s called LocationCreate", userUID)
+	log.Printf("controller#LocationCreate: User %d called LocationCreate", user.UserUID)
 
 	// Check location type exists
 	if locationType != "bin" && locationType != "bag" && locationType != "area" {
 		return Error(c, 400, "Location type must be bin, bag or area")
-	}
-
-	// convert uid to uint
-	userUIDInt, err := strconv.ParseUint(userUID, 10, 64)
-	if err != nil {
-		return Error(c, 400, "Error converting userUID to uint")
 	}
 
 	// Check for empty fields
@@ -42,14 +35,14 @@ func LocationCreate(c *fiber.Ctx) error {
 
 	// Validate location QR code is not in use
 	var location models.Location
-	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
+	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, user.UserUID).First(&location)
 	code, err := recordNotInUse("Location QR", result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
 	// Valide location name is not in use
-	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, userUID).First(&location)
+	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, user.UserUID).First(&location)
 	code, err = recordNotInUse("Location Name", result)
 	if err != nil {
 		return Error(c, code, err.Error())
@@ -58,7 +51,7 @@ func LocationCreate(c *fiber.Ctx) error {
 	// create location
 	location = models.Location{
 		LocationName:  locationName,
-		LocationOwner: uint(userUIDInt),
+		LocationOwner: user.UserUID,
 		LocationType:  locationType,
 		LocationQR:    locationQR,
 	}
@@ -74,10 +67,10 @@ func LocationCreate(c *fiber.Ctx) error {
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func LocationSetLocation(c *fiber.Ctx) error {
 	// Initialize variables
-	userUID := c.Locals("uid").(string)
+	user := c.Locals("user").(models.User)
 	locationUID := c.Query("location_uid")
 	setLocationUID := c.Query("set_location_uid")
 
@@ -88,7 +81,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 
 	// Validate the QR code
 	var location models.Location
-	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, userUID).First(&location)
+	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
 	code, err := RecordExists("Location QR", result)
 	if err != nil {
 		return Error(c, code, err.Error())
@@ -96,7 +89,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 
 	// Validate the ownership
 	var setLocation models.Location
-	result = db.DB.Where("location_uid = ? AND location_owner = ?", setLocationUID, userUID).First(&setLocation)
+	result = db.DB.Where("location_uid = ? AND location_owner = ?", setLocationUID, user.UserUID).First(&setLocation)
 	code, err = RecordExists("Location", result)
 	if err != nil {
 		return Error(c, code, err.Error())
@@ -116,15 +109,15 @@ func LocationSetLocation(c *fiber.Ctx) error {
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func LocationEdit(c *fiber.Ctx) error {
 	// Initialize variables
-	userUID := c.Locals("uid").(string)
+	user := c.Locals("user").(models.User)
 	locationUID := c.Query("locationUID")
 
 	// Validate ownership
 	var location models.Location
-	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, userUID).First(&location)
+	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
 	code, err := RecordExists("Ownership", result)
 	if err != nil {
 		return Error(c, code, err.Error())

@@ -19,10 +19,10 @@ import (
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func ScanBarcode(c *fiber.Ctx) error {
 	// Initialize variables
-	uid := c.Locals("uid").(string)
+	user := c.Locals("user").(models.User)
 	barcode := c.Query("barcode")
 
 	// Validate barcode
@@ -54,11 +54,11 @@ func ScanBarcode(c *fiber.Ctx) error {
 
 	// Search Ownership by barcode
 	var ownerships []models.Ownership
-	db.DB.Where("item_number = ? AND item_owner = ?", item.ItemUid, uid).Find(&ownerships)
+	db.DB.Where("item_number = ? AND item_owner = ?", item.ItemUid, user.UserUID).Find(&ownerships)
 
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
-		ownership, err := createOwnership(uid, item.ItemUid)
+		ownership, err := createOwnership(user.UserUID, item.ItemUid)
 		if err != nil {
 			return Error(c, 400, err.Error())
 		}
@@ -78,10 +78,10 @@ func ScanBarcode(c *fiber.Ctx) error {
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func ScanCheckQR(c *fiber.Ctx) error {
 	// Initialize variables
-	uid := c.Locals("uid")
+	user := c.Locals("user").(models.User)
 	qr := c.Query("qr")
 
 	// Check for empty fields
@@ -91,7 +91,7 @@ func ScanCheckQR(c *fiber.Ctx) error {
 
 	// Check if qr exists as location
 	var location models.Location
-	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, uid).First(&location)
+	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&location)
 	if location.LocationUID != 0 {
 		return Success(c, "LOCATION")
 	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
@@ -100,7 +100,7 @@ func ScanCheckQR(c *fiber.Ctx) error {
 
 	// Check if qr exists as ownership
 	var ownership models.Ownership
-	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, uid).First(&ownership)
+	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownership)
 	if ownership.OwnershipUID != 0 {
 		return Success(c, "OWNERSHIP")
 	}

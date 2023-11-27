@@ -15,10 +15,10 @@ import (
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func OwnershipQuantity(c *fiber.Ctx) error {
 	// Initialize variables
-	userUID := c.Locals("uid").(string)
+	user := c.Locals("user").(models.User)
 	ownershipUID := c.Query("ownershipUID")
 	amountStr := c.Query("amount")
 	changeType := c.Params("type")
@@ -34,7 +34,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 
 	// Valide and retreive the ownership
 	var ownership models.Ownership
-	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
+	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
 	code, err := RecordExists("Ownership", result)
 	if err != nil {
 		return Error(c, code, err.Error())
@@ -71,15 +71,15 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func OwnershipDelete(c *fiber.Ctx) error {
 	// Initialize variables
-	userUID := c.Locals("uid").(string)
+	user := c.Locals("user").(models.User)
 	ownershipUID := c.Query("ownershipUID")
 
 	// Validate ownership
 	var ownership models.Ownership
-	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
+	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
 	code, err := RecordExists("Ownership", result)
 	if err != nil {
 		return Error(c, code, err.Error())
@@ -102,15 +102,15 @@ func OwnershipDelete(c *fiber.Ctx) error {
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func OwnershipEdit(c *fiber.Ctx) error {
 	// Initialize variables
-	userUID := c.Locals("uid").(string)
+	user := c.Locals("user").(models.User)
 	ownershipUID := c.Query("ownershipUID")
 
 	// Validate ownership
 	var ownership models.Ownership
-	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
+	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
 	code, err := RecordExists("Ownership", result)
 
 	if err != nil {
@@ -135,10 +135,10 @@ func OwnershipEdit(c *fiber.Ctx) error {
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func OwnershipCreate(c *fiber.Ctx) error {
 	// Initialize variables
-	userUID := c.Locals("uid").(string)
+	user := c.Locals("user").(models.User)
 
 	// convert uid to uint
 	itemUID, err := strconv.ParseUint(c.Query("item_uid"), 10, 64)
@@ -146,7 +146,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 		return Error(c, 400, "There was an error converting itemUID to Uint")
 	}
 
-	ownership, err := createOwnership(userUID, uint(itemUID))
+	ownership, err := createOwnership(user.UserUID, uint(itemUID))
 	if err != nil {
 		return Error(c, 400, err.Error())
 	}
@@ -161,16 +161,16 @@ func OwnershipCreate(c *fiber.Ctx) error {
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func OwnershipSetLocation(c *fiber.Ctx) error {
 	// Initialize variables
-	userUID := c.Locals("uid").(string)
+	user := c.Locals("user").(models.User)
 	locationQR := c.Query("location_qr")
 	ownershipUID := c.Query("ownershipUID")
 
 	// Validate the QR code
 	var location models.Location
-	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, userUID).First(&location)
+	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, user.UserUID).First(&location)
 	code, err := RecordExists("Location QR", result)
 	if err != nil {
 		return Error(c, code, err.Error())
@@ -178,7 +178,7 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 
 	// Validate the ownership
 	var ownership models.Ownership
-	result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, userUID).First(&ownership)
+	result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
 	code, err = RecordExists("Ownership", result)
 	if err != nil {
 		return Error(c, code, err.Error())
