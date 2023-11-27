@@ -71,10 +71,9 @@ func ScanBarcode(c *fiber.Ctx) error {
 		preloadOwnership(&ownerships[i])
 	}
 
-	itemDTO := DTO("item", item.Name)
 	ownershipDTO := DTO("ownership", ownerships)
 
-	return Success(c, "Item found", itemDTO, ownershipDTO)
+	return Success(c, "Item found", ownershipDTO)
 }
 
 /*

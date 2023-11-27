@@ -92,7 +92,7 @@ func createOwnership(uid uint, itemUid uint) (models.Ownership, error) {
 func Success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
 	responseMap := fiber.Map{
 		"message": message,
-	}
+		"success": true,}
 
 	for _, dto := range dtos {
 		responseMap[dto.Name] = dto.Data
@@ -114,7 +114,8 @@ func Success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
 func Error(c *fiber.Ctx, code int, message string) error {
 	log.Printf("%s: Status Code: %d, Response: %v", utils.CallerFunctionName(2), code, fiber.Map{"message": message})
 	return c.Status(code).JSON(fiber.Map{
-		"message": message})
+		"message": message,
+		"success": true})
 }
 
 /*
