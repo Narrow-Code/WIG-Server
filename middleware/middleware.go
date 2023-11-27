@@ -46,7 +46,7 @@ func ValidateToken() fiber.Handler {
 			return controller.Error(c, fiber.StatusUnauthorized, "Unauthorized")
 		}
 
-		c.Locals("uid", user)
+		c.Locals("user", user)
 		return c.Next()
 	}
 }

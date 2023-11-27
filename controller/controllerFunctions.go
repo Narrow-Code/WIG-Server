@@ -128,3 +128,29 @@ func Error(c *fiber.Ctx, code int, message string) error {
 func DTO(name string, data interface{}) models.DTO {
 	return models.DTO{Name: name, Data: data}
 }
+
+/*
+* Preloads the Ownerships foreignkey structs
+*
+* @param ownership The ownership to preload.
+ */
+func preloadOwnership(ownership *models.Ownership) {
+	db.DB.Preload("User").Preload("Item").Preload("Borrower").Preload("Location").Find(ownership)
+	preloadLocation(&ownership.Location)
+}
+
+/*
+* Preloads the Locations foreignkey structs
+*
+* @param location The location to preload.
+ */
+func preloadLocation(location *models.Location) {
+	db.DB.Preload("User").Preload("Location").Find(&location)
+
+	// Recursively preload the parent's hierarchy
+	if location.Parent != nil && location.Location.LocationUID != 1 {
+		preloadLocation(location.Location)
+	} else if location.Location.LocationUID == 1 {
+		location.Location = nil
+	}
+}

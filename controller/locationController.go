@@ -96,7 +96,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	}
 
 	// Set the location and save
-	location.LocationLocation = &setLocation.LocationUID
+	location.Parent = &setLocation.LocationUID
 	db.DB.Save(&location)
 
 	// return success

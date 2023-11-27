@@ -66,6 +66,11 @@ func ScanBarcode(c *fiber.Ctx) error {
 		ownerships = append(ownerships, ownership)
 	}
 
+	for i := range ownerships {
+		//db.DB.Preload("User").Preload("Item").Preload("Borrower").Find(&ownerships[i])
+		preloadOwnership(&ownerships[i])
+	}
+
 	itemDTO := DTO("item", item.Name)
 	ownershipDTO := DTO("ownership", ownerships)
 
