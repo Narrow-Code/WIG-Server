@@ -3,6 +3,6 @@ package models
 
 // Represents information about a borrower.
 type Borrower struct {
-	BorrowerUID  uint   `json:"borrower_uid" gorm:"primary_key;column:borrower_uid"`
-	BorrowerName string `json:"borrower_name" gorm:"column:borrower_name"`
+	BorrowerUID  uint   `json:"borrowerUID" gorm:"primary_key;column:borrower_uid"`
+	BorrowerName string `json:"borrowerName" gorm:"column:borrower_name"`
 }
