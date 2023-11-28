@@ -62,7 +62,6 @@ func ScanBarcode(c *fiber.Ctx) error {
 		if err != nil {
 			return Error(c, 400, err.Error())
 		}
-		ownership.ItemQuantity = 1
 		ownerships = append(ownerships, ownership)
 	}
 

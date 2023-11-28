@@ -66,6 +66,7 @@ func createOwnership(uid uint, itemUid uint) (models.Ownership, error) {
 	ownership := models.Ownership{
 		ItemOwner:  uid,
 		ItemNumber: itemUid,
+		ItemQuantity: 1,
 	}
 
 	result := db.DB.Create(&ownership)
