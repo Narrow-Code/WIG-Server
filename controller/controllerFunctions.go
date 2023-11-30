@@ -152,7 +152,5 @@ func preloadLocation(location *models.Location) {
 	// Recursively preload the parent's hierarchy
 	if location.Parent != nil && location.Location.LocationUID != 1 {
 		preloadLocation(location.Location)
-	} else if location.Location.LocationUID == 1 {
-		location.Location = nil
 	}
 }
