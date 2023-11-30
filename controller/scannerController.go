@@ -66,7 +66,6 @@ func ScanBarcode(c *fiber.Ctx) error {
 	}
 
 	for i := range ownerships {
-		//db.DB.Preload("User").Preload("Item").Preload("Borrower").Find(&ownerships[i])
 		preloadOwnership(&ownerships[i])
 	}
 
@@ -112,4 +111,33 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	}
 
 	return Success(c, "NEW")
+}
+
+func ScanQRLocation(c *fiber.Ctx) error {
+	// Initialize variables
+	user := c.Locals("user").(models.User)
+	qr := c.Query("qr")
+
+	// Validate qr
+	if qr == "" {
+		return Error(c, 400, "Barcode is empty and required")
+	}
+
+	// Check if item exists in local database
+	var location models.Location
+	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&location)
+
+	if result.Error == gorm.ErrRecordNotFound {
+		return Error(c, 400, "Item was not found in the database")
+	}
+
+	// If there is a connection error
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return Error(c, 400, "internal server error")
+	}
+
+	preloadLocation(&location)
+	locationDTO := DTO("location", location)
+
+	return Success(c, "Item found", locationDTO)
 }
