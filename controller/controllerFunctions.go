@@ -116,7 +116,7 @@ func Error(c *fiber.Ctx, code int, message string) error {
 	log.Printf("%s: Status Code: %d, Response: %v", utils.CallerFunctionName(2), code, fiber.Map{"message": message})
 	return c.Status(code).JSON(fiber.Map{
 		"message": message,
-		"success": true})
+		"success": false})
 }
 
 /*

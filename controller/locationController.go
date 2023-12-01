@@ -6,6 +6,8 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 /*
@@ -52,7 +54,7 @@ func LocationCreate(c *fiber.Ctx) error {
 	location = models.Location{
 		LocationName:  locationName,
 		LocationOwner: user.UserUID,
-		LocationType:  locationType,
+		LocationType:  string(cases.Title(language.English).String(locationType)),
 		LocationQR:    locationQR,
 	}
 
