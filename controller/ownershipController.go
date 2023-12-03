@@ -61,6 +61,8 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	// Save new amount to the database and create response
 	db.DB.Save(&ownership)
 
+	preloadOwnership(&ownership)
+
 	ownershipDTO := DTO("ownership", ownership)
 	return Success(c, "Item found", ownershipDTO)
 }
