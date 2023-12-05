@@ -4,6 +4,7 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"WIG-Server/upcitemdb"
+	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -40,7 +41,12 @@ func ScanBarcode(c *fiber.Ctx) error {
 
 	// If item isn't found, check api and add to
 	if result.Error == gorm.ErrRecordNotFound {
-		upcitemdb.GetBarcode(barcode)
+		log.Println("Record not found")
+		limit := upcitemdb.GetBarcode(barcode)
+		if limit == 429 {
+			return Error(c, limit, "API limit reached")
+		}
+
 		result = db.DB.Where("barcode = ?", barcode).First(&item)
 		if result.Error == gorm.ErrRecordNotFound {
 			return Error(c, 400, "Item was not found in the database")

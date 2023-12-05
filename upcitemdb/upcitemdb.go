@@ -17,7 +17,7 @@ import (
 *
 * @param barcode The barcode to retrieve data for.
 */
-func GetBarcode(barcode string) {
+func GetBarcode(barcode string) int {
 	url := "https://api.upcitemdb.com/prod/trial/lookup?upc=" + barcode
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -31,9 +31,13 @@ func GetBarcode(barcode string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return
+		return 0
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == 429 {
+		return 429
+	}
 
 	var reader io.ReadCloser
 
@@ -42,7 +46,7 @@ func GetBarcode(barcode string) {
 		reader, err = gzip.NewReader(resp.Body)
 		if err != nil {
 			log.Println("FAIL")
-			return
+			return 0
 		}
 		defer reader.Close()
 	default:
@@ -53,7 +57,7 @@ func GetBarcode(barcode string) {
 	decoder := json.NewDecoder(reader)
 	err = decoder.Decode(&data)
 	if err != nil {
-		return
+		return 0
 	}
 
 	if items, exists := data["items"]; exists {
@@ -78,5 +82,5 @@ func GetBarcode(barcode string) {
 		}
 
 	}
-
+return 0
 }
