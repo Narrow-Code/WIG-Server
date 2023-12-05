@@ -41,6 +41,7 @@ func GetBarcode(barcode string) {
 	case "gzip":
 		reader, err = gzip.NewReader(resp.Body)
 		if err != nil {
+			log.Println("FAIL")
 			return
 		}
 		defer reader.Close()
