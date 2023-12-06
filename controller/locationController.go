@@ -58,9 +58,11 @@ func LocationCreate(c *fiber.Ctx) error {
 		LocationQR:    locationQR,
 	}
 
+	preloadLocation(&location)
 	db.DB.Create(&location)
+	locationDTO := DTO("ownership", location)
 
-	return Success(c, "Location has been added successfully")
+	return Success(c, "Location has been added successfully", locationDTO)
 }
 
 /*
