@@ -60,7 +60,7 @@ func LocationCreate(c *fiber.Ctx) error {
 
 	preloadLocation(&location)
 	db.DB.Create(&location)
-	locationDTO := DTO("ownership", location)
+	locationDTO := DTO("location", location)
 
 	return Success(c, "Location has been added successfully", locationDTO)
 }
