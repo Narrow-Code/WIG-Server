@@ -64,7 +64,8 @@ func ScanBarcode(c *fiber.Ctx) error {
 
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
-		ownership, err := createOwnership(user.UserUID, item.ItemUid, "")
+		ownership, err := createOwnership(user.UserUID, item.ItemUid, "", "")
+		
 		if err != nil {
 			return Error(c, 400, err.Error())
 		}

@@ -142,6 +142,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
 	qr := ""
+	name := ""
 
 	// Parse request into data map
 	var data map[string]string
@@ -150,8 +151,9 @@ func OwnershipCreate(c *fiber.Ctx) error {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
 
-	if data["qr"] != "" {
+	if data["qr"] != "" && data["name"] != "" {
 		qr = data["qr"]
+		name = data["name"]
 	}
 
 	// convert uid to uint
@@ -160,12 +162,12 @@ func OwnershipCreate(c *fiber.Ctx) error {
 		return Error(c, 400, "There was an error converting itemUID to Uint")
 	}
 
-	ownership, err := createOwnership(user.UserUID, uint(itemUID), qr)
+	ownership, err := createOwnership(user.UserUID, uint(itemUID), qr, name)
 	if err != nil {
 		return Error(c, 400, err.Error())
 	}
-
-	ownershipDTO := DTO("ownershipUID", ownership.OwnershipUID)
+	preloadOwnership(&ownership)
+	ownershipDTO := DTO("ownership", ownership)
 	return Success(c, "Ownership was successfully created", ownershipDTO)
 }
 
