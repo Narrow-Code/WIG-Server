@@ -32,7 +32,7 @@ func Setup(app *fiber.App) {
 	app.Delete("/app/ownership/delete", controller.OwnershipDelete)
 
 	// Location Routes
-	app.Post("/app/location/create/:type", controller.LocationCreate)
+	app.Post("/app/location/create", controller.LocationCreate)
 	app.Put("/app/location/set-location", controller.LocationSetLocation)
 	app.Put("/app/location/edit", controller.LocationEdit)
 }

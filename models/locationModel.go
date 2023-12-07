@@ -5,7 +5,6 @@ type Location struct {
 	LocationUID         uint      `json:"locationUID" gorm:"primary_key;column:location_uid"`
 	LocationOwner       uint      `json:"locationOwner" gorm:"column:location_owner"`
 	LocationName        string    `json:"locationName" gorm:"column:location_name"`
-	LocationType        string    `json:"locationType" gorm:"column:location_type"`
 	Parent              *uint     `json:"locationParent" gorm:"column:location_parent;default:1"`
 	LocationQR          string    `json:"locationQR" gorm:"column:location_qr"`
 	LocationTags        string    `json:"locationTags" gorm:"column:location_tags"`

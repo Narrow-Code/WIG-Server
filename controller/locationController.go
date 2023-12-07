@@ -6,8 +6,6 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 /*
@@ -22,13 +20,7 @@ func LocationCreate(c *fiber.Ctx) error {
 	user := c.Locals("user").(models.User)
 	locationQR := c.Query("location_qr")
 	locationName := c.Query("location_name")
-	locationType := c.Params("type")
 	log.Printf("controller#LocationCreate: User %d called LocationCreate", user.UserUID)
-
-	// Check location type exists
-	if locationType != "bin" && locationType != "bag" && locationType != "area" {
-		return Error(c, 400, "Location type must be bin, bag or area")
-	}
 
 	// Check for empty fields
 	if locationQR == "" || locationName == "" {
@@ -54,7 +46,6 @@ func LocationCreate(c *fiber.Ctx) error {
 	location = models.Location{
 		LocationName:  locationName,
 		LocationOwner: user.UserUID,
-		LocationType:  string(cases.Title(language.English).String(locationType)),
 		LocationQR:    locationQR,
 	}
 
