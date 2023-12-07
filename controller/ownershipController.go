@@ -141,6 +141,18 @@ func OwnershipEdit(c *fiber.Ctx) error {
 func OwnershipCreate(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
+	qr := ""
+
+	// Parse request into data map
+	var data map[string]string
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+
+	if data["qr"] != "" {
+		qr = data["qr"]
+	}
 
 	// convert uid to uint
 	itemUID, err := strconv.ParseUint(c.Query("item_uid"), 10, 64)
@@ -148,7 +160,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 		return Error(c, 400, "There was an error converting itemUID to Uint")
 	}
 
-	ownership, err := createOwnership(user.UserUID, uint(itemUID))
+	ownership, err := createOwnership(user.UserUID, uint(itemUID), qr)
 	if err != nil {
 		return Error(c, 400, err.Error())
 	}
@@ -158,7 +170,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 }
 
 /*
-* Sets the locatino of the database.
+* Sets the location of the ownership in the database.
 *
 * @param c The Fiber context containing the HTTP request and response objects.
 *
@@ -193,3 +205,4 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	// return success
 	return Success(c, "Ownership set in "+location.LocationName)
 }
+

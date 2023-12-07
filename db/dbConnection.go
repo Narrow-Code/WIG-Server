@@ -89,6 +89,18 @@ func AutoMigrate(connection *gorm.DB) {
 		connection.Create(&defaultLocation)
 	}
 
+	// Check if Item table is empty
+	var itemCount int64
+	connection.Model(&models.Item{}).Count(&itemCount)
+
+	if itemCount == 0 {
+		// Create a default Item record
+		defaultItem := models.Item{
+			ItemUid: 1,
+			Name: "Default Item"}
+		connection.Create(&defaultItem)
+	}
+
 }
 
 /*

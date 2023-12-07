@@ -62,11 +62,12 @@ func recordNotInUse(field string, result *gorm.DB) (int, error) {
 * @return models.Ownership The ownership model.
 * @return error The error message, if there is one.
  */
-func createOwnership(uid uint, itemUid uint) (models.Ownership, error) {
+func createOwnership(uid uint, itemUid uint, customName string) (models.Ownership, error) {
 	ownership := models.Ownership{
 		ItemOwner:  uid,
 		ItemNumber: itemUid,
 		ItemQuantity: 1,
+		CustomItemName: customName,
 	}
 
 	result := db.DB.Create(&ownership)
