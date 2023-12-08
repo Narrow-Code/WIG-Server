@@ -62,10 +62,14 @@ func recordNotInUse(field string, result *gorm.DB) (int, error) {
 * @return models.Ownership The ownership model.
 * @return error The error message, if there is one.
  */
-func createOwnership(uid uint, itemUid uint, qr string, customName string) (models.Ownership, error) {
+func createOwnership(uid uint, item models.Item, qr string, customName string) (models.Ownership, error) {
+	if customName == "" {
+		customName = item.Name
+	}
+
 	ownership := models.Ownership{
 		ItemOwner:  uid,
-		ItemNumber: itemUid,
+		ItemNumber: item.ItemUid,
 		ItemQuantity: 1,
 		ItemQR: qr,
 		CustomItemName: customName,
@@ -80,7 +84,7 @@ func createOwnership(uid uint, itemUid uint, qr string, customName string) (mode
 		log.Printf("controller#CreateOwnership: No rows were affected, creation may not have been successful")
 	}
 
-	log.Printf("controller#createOwnership: Ownership record successfully created between user %d and item %d", uid, itemUid)
+	log.Printf("controller#createOwnership: Ownership record successfully created between user %d and item %d", uid, item.ItemUid)
 	return ownership, nil
 }
 

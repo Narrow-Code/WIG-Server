@@ -174,14 +174,15 @@ func OwnershipCreateNoItem(c *fiber.Ctx) error {
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
-
-	// convert uid to uint
-	itemUID, err := strconv.ParseUint(c.Query("item_uid"), 10, 64)
+	
+	var item models.Item
+	result = db.DB.Where("item_uid = ?", c.Query("item_uid")).First(&item)
+	code, err = recordNotInUse("Ownership", result)
 	if err != nil {
-		return Error(c, 400, "There was an error converting itemUID to Uint")
+		return Error(c, code, err.Error())
 	}
 
-	ownership, err := createOwnership(user.UserUID, uint(itemUID), qr, name)
+	ownership, err := createOwnership(user.UserUID, item, qr, name)
 	if err != nil {
 		return Error(c, 400, err.Error())
 	}
