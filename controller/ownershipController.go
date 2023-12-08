@@ -138,12 +138,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 *
 * @return error The error message, if there is any.
  */
-func OwnershipCreate(c *fiber.Ctx) error {
-	// Initialize variables
-	user := c.Locals("user").(models.User)
-	qr := ""
-	name := ""
-
+func OwnershipCreateNoItem(c *fiber.Ctx) error {
 	// Parse request into data map
 	var data map[string]string
 	err := c.BodyParser(&data)
@@ -151,9 +146,33 @@ func OwnershipCreate(c *fiber.Ctx) error {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
 
-	if data["qr"] != "" && data["name"] != "" {
-		qr = data["qr"]
-		name = data["name"]
+	user := c.Locals("user").(models.User)
+	qr := data["qr"]
+	name := data["name"]
+	
+	if data["qr"] == "" && data["name"] == "" {
+		return Error(c, 400, "Missing field qr or name")
+	}
+
+	// TODO make sure qr is not in use
+	var ownershipCheck models.Ownership
+	result := db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownershipCheck)
+	code, err := recordNotInUse("Ownership", result)
+	if err != nil {
+		return Error(c, code, err.Error())
+	}
+
+	var locationCheck models.Location
+	result = db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&locationCheck)
+	code, err = recordNotInUse("Location", result)
+	if err != nil {
+		return Error(c, code, err.Error())
+	}
+
+	result = db.DB.Where("custom_item_name = ? AND item_owner = ?", name, user.UserUID).First(&ownershipCheck)
+	code, err = recordNotInUse("Ownership", result)
+	if err != nil {
+		return Error(c, code, err.Error())
 	}
 
 	// convert uid to uint
@@ -166,6 +185,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	if err != nil {
 		return Error(c, 400, err.Error())
 	}
+
 	preloadOwnership(&ownership)
 	ownershipDTO := DTO("ownership", ownership)
 	return Success(c, "Ownership was successfully created", ownershipDTO)
