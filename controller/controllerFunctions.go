@@ -47,7 +47,7 @@ func recordNotInUse(field string, result *gorm.DB) (int, error) {
 		return 400, errors.New(result.Error.Error())
 	}
 	if result.RowsAffected != 0 {
-		return 400, errors.New(field + "Record is in use in the database")
+		return 400, errors.New(field + " Record is in use in the database")
 	}
 	log.Printf("controller#recordNotInUse: %s is not in use in the database", field)
 	return 200, nil

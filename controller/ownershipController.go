@@ -154,7 +154,6 @@ func OwnershipCreateNoItem(c *fiber.Ctx) error {
 		return Error(c, 400, "Missing field qr or name")
 	}
 
-	// TODO make sure qr is not in use
 	var ownershipCheck models.Ownership
 	result := db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownershipCheck)
 	code, err := recordNotInUse("Ownership", result)
@@ -177,7 +176,7 @@ func OwnershipCreateNoItem(c *fiber.Ctx) error {
 	
 	var item models.Item
 	result = db.DB.Where("item_uid = ?", c.Query("item_uid")).First(&item)
-	code, err = recordNotInUse("Ownership", result)
+	code, err = RecordExists("Ownership", result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
