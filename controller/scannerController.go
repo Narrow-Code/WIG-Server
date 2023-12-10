@@ -49,7 +49,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 
 		result = db.DB.Where("barcode = ?", barcode).First(&item)
 		if result.Error == gorm.ErrRecordNotFound {
-			return Error(c, 400, "Item was not found in the database")
+			return Error(c, 404, "Item was not found in the database")
 		}
 	}
 
@@ -58,7 +58,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 		return Error(c, 400, "internal server error")
 	}
 
-	// Search Ownership by barcode
+	// Search Ownership by uid
 	var ownerships []models.Ownership
 	db.DB.Where("item_number = ? AND item_owner = ?", item.ItemUid, user.UserUID).Find(&ownerships)
 

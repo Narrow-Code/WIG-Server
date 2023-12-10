@@ -161,3 +161,23 @@ func preloadLocation(location *models.Location) {
 		preloadLocation(location.Location)
 	}
 }
+
+/*
+* Returns the ownerships and locations inside of a parent location.
+*
+* @param location The location
+* @param user The user making the call
+*/
+func GetAllFromLocation(location models.Location, user models.User) ([]models.Ownership, []models.Location) {
+	// search and get all ownerships from location
+	var ownerships []models.Ownership
+	db.DB.Where("item_location = ? AND item_owner = ?", location.LocationUID, user.UserUID).Find(&ownerships)	
+
+	// search and get all locations from parent location
+	var locations []models.Location
+	db.DB.Where("location_parent = ? AND location_owner = ?", location.LocationUID, user.UserUID).Find(&locations)
+
+	// TODO recursion?
+
+	return ownerships, locations
+}

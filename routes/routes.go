@@ -35,4 +35,5 @@ func Setup(app *fiber.App) {
 	app.Post("/app/location/create", controller.LocationCreate)
 	app.Put("/app/location/set-location", controller.LocationSetLocation)
 	app.Put("/app/location/edit", controller.LocationEdit)
+	app.Post("/app/location/unpack", controller.UnpackLocation)
 }

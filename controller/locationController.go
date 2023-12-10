@@ -129,3 +129,32 @@ func LocationEdit(c *fiber.Ctx) error {
 	// Ownership successfully updated
 	return Success(c, "Location updated successfully")
 }
+
+/*
+* Returns all ownerships and locations stored in a location.
+*
+* @param c The fiber context containing the HTTP request and esponse objects.
+* @return error The error message, if there is any.
+*/
+func UnpackLocation( c *fiber.Ctx) error {
+	// Initialize variables
+	user := c.Locals("user").(models.User)
+	locationUID := c.Query("locationUID")
+
+	// Validate ownership
+	var location models.Location
+	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
+	code, err := RecordExists("Location", result)
+	if err != nil {
+		return Error(c, code, err.Error())
+	}
+
+	ownerships, locations := GetAllFromLocation(location, user)
+
+	// TODO iterate to preload all ownership and locations
+
+	ownershipDTO := DTO("ownerships", ownerships)
+	locationDTO := DTO("locations", locations)
+
+	return Success(c, "Unpacked", ownershipDTO, locationDTO)
+}
