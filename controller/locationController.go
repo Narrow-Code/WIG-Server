@@ -152,6 +152,13 @@ func UnpackLocation( c *fiber.Ctx) error {
 	ownerships, locations := GetAllFromLocation(location, user)
 
 	// TODO iterate to preload all ownership and locations
+	for i := range ownerships {
+		preloadOwnership(&ownerships[i])
+	}
+
+	for i := range locations {
+		preloadLocation(&locations[i])
+	}
 
 	ownershipDTO := DTO("ownerships", ownerships)
 	locationDTO := DTO("locations", locations)
