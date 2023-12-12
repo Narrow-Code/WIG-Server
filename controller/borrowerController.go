@@ -94,6 +94,14 @@ func CheckoutItem(c *fiber.Ctx) error {
 	return Success(c, "Checked out", ownershipsDTO)
 }
 
+/*
+* Sets returns checked out items to original owners within the list.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
+
 func CheckinItem(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
@@ -127,6 +135,31 @@ func CheckinItem(c *fiber.Ctx) error {
 	return Success(c, "Checked in", ownershipsDTO)
 
 }
+
+/*
+* Returns all borrowers associated with user.
+*
+* @param c The Fiber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
+func GetBorrowers(c *fiber.Ctx) error{
+	// Initialize variables
+	user := c.Locals("user").(models.User)
+
+	// Get borrower	
+	var borrowers []models.Borrower
+	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
+
+	if len(borrowers) == 0 {
+		return Error(c, 404, "No borrowers found")
+	}
+
+	borrowersDTO := DTO("borrowers", &borrowers)
+
+	return Success(c, "Borrowers returned", borrowersDTO)
+}
+
 
 type BorrowerRequest struct {
 	Ownerships []int `json:"ownerships"` 
