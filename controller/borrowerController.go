@@ -152,7 +152,7 @@ func GetBorrowers(c *fiber.Ctx) error{
 	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
 
 	if len(borrowers) == 0 {
-		return Error(c, 404, "No borrowers found")
+		return Success(c, "No borrowers found")
 	}
 
 	borrowersDTO := DTO("borrowers", &borrowers)
