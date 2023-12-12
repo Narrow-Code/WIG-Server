@@ -40,4 +40,5 @@ func Setup(app *fiber.App) {
 	// Borrower Routes
 	app.Post("/app/borrower/create", controller.CreateBorrower)
 	app.Post("/app/borrower/checkout", controller.CheckoutItem)
+	app.Post("/app/borrower/checkin", controller.CheckinItem)
 }
