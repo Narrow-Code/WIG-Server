@@ -62,6 +62,11 @@ func AutoMigrate(connection *gorm.DB) {
 			BorrowerUID:  1,
 			BorrowerName: "Default Borrower"}
 		connection.Create(&defaultBorrower)
+
+		selfBorrower := models.Borrower{
+			BorrowerUID: 2,
+			BorrowerName: "Self"}
+		connection.Create(&selfBorrower)
 	}
 
 	// Check if User table is empty
