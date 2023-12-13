@@ -65,7 +65,7 @@ func CheckoutItem(c *fiber.Ctx) error {
 	var borrower models.Borrower
 	var userUID = user.UserUID
 	if (borrowerUID == 2){	
-		userUID = 2
+		userUID = 1
 	}
 
 	result := db.DB.Where("borrower_uid = ? AND borrower_owner = ?", borrowerUID, userUID).First(&borrower)
