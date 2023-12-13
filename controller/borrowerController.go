@@ -62,10 +62,14 @@ func CheckoutItem(c *fiber.Ctx) error {
 	err = c.BodyParser(&request)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
 
-	// Get borrower	
 	var borrower models.Borrower
-	result := db.DB.Where("borrower_uid = ? AND borrower_owner = ?", borrowerUID, user.UserUID).First(&borrower)
+	var userUID = user.UserUID
+	if (borrowerUID == 2){	
+		userUID = 2
+	}
 
+	result := db.DB.Where("borrower_uid = ? AND borrower_owner = ?", borrowerUID, userUID).First(&borrower)
+	
 	code, err := RecordExists("Borrower UID", result)
 	if err != nil {return Error(c, code, err.Error())}
 
