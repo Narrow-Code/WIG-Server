@@ -16,6 +16,6 @@ jobs:
       - name: Test SSH Connection
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: 34.201.123.65
+          host: ec2-34-201-123-65.compute-1.amazonaws.com
           username: admin
           key: ${{ secrets.AWS_WIG }}
