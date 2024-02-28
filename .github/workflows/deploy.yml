@@ -32,3 +32,8 @@ jobs:
           script: |
             cd go/src/WIG-Server
             git pull
+            tmux kill-server
+            tmux
+            go run main.go
+            
+            
