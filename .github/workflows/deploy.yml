@@ -3,7 +3,7 @@ name: Test AWS Connection
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   test-aws-connection:
