@@ -1,14 +1,16 @@
-name: Push-to-EC2
+name: Deploy
 
 # Trigger deployment only on push to main branch
 on:
-  push:
-    branches:
-      - dev
+  workflow_run:
+    workflows: ["Unit Tests"]
+    types:
+      - completed
 
 jobs:
   deploy:
-    name: Deploy to EC2 on master branch push
+    name: Deploy to EC2
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +25,7 @@ jobs:
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: ${{ secrets.TARGET_DIR }}
 
-      - name: Executing remote ssh commands using ssh key
+      - name: Executing Script
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS }}
