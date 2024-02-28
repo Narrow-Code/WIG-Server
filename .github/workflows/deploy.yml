@@ -1,4 +1,4 @@
-name: Test AWS Connection
+name: SSH Connection Test
 
 on:
   push:
@@ -6,13 +6,16 @@ on:
       - dev
 
 jobs:
-  test-aws-connection:
+  test-ssh-connection:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.AWS_WIG }}
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Test SSH Connection
-        run: ssh -i ${{ secrets.AWS_WIG }} admin@ec2-34-201-123-65.compute-1.amazonaws.com echo "SSH successful"
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 34.201.123.65
+          username: admin
+          key: ${{ secrets.AWS_WIG }}
