@@ -15,9 +15,6 @@ jobs:
       - name: Checkout the files
         uses: actions/checkout@v2
 
-      - name: Set up Go
-        run: echo "export PATH=\$PATH:/usr/local/go/bin" >> $GITHUB_ENV
-
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@main
         env:
@@ -35,5 +32,5 @@ jobs:
           script: |
             cd go/src/WIG-Server
             git pull
-            go version
+            /usr/local/go/bin/go version
             
