@@ -15,4 +15,4 @@ jobs:
           ssh-private-key: ${{ secrets.AWS_WIG }}
 
       - name: Test SSH Connection
-        run: ssh -i $SSH-PRIVATE-KEY admin@ec2-34-201-123-65.compute-1.amazonaws.com echo "SSH successful"
+        run: ssh -i $ssh-private-key admin@ec2-34-201-123-65.compute-1.amazonaws.com echo "SSH successful"
