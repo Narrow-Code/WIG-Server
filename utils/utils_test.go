@@ -7,14 +7,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func GenerateTokenTestPossitive(t  *testing.T) {
+func TestGenerateTokenPossitive(t  *testing.T) {
 	os.Setenv("TOKEN_SECRET", "mysecret")
 	token := GenerateToken("testuser", "testhash")
 
 	assert.NotEmpty(t, token, "Generated token should not be empty")
 }
 
-func CallerFunctionNameTestPossitive(t *testing.T) {
+func TestCallerFunctionNamePossitive(t *testing.T) {
 	// Get the name of the immediate caller function
 	callerName := CallerFunctionName(0)
 	expected := "utils.CallerFunctionName"
@@ -37,7 +37,7 @@ func CallerFunctionNameTestPossitive(t *testing.T) {
 	}
 }
 
-func CallerFunctionNameTestNegativeHighCallback(t *testing.T) {
+func TestCallerFunctionNameNegativeHighCallback(t *testing.T) {
 	callerName := CallerFunctionName(1000)
 	expected := "unknown"
 	if !strings.Contains(callerName, expected) {
