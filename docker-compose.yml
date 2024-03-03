@@ -5,6 +5,11 @@ services:
     build: ./
     depends_on:
       - db
+    environment:
+      MYSQL_DBNAME: wig
+      MYSQL_USER: wig
+      MYSQL_PASSWORD: wigsecret
+      MYSQL_HOST: "db:3306"  
     ports:
       - "30001:30001"
     networks:
