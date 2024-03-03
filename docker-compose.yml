@@ -1,6 +1,14 @@
 version: '3.4'
 services:
-
+  app:
+    image: wig-server
+    build: ./
+    depends_on:
+      - db
+    ports:
+      - "30001:30001"
+    networks:
+      - wig-db
         
   db:
     container_name: wigdb
@@ -18,3 +26,7 @@ services:
       
 volumes:
   wig-db:
+
+  networks:
+  wig-db:
+    driver: overlay
