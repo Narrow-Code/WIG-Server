@@ -16,7 +16,6 @@ services:
       - wig-db
         
   db:
-    container_name: wigdb
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: secret
@@ -24,7 +23,7 @@ services:
       MYSQL_USER: wig
       MYSQL_PASSWORD: wigsecret
     volumes:
-    - wig-db:/var/lib/mysql
+      - wig-db:/var/lib/mysql
     networks:
       - wig-db
 
