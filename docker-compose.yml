@@ -1,6 +1,19 @@
 version: '3.4'
 services:
-
+  app:
+    image: wig-server
+    build: ./
+    depends_on:
+      - db
+    environment:
+      MYSQL_DBNAME: wig
+      MYSQL_USER: wig
+      MYSQL_PASSWORD: wigsecret
+      MYSQL_HOST: "db:3306"  
+    ports:
+      - "30001:30001"
+    networks:
+      - wig-db
         
   db:
     container_name: wigdb
@@ -18,3 +31,7 @@ services:
       
 volumes:
   wig-db:
+
+  networks:
+  wig-db:
+    driver: overlay
