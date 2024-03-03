@@ -34,8 +34,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd go/src/WIG-Server
-            git pull
-            tmux kill-sever
-            tmux
-            /usr/local/go/bin/go run main.go
+            docker-compose build app
+            docker-compose up -d -p wig 
             
