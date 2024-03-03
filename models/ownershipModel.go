@@ -1,26 +1,21 @@
-/*
-* Package models defines the data models used in the WIG-Server application.
-*/
 package models
 
-/*
-* Ownership represents information about ownership.
-*/
+// Represents information about ownership.
 type Ownership struct {
-	OwnedUID 	uint 	`json:"owned_uid" gorm:"primary_key;column:owned_uid"`
-	OwnedOwner 	uint 	`json:"owned_owner" gorm="column:owned_owner"`
-	OwnedItem 	uint	`json:"owned_item" gorm="column:owned_item"`
-	OwnedCustName	string 	`json:"owned_custom_name" gorm="column:owned_custom_name"`
-	OwnedCustImg	string	`json:"owned_custom_img" gorm="column:owned_custom_img"`
-	OwnedCustDesc	string 	`json:"owned_custom_description" gorm="column:owned_custom_description"`
-	OwnedLocation 	uint 	`json:"owned_location" gorm="column:owned_location"`
-	OwnedQR 	string 	`json:"owned_qr" gorm="column:owned_qr"`
-	OwnedTags	string 	`json:"owned_tags" gorm="column:owned_tags"`
-	OwnedQuantity	int 	`json:"owned_quantity" gorm="column:owned_quantity"`
-	OwnedCheckedOut	string	`json:"owned_checked_out" gorm="column:owned_checked_out"`
-	OwnedBorrower	uint 	`json:"owned_borrower" gorm="column:owned_borrower"`
-	User            User    `gorm:"foreignkey:owned_owner"`
-	Location	Location `gorm:"foreignkey:owned_location"`
-	Item		Item	`gorm:"foreignkey:owned_item"`
-	Borrower	Borrower `gorm:"foreignkey:owned_borrower"`
+	OwnershipUID   uint     `json:"ownershipUID" gorm:"primary_key;column:ownership_uid"`
+	ItemOwner      uint     `json:"itemOwner" gorm:"column:item_owner"`
+	ItemNumber     uint     `json:"itemNumber" gorm:"column:item_number"`
+	CustomItemName string   `json:"customItemName" gorm:"column:custom_item_name"`
+	CustItemImg    string   `json:"customItemImage" gorm:"column:custom_item_img"`
+	OwnedCustDesc  string   `json:"customItemDescription" gorm:"column:custom_item_description"`
+	ItemLocation   uint     `json:"itemLocation" gorm:"column:item_location;default:1"`
+	ItemQR         string   `json:"itemQR" gorm:"column:item_qr"`
+	ItemTags       string   `json:"itemTags" gorm:"column:item_tags"`
+	ItemQuantity   int      `json:"itemQuantity" gorm:"column:item_quantity;"`
+	ItemCheckedOut string   `json:"itemCheckedOut" gorm:"column:item_checked_out"`
+	ItemBorrower   uint     `json:"itemBorrower" gorm:"column:item_borrower;default:1"`
+	User           User     `json:"user" gorm:"foreignkey:item_owner"`
+	Location       Location `json:"location" gorm:"foreignkey:item_location"`
+	Item           Item     `json:"item" gorm:"foreignkey:item_number"`
+	Borrower       Borrower `json:"borrower" gorm:"foreignkey:item_borrower"`
 }
