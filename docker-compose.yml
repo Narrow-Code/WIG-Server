@@ -32,6 +32,6 @@ services:
 volumes:
   wig-db:
 
-  networks:
+networks:
   wig-db:
     driver: overlay
