@@ -37,6 +37,7 @@ func Setup(app *fiber.App) {
 	app.Put("/app/location/set-location", controller.LocationSetLocation)
 	app.Put("/app/location/edit", controller.LocationEdit)
 	app.Post("/app/location/unpack", controller.UnpackLocation)
+	app.Post("/app/location/search", controller.LocationSearch)
 
 	// Borrower Routes
 	app.Post("/app/borrower/create", controller.CreateBorrower)
