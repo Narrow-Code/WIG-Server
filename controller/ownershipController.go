@@ -248,7 +248,7 @@ func OwnershipSearch(c *fiber.Ctx) error {
 	tags := data["tags"]
 	var ownerships []models.Ownership
 
-	tagsFormat := strings.Split(tags, ",")
+	tagsFormat := strings.Split(strings.TrimSpace(tags), ",")
 
 	query := db.DB.Where("item_owner = ? AND custom_item_name LIKE ?", user.UserUID, "%"+name+"%")
 
