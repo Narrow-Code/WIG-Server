@@ -197,7 +197,10 @@ func LocationSearch(c *fiber.Ctx) error {
 		return Error(c, 404, "Not found")
 	}
 
-	
+	for i := range locations {
+		preloadLocation(&locations[i])
+	}
+
 	locationDTO := DTO("locations", locations)
 	return Success(c, "Items found", locationDTO)
 }

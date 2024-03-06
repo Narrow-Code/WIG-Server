@@ -259,8 +259,11 @@ func OwnershipSearch(c *fiber.Ctx) error {
 	if err := query.Find(&ownerships).Error; err != nil{
 		return Error(c, 404, "Not found")
 	}
-
 	
+	for i := range ownerships {
+		preloadOwnership(&ownerships[i])
+	}
+
 	ownershipDTO := DTO("ownership", ownerships)
 	return Success(c, "Items found", ownershipDTO)
 }
