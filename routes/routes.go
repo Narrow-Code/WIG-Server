@@ -30,6 +30,7 @@ func Setup(app *fiber.App) {
 	app.Put("/app/ownership/edit", controller.OwnershipEdit)
 	app.Put("/app/ownership/set-location", controller.OwnershipSetLocation)
 	app.Delete("/app/ownership/delete", controller.OwnershipDelete)
+	app.Post("/app/ownership/search", controller.OwnershipSearch)
 
 	// Location Routes
 	app.Post("/app/location/create", controller.LocationCreate)

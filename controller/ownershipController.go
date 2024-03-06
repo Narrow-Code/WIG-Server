@@ -3,6 +3,7 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"strings"
 
 	"strconv"
 
@@ -228,3 +229,38 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	return Success(c, "Ownership set in "+location.LocationName)
 }
 
+/* 
+* Searches for items based on users query.
+*
+* @param c The FIber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
+func OwnershipSearch(c *fiber.Ctx) error {
+	// Initialize variables
+	user := c.Locals("user").(models.User)
+	var data map[string]string
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing the JSON")
+	}
+	name := data["name"]
+	tags := data["tags"]
+	var ownerships []models.Ownership
+
+	tagsFormat := strings.Split(tags, ",")
+
+	query := db.DB.Where("item_owner = ? AND custom_item_name LIKE ?", user.UserUID, "%"+name+"%")
+
+	for _, tag := range tagsFormat {
+		query = query.Where("item_tags LIKE ?", "%"+tag+"%")
+	}
+
+	if err := query.Find(&ownerships).Error; err != nil{
+		return Error(c, 404, "Not found")
+	}
+
+	
+	ownershipDTO := DTO("ownership", ownerships)
+	return Success(c, "Items found", ownershipDTO)
+}
