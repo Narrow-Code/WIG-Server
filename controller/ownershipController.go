@@ -111,6 +111,13 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	user := c.Locals("user").(models.User)
 	ownershipUID := c.Query("ownershipUID")
 
+	// Parse request into data map
+	var data map[string]string
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+
 	// Validate ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
@@ -121,10 +128,11 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	}
 
 	// Add new fields
-	ownership.CustomItemName = c.Query("custom_item_name")
-	ownership.CustItemImg = c.Query("custom_item_img")
-	ownership.OwnedCustDesc = c.Query("custom_item_description")
-	ownership.ItemTags = c.Query("item_tags")
+	ownership.CustomItemName = data["custom_item_name"]
+	ownership.CustItemImg = data["custom_item_img"]
+	ownership.OwnedCustDesc = data["custom_item_description"]
+	ownership.ItemTags = data["item_tags"]
+	ownership.ItemQR = data["qr"]
 
 	db.DB.Save(&ownership)
 
