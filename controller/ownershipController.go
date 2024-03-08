@@ -128,10 +128,10 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	}
 
 	// Add new fields
-	ownership.CustomItemName = data["custom_item_name"]
-	ownership.CustItemImg = data["custom_item_img"]
-	ownership.OwnedCustDesc = data["custom_item_description"]
-	ownership.ItemTags = data["item_tags"]
+	ownership.CustomItemName = data["customItemName"]
+	ownership.CustItemImg = data["customItemImg"]
+	ownership.OwnedCustDesc = data["customItemDescription"]
+	ownership.ItemTags = data["itemTags"]
 	ownership.ItemQR = data["qr"]
 
 	db.DB.Save(&ownership)
