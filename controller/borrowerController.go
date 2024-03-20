@@ -188,9 +188,10 @@ func GetCheckedOutItems(c *fiber.Ctx) error{
 			preloadOwnership(&ownerships[o])
 		}
 		borrower := CheckedOutDto(borrowers[b], ownerships)
-		checkedOut = append(checkedOut, borrower)
-	}
-
+		if len(ownerships) != 0 {
+			checkedOut = append(checkedOut, borrower)
+		}
+	} 
 	checkedOutItems := DTO("borrowers", checkedOut)
 
 	return Success(c, "Checked Out Items returned", checkedOutItems)
