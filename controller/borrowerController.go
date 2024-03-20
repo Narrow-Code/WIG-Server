@@ -164,6 +164,37 @@ func GetBorrowers(c *fiber.Ctx) error{
 	return Success(c, "Borrowers returned", borrowersDTO)
 }
 
+func GetCheckedOutItems(c *fiber.Ctx) error{
+	// Initialize variables
+	user := c.Locals("user").(models.User)
+	var ownerships []models.Ownership
+	var checkedOut []models.CheckedOutDTO
+
+	// Get borrower	
+	var borrowers []models.Borrower
+	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
+
+	if len(borrowers) == 0 {
+		return Success(c, "No borrowers found")
+	}
+
+	for b := range borrowers {
+		query := db.DB.Where("item_owner = ? AND item_borrower = ?", user.UserUID, borrowers[b].BorrowerUID)
+		
+		if err := query.Find(&ownerships).Error; err != nil{
+			continue
+		}	
+		for o := range ownerships {
+			preloadOwnership(&ownerships[o])
+		}
+		borrower := CheckedOutDto(borrowers[b], ownerships)
+		checkedOut = append(checkedOut, borrower)
+	}
+
+	checkedOutItems := DTO("borrowers", checkedOut)
+
+	return Success(c, "Checked Out Items returned", checkedOutItems)
+}
 
 type BorrowerRequest struct {
 	Ownerships []int `json:"ownerships"` 

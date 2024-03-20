@@ -138,6 +138,10 @@ func DTO(name string, data interface{}) models.DTO {
 	return models.DTO{Name: name, Data: data}
 }
 
+func CheckedOutDto(borrower models.Borrower, ownerships []models.Ownership) models.CheckedOutDTO {
+	return models.CheckedOutDTO{Borrower: borrower, Ownerships: ownerships}
+}
+
 /*
 * Preloads the Ownerships foreignkey structs
 *
