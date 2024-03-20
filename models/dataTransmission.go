@@ -5,3 +5,8 @@ type DTO struct {
 	Name string
 	Data interface{}
 }
+
+type CheckedOutDTO struct {
+	Borrower Borrower
+	Ownerships []Ownership
+}
