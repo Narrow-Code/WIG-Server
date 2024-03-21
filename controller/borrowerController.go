@@ -179,7 +179,7 @@ func GetCheckedOutItems(c *fiber.Ctx) error{
 	}
 
 	for b := range borrowers{
-		checkedOut = nil
+		ownerships = nil
 		query := db.DB.Where("item_owner = ? AND item_borrower = ?", user.UserUID, borrowers[b].BorrowerUID)
 		
 		if err := query.Find(&ownerships).Error; err != nil{
