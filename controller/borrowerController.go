@@ -178,7 +178,8 @@ func GetCheckedOutItems(c *fiber.Ctx) error{
 		return Success(c, "No borrowers found")
 	}
 
-	for b := range borrowers {
+	for b := range borrowers{
+		checkedOut = nil
 		query := db.DB.Where("item_owner = ? AND item_borrower = ?", user.UserUID, borrowers[b].BorrowerUID)
 		
 		if err := query.Find(&ownerships).Error; err != nil{
