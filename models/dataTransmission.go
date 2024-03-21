@@ -7,6 +7,6 @@ type DTO struct {
 }
 
 type CheckedOutDTO struct {
-	Borrower Borrower
-	Ownerships []Ownership
+	Borrower Borrower `json:"borrower"`
+	Ownerships []Ownership `json:"ownerships"`
 }
