@@ -36,8 +36,8 @@ func Connect() {
 		if err == nil {
 			break
 		}
-		fmt.Println("Database connection failed. Retrying in 3 seconds...")
-		time.Sleep(3 * time.Second)
+		fmt.Println("Database connection failed. Retrying in 5 seconds...")
+		time.Sleep(5 * time.Second)
 		retries--
 	}
 
