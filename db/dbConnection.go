@@ -5,6 +5,7 @@ import (
 	"WIG-Server/models"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -24,12 +25,24 @@ func Connect() {
 	dbname := os.Getenv("MYSQL_DBNAME")
 
 	connection := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbuser, dbpassword, dbhost, dbname)
-	var db, err = gorm.Open(mysql.Open(connection), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+	
+	var db *gorm.DB
+	var err error
+	retries := 5
+	for retries > 0 {
+		db, err = gorm.Open(mysql.Open(connection), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Info),
+		})
+		if err == nil {
+			break
+		}
+		fmt.Println("Database connection failed. Retrying in 5 seconds...")
+		time.Sleep(5 * time.Second)
+		retries--
+	}
 
 	if err != nil {
-		panic("Database connection failed")
+		panic("Database connection failed after multiple retries")
 	}
 
 	DB = db
