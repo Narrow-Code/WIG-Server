@@ -206,10 +206,14 @@ func LocationSearch(c *fiber.Ctx) error {
 */
 func ReturnInventory(c *fiber.Ctx) error {
 	// Initialize variables
-//	user := c.Locals("user").(models.User)
+	user := c.Locals("user").(models.User)
 
-	// Search all locations and items with default location
-	// Loop through all locations and attach locations and items within (Preload and recusion)
+	var locations models.Location
+	db.DB.Where("location_uid = ? AND location_owner = ?", 1, user.UserUID).First(&locations)
 
-	return Success(c, "TEST") // fix to return properly
+	inventory := ReturnAllInventory(locations)
+	inventoryDTO := DTO("inventory", inventory)
+	
+
+	return Success(c, "Inventory returned", inventoryDTO)
 }
