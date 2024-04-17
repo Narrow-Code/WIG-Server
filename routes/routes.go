@@ -45,4 +45,6 @@ func Setup(app *fiber.App) {
 	app.Post("/app/borrower/checkin", controller.CheckinItem)
 	app.Get("/app/borrower/get", controller.GetBorrowers)
 	app.Get("/app/borrower/getcheckedout", controller.GetCheckedOutItems)
+
+	app.Get("/app/inventory", controller.ReturnInventory)
 }
