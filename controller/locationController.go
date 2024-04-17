@@ -149,16 +149,7 @@ func UnpackLocation( c *fiber.Ctx) error {
 		return Error(c, code, err.Error())
 	}
 
-	ownerships, locations := GetAllFromLocation(location, user)
-
-	// TODO iterate to preload all ownership and locations
-	for i := range ownerships {
-		preloadOwnership(&ownerships[i])
-	}
-
-	for i := range locations {
-		preloadLocation(&locations[i])
-	}
+	ownerships, locations := GetAllFromLocation(location)
 
 	ownershipDTO := DTO("ownerships", ownerships)
 	locationDTO := DTO("locations", locations)
@@ -203,4 +194,22 @@ func LocationSearch(c *fiber.Ctx) error {
 
 	locationDTO := DTO("locations", locations)
 	return Success(c, "Items found", locationDTO)
+}
+
+
+/* 
+* Returns the entire inventory for a user.
+*
+* @param c The FIber context containing the HTTP request and response objects.
+*
+* @return error The error message, if there is any.
+*/
+func ReturnInventory(c *fiber.Ctx) error {
+	// Initialize variables
+//	user := c.Locals("user").(models.User)
+
+	// Search all locations and items with default location
+	// Loop through all locations and attach locations and items within (Preload and recusion)
+
+	return Success(c, "TEST") // fix to return properly
 }

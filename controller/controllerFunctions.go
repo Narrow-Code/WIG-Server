@@ -172,16 +172,39 @@ func preloadLocation(location *models.Location) {
 * @param location The location
 * @param user The user making the call
 */
-func GetAllFromLocation(location models.Location, user models.User) ([]models.Ownership, []models.Location) {
+func GetAllFromLocation(location models.Location) ([]models.Ownership, []models.Location) {
 	// search and get all ownerships from location
 	var ownerships []models.Ownership
-	db.DB.Where("item_location = ? AND item_owner = ?", location.LocationUID, user.UserUID).Find(&ownerships)	
+	db.DB.Where("item_location = ? AND item_owner = ?", location.LocationUID, location.LocationOwner).Find(&ownerships)	
 
 	// search and get all locations from parent location
 	var locations []models.Location
-	db.DB.Where("location_parent = ? AND location_owner = ?", location.LocationUID, user.UserUID).Find(&locations)
+	db.DB.Where("location_parent = ? AND location_owner = ?", location.LocationUID, location.LocationOwner).Find(&locations)
 
-	// TODO recursion?
+	for i := range ownerships {
+		preloadOwnership(&ownerships[i])
+	}
+
+	for i := range locations {
+		preloadLocation(&locations[i])
+	}
 
 	return ownerships, locations
+}
+
+func ReturnAllInventory(location models.Location) models.InventoryDTO {
+	var inventoryDTO models.InventoryDTO
+	var inventoryList []models.InventoryDTO
+
+	ownerships, locations := GetAllFromLocation(location)
+
+	for i := range locations {
+		inventoryList = append(inventoryList, ReturnAllInventory(locations[i]))
+	}
+	
+	inventoryDTO.Parent = location
+	inventoryDTO.Ownerships = ownerships	
+	inventoryDTO.Locations = inventoryList
+
+	return inventoryDTO
 }

@@ -13,6 +13,6 @@ type CheckedOutDTO struct {
 
 type InventoryDTO struct {
 	Parent Location `json:"parent"`
-	Locations []Location `json:"locations"`
+	Locations []InventoryDTO `json:"locations"`
 	Ownerships []Ownership `json:"ownerships"`
 }
