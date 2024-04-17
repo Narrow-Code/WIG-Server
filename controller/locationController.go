@@ -149,7 +149,7 @@ func UnpackLocation( c *fiber.Ctx) error {
 		return Error(c, code, err.Error())
 	}
 
-	ownerships, locations := GetAllFromLocation(location)
+	ownerships, locations := GetAllFromLocation(location, user)
 
 	ownershipDTO := DTO("ownerships", ownerships)
 	locationDTO := DTO("locations", locations)
@@ -209,9 +209,9 @@ func ReturnInventory(c *fiber.Ctx) error {
 	user := c.Locals("user").(models.User)
 
 	var locations models.Location
-	db.DB.Where("location_uid = ?", 1, user.UserUID).First(&locations)
+	db.DB.Where("location_uid = ?", 1).First(&locations)
 
-	inventory := ReturnAllInventory(locations)
+	inventory := ReturnAllInventory(locations, user)
 	inventoryDTO := DTO("inventory", inventory)
 	
 
