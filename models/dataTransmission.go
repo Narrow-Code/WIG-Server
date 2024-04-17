@@ -10,3 +10,9 @@ type CheckedOutDTO struct {
 	Borrower Borrower `json:"borrower"`
 	Ownerships []Ownership `json:"ownerships"`
 }
+
+type InventoryDTO struct {
+	Parent Location `json:"parent"`
+	Locations []Location `json:"locations"`
+	Ownerships []Ownership `json:"ownerships"`
+}
