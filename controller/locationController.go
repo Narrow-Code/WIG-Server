@@ -127,9 +127,9 @@ func LocationEdit(c *fiber.Ctx) error {
 	}
 
 	// Add new fields
-	location.LocationName = data["location_name"]
-	location.LocationDescription = data["location_description"]
-	location.LocationTags = data["location_tags"]
+	location.LocationName = data["locationName"]
+	location.LocationDescription = data["locationDescription"]
+	location.LocationTags = data["locationTags"]
 	location.LocationQR = data["qr"]
 
 	db.DB.Save(&location)
