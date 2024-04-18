@@ -111,6 +111,13 @@ func LocationEdit(c *fiber.Ctx) error {
 	user := c.Locals("user").(models.User)
 	locationUID := c.Query("locationUID")
 
+	// Parse request into data map
+	var data map[string]string
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+
 	// Validate ownership
 	var location models.Location
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
@@ -120,10 +127,10 @@ func LocationEdit(c *fiber.Ctx) error {
 	}
 
 	// Add new fields
-	location.LocationName = c.Query("location_name")
-	location.LocationDescription = c.Query("location_description")
-	location.LocationTags = c.Query("location_tags")
-	location.LocationQR = c.Query("qr")
+	location.LocationName = data["location_name"]
+	location.LocationDescription = data["location_description"]
+	location.LocationTags = data["location_tags"]
+	location.LocationQR = data["qr"]
 
 	db.DB.Save(&location)
 
