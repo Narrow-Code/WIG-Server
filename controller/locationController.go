@@ -123,6 +123,7 @@ func LocationEdit(c *fiber.Ctx) error {
 	location.LocationName = c.Query("location_name")
 	location.LocationDescription = c.Query("location_description")
 	location.LocationTags = c.Query("location_tags")
+	location.LocationQR = c.Query("qr")
 
 	db.DB.Save(&location)
 
