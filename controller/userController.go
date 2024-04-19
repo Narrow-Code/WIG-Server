@@ -170,3 +170,7 @@ func UserSignup(c *fiber.Ctx) error {
 
 	return Success(c, "Signup was successful")
 }
+
+func Ping (c *fiber.Ctx) error {
+	return Success(c, "Ping was successful")
+}
