@@ -3,9 +3,8 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 /**
@@ -53,22 +52,18 @@ func CheckoutItem(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
 	var request BorrowerRequest
-	borrowerUID, err := strconv.ParseUint(c.Query("borrowerUID"), 10, 64)
-
+	borrowerUID := c.Query("borrowerUID")
+	borrowerUUID, err := uuid.Parse(borrowerUID)
 	if err != nil {
-		return Error(c, 400, "There was an error converting borrowerUID")
+		Error(c, 400, "Borrower UUID not correct format")	
 	}
 
 	err = c.BodyParser(&request)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
 
 	var borrower models.Borrower
-	var userUID = user.UserUID
-	if (borrowerUID == 2){	
-		userUID = 0
-	}
 
-	result := db.DB.Where("borrower_uid = ? AND borrower_owner = ?", borrowerUID, userUID).First(&borrower)
+	result := db.DB.Where("borrower_uid = ? AND borrower_owner = ?", borrowerUID, user.UserUID).First(&borrower)
 	
 	code, err := RecordExists("Borrower UID", result)
 	if err != nil {return Error(c, code, err.Error())}
@@ -82,7 +77,7 @@ func CheckoutItem(c *fiber.Ctx) error {
 		
 		_, err := RecordExists("Ownership", result)
 		if err == nil {
-			item.ItemBorrower = uint(borrowerUID)
+			item.ItemBorrower = borrowerUUID
 			db.DB.Save(&item)
 			preloadOwnership(&item)
 			successfulOwnerships = append(successfulOwnerships, ownership)
@@ -110,6 +105,7 @@ func CheckinItem(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
 	var request BorrowerRequest
+	var selfReturn models.Borrower
 
 	err := c.BodyParser(&request)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
@@ -120,10 +116,11 @@ func CheckinItem(c *fiber.Ctx) error {
 	for _, ownership := range request.Ownerships {		
 		var item models.Ownership
 		result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownership, user.UserUID).First(&item)
+		db.DB.Where("borrower_name = ? AND item_owner = ?", "Self", user.UserUID).First(&selfReturn)
 		
 		_, err := RecordExists("Ownership", result)
 		if err == nil {
-			item.ItemBorrower = uint(1)
+			item.ItemBorrower = selfReturn.BorrowerUID
 			db.DB.Save(&item)
 			preloadOwnership(&item)
 			successfulOwnerships = append(successfulOwnerships, ownership)

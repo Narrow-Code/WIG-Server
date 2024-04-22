@@ -72,12 +72,10 @@ func AutoMigrate(connection *gorm.DB) {
 	if borrowerCount == 0 {
 		// Create a default Borrower record
 		defaultBorrower := models.Borrower{
-			BorrowerUID:  1,
-			BorrowerName: "Default Borrower"}
+			BorrowerName: "Default"}
 		connection.Create(&defaultBorrower)
 
 		selfBorrower := models.Borrower{
-			BorrowerUID: 2,
 			BorrowerName: "Self"}
 		connection.Create(&selfBorrower)
 	}

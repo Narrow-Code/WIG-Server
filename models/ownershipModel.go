@@ -1,5 +1,9 @@
 package models
 
+import(
+	"github.com/google/uuid"
+)
+
 // Represents information about ownership.
 type Ownership struct {
 	OwnershipUID   uint     `json:"ownershipUID" gorm:"primary_key;column:ownership_uid"`
@@ -13,7 +17,7 @@ type Ownership struct {
 	ItemTags       string   `json:"itemTags" gorm:"column:item_tags"`
 	ItemQuantity   int      `json:"itemQuantity" gorm:"column:item_quantity;"`
 	ItemCheckedOut string   `json:"itemCheckedOut" gorm:"column:item_checked_out"`
-	ItemBorrower   uint     `json:"itemBorrower" gorm:"column:item_borrower;default:1"`
+	ItemBorrower   uuid.UUID     `json:"itemBorrower" gorm:"column:item_borrower;default:1"`
 	User           User     `json:"user" gorm:"foreignkey:item_owner"`
 	Location       Location `json:"location" gorm:"foreignkey:item_location"`
 	Item           Item     `json:"item" gorm:"foreignkey:item_number"`
