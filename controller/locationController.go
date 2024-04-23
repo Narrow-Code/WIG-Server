@@ -220,7 +220,7 @@ func ReturnInventory(c *fiber.Ctx) error {
 	user := c.Locals("user").(models.User)
 
 	var locations models.Location
-	db.DB.Where("location_uid = ?", 1).First(&locations)
+	db.DB.Where("location_uid = ?", "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA").First(&locations)
 
 	inventory := ReturnAllInventory(locations, user)
 	inventoryDTO := DTO("inventory", inventory)
