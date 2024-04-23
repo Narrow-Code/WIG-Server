@@ -8,7 +8,7 @@ import(
 type Ownership struct {
 	OwnershipUID   uint     `json:"ownershipUID" gorm:"primary_key;column:ownership_uid"`
 	ItemOwner      uint     `json:"itemOwner" gorm:"column:item_owner"`
-	ItemNumber     uint     `json:"itemNumber" gorm:"column:item_number"`
+	ItemNumber     uuid.UUID     `json:"itemNumber" gorm:"column:item_number;type:varchar(191)"`
 	CustomItemName string   `json:"customItemName" gorm:"column:custom_item_name"`
 	CustItemImg    string   `json:"customItemImage" gorm:"column:custom_item_img"`
 	OwnedCustDesc  string   `json:"customItemDescription" gorm:"column:custom_item_description"`
