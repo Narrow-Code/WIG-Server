@@ -115,7 +115,7 @@ func AutoMigrate(connection *gorm.DB) {
 	if itemCount == 0 {
 		// Create a default Item record
 		defaultItem := models.Item{
-			ItemUid: 1,
+			ItemUid: uuid.MustParse("33333333-3333-3333-3333-333333333333"),
 			Name: "Default Item"}
 		connection.Create(&defaultItem)
 	}
