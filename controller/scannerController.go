@@ -101,7 +101,8 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	// Check if qr exists as location
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&location)
-	if location.LocationUID != 0 {
+	emptyUID := [16]byte{}
+	if location.LocationUID != emptyUID {
 		return Success(c, "LOCATION")
 	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return Error(c, 400, "internal server error")
