@@ -9,5 +9,5 @@ import (
 type Borrower struct {
 	BorrowerUID  	uuid.UUID    `json:"borrowerUID" gorm:"primary_key;column:borrower_uid;type:varchar(191);default:11111111-1111-1111-1111-111111111111"`
 	BorrowerName 	string  `json:"borrowerName" gorm:"column:borrower_name"`
-	BorrowerOwner	uint 	`json:"-" gorm:"column:borrower_owner"`
+	BorrowerOwner	uuid.UUID 	`json:"-" gorm:"column:borrower_owner;type:varchar(191)"`
 }

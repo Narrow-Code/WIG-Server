@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 // Represents information about a location.
 type Location struct {
 	LocationUID         uuid.UUID      `json:"locationUID" gorm:"primary_key;column:location_uid;type:varchar(191)"`
-	LocationOwner       uint      `json:"locationOwner" gorm:"column:location_owner"`
+	LocationOwner       uuid.UUID      `json:"locationOwner" gorm:"column:location_owner;type:varchar(191)"`
 	LocationName        string    `json:"locationName" gorm:"column:location_name"`
 	Parent              uuid.UUID     `json:"locationParent" gorm:"column:location_parent;type:varchar(191);default:AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"`
 	LocationQR          string    `json:"locationQR" gorm:"column:location_qr"`

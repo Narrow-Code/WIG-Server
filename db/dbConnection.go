@@ -90,7 +90,7 @@ func AutoMigrate(connection *gorm.DB) {
 	if userCount == 0 {
 		// Create a default User record
 		defaultUser := models.User{
-			UserUID:  1,
+			UserUID:  uuid.MustParse("BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"),
 			Username: "Default User"}
 		connection.Create(&defaultUser)
 	}
@@ -104,7 +104,7 @@ func AutoMigrate(connection *gorm.DB) {
 		defaultLocation := models.Location{
 			LocationUID:   uuid.MustParse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"),
 			LocationName:  "Default Location",
-			LocationOwner: 1}
+			LocationOwner: uuid.MustParse("BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB")}
 		connection.Create(&defaultLocation)
 	}
 
