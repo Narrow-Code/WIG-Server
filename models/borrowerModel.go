@@ -5,9 +5,14 @@ import (
 	"github.com/google/uuid"
 )
 
-// Represents information about a borrower.
+// Borrower represents information about a borrower.
 type Borrower struct {
-	BorrowerUID  	uuid.UUID    `json:"borrowerUID" gorm:"primary_key;column:borrower_uid;type:varchar(191);default:11111111-1111-1111-1111-111111111111"`
-	BorrowerName 	string  `json:"borrowerName" gorm:"column:borrower_name"`
-	BorrowerOwner	uuid.UUID 	`json:"-" gorm:"column:borrower_owner;type:varchar(191)"`
+	// BorrowerUID uniquely identifies the borrower
+	BorrowerUID uuid.UUID `json:"borrowerUID" gorm:"primary_key;column:borrower_uid;type:varchar(191);default:11111111-1111-1111-1111-111111111111"`
+
+	// BorrowerName is the name of the borrower
+	BorrowerName string `json:"borrowerName" gorm:"column:borrower_name"`
+
+	// BorrowerOwner is the unique identifier of the owner of the borrower.
+	BorrowerOwner uuid.UUID `json:"-" gorm:"column:borrower_owner;type:varchar(191)"`
 }
