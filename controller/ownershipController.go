@@ -184,11 +184,6 @@ func OwnershipCreateNoItem(c *fiber.Ctx) error {
 	}
 	
 	var item models.Item
-	result = db.DB.Where("item_uid = ?", c.Query("item_uid")).First(&item)
-	code, err = RecordExists("Ownership", result)
-	if err != nil {
-		return Error(c, code, err.Error())
-	}
 
 	ownership, err := createOwnership(user.UserUID, item, qr, name)
 	if err != nil {
