@@ -17,19 +17,25 @@ import (
 * @return string The generated authentication token.
  */
 func GenerateToken(username string, hash string) string {
+	// Load environment variables
 	godotenv.Load()
-	var secret = []byte(os.Getenv("TOKEN_SECRET"))
 
-	// Generate access token
+	// Get token secret from environment
+	tokenSecret := []byte(os.Getenv("TOKEN_SECRET"))
+
+	// Generate JWT token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
 		"hash":     hash,
 	})
-	tokenStr, err := token.SignedString(secret)
 
-	// Return error if access token generation fails
+	// Sign token with secret
+	tokenStr, err := token.SignedString(tokenSecret)
+
+	// Return error if access token signing fails
 	if err != nil {
 		return "error"
 	}
+
 	return tokenStr
 }
