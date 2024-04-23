@@ -32,6 +32,7 @@ func CreateBorrower(c *fiber.Ctx) error {
 	borrower = models.Borrower{
 		BorrowerName:  borrowerName,
 		BorrowerOwner: user.UserUID,
+		BorrowerUID: uuid.New(),
 	}
 
 	db.DB.Create(&borrower)
@@ -57,14 +58,12 @@ func CheckoutItem(c *fiber.Ctx) error {
 	if err != nil {
 		Error(c, 400, "Borrower UUID not correct format")	
 	}
+	var borrower models.Borrower
+	result := db.DB.Where("borrower_uid = ?", borrowerUID).First(&borrower)
 
 	err = c.BodyParser(&request)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
 
-	var borrower models.Borrower
-
-	result := db.DB.Where("borrower_uid = ? AND borrower_owner = ?", borrowerUID, user.UserUID).First(&borrower)
-	
 	code, err := RecordExists("Borrower UID", result)
 	if err != nil {return Error(c, code, err.Error())}
 
@@ -105,7 +104,6 @@ func CheckinItem(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
 	var request BorrowerRequest
-	var selfReturn models.Borrower
 
 	err := c.BodyParser(&request)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
@@ -116,11 +114,10 @@ func CheckinItem(c *fiber.Ctx) error {
 	for _, ownership := range request.Ownerships {		
 		var item models.Ownership
 		result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownership, user.UserUID).First(&item)
-		db.DB.Where("borrower_name = ? AND item_owner = ?", "Self", user.UserUID).First(&selfReturn)
 		
 		_, err := RecordExists("Ownership", result)
 		if err == nil {
-			item.ItemBorrower = selfReturn.BorrowerUID
+			item.ItemBorrower = uuid.MustParse("11111111-1111-1111-1111-111111111111")
 			db.DB.Save(&item)
 			preloadOwnership(&item)
 			successfulOwnerships = append(successfulOwnerships, ownership)

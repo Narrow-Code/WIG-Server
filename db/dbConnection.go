@@ -1,4 +1,4 @@
-// Provides functionalities for configuring and connecting to the database.
+// Provides functionalities for configuring connecting to the database.
 package db
 
 import (
@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -72,11 +73,13 @@ func AutoMigrate(connection *gorm.DB) {
 	if borrowerCount == 0 {
 		// Create a default Borrower record
 		defaultBorrower := models.Borrower{
-			BorrowerName: "Default"}
+			BorrowerName: "Default",
+			BorrowerUID: uuid.MustParse("11111111-1111-1111-1111-111111111111")}
 		connection.Create(&defaultBorrower)
 
 		selfBorrower := models.Borrower{
-			BorrowerName: "Self"}
+			BorrowerName: "Self",
+			BorrowerUID: uuid.MustParse("22222222-2222-2222-2222-222222222222")}
 		connection.Create(&selfBorrower)
 	}
 
