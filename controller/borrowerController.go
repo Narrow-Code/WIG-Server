@@ -167,6 +167,10 @@ func GetCheckedOutItems(c *fiber.Ctx) error{
 	// Get borrower	
 	var borrowers []models.Borrower
 	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
+	var self models.Borrower
+	db.DB.Where("borrower_uid = ?", "22222222-2222-2222-2222-222222222222").First(&self)
+
+	borrowers = append(borrowers, self)
 
 	if len(borrowers) == 0 {
 		return Success(c, "No borrowers found")
