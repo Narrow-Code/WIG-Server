@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 /*
@@ -48,6 +49,7 @@ func LocationCreate(c *fiber.Ctx) error {
 		LocationName:  locationName,
 		LocationOwner: user.UserUID,
 		LocationQR:    locationQR,
+		LocationUID: uuid.New(),
 	}
 
 	db.DB.Create(&location)
