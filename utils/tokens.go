@@ -9,11 +9,10 @@ import (
 )
 
 /*
-* Generates a randomized authentication token for API calls between the WIG-Application and server.
-*
+* GenerateToken generates a randomized authentication token for API calls between the WIG-Application and server.
+* 
 * @param username The username.
 * @param hash The hashed password.
-*
 * @return string The generated authentication token.
  */
 func GenerateToken(username string, hash string) string {
