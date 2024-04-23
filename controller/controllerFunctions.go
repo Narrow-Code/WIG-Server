@@ -71,7 +71,6 @@ func createOwnership(uid uint, item models.Item, qr string, customName string) (
 	ownership := models.Ownership{
 		ItemOwner:  uid,
 		ItemNumber: item.ItemUid,
-		ItemQuantity: 1,
 		ItemQR: qr,
 		CustomItemName: customName,
 	}
