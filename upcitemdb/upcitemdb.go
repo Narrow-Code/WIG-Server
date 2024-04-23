@@ -9,6 +9,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 /*
@@ -16,7 +18,7 @@ import (
 * If an item is retrieved it is then added to the Items table in the database.
 *
 * @param barcode The barcode to retrieve data for.
-*/
+ */
 func GetBarcode(barcode string) int {
 	url := "https://api.upcitemdb.com/prod/trial/lookup?upc=" + barcode
 
@@ -78,6 +80,9 @@ func GetBarcode(barcode string) int {
 			if images, exists := itemData["images"]; exists && len(images.([]interface{})) > 0 {
 				newItem.Image = images.([]interface{})[0].(string)
 			}
+
+			newItem.ItemUid = uuid.New()
+
 			db.DB.Create(&newItem)
 		}
 
