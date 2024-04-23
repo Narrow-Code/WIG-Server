@@ -111,7 +111,7 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	// Check if qr exists as ownership
 	var ownership models.Ownership
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownership)
-	if ownership.OwnershipUID != 0 {
+	if ownership.OwnershipUID != emptyUID {
 		return Success(c, "OWNERSHIP")
 	}
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {

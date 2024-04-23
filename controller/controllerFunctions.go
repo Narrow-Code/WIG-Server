@@ -73,6 +73,7 @@ func createOwnership(uid uint, item models.Item, qr string, customName string) (
 	}
 
 	ownership := models.Ownership{
+		OwnershipUID: uuid.New(),
 		ItemOwner:  uid,
 		ItemNumber: item.ItemUid,
 		ItemLocation: uuid.MustParse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"),
@@ -213,14 +214,3 @@ func ReturnAllInventory(location models.Location, user models.User) models.Inven
 	return inventoryDTO
 }
 
-func generateCustomUUID(prefix string) uuid.UUID {
-	id := uuid.New()
-
-	strID := id.String()
-
-	strID = prefix + strID[1:]
-
-	customUUID, _ := uuid.Parse(strID)
-
-	return customUUID
-}

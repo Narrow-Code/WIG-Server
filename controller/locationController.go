@@ -50,7 +50,7 @@ func LocationCreate(c *fiber.Ctx) error {
 		LocationOwner: user.UserUID,
 		LocationQR:    locationQR,
 		Parent:	       uuid.MustParse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"),
-		LocationUID: generateCustomUUID("L"),
+		LocationUID: uuid.New(),
 	}
 
 	db.DB.Create(&location)

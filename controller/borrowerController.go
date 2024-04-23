@@ -3,6 +3,8 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
@@ -68,7 +70,7 @@ func CheckoutItem(c *fiber.Ctx) error {
 	if err != nil {return Error(c, code, err.Error())}
 
 	success := 0
-	var successfulOwnerships []int
+	var successfulOwnerships []string
 
 	for _, ownership := range request.Ownerships {		
 		var item models.Ownership
@@ -109,7 +111,7 @@ func CheckinItem(c *fiber.Ctx) error {
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
 
 	success := 0
-	var successfulOwnerships []int
+	var successfulOwnerships []string
 
 	for _, ownership := range request.Ownerships {		
 		var item models.Ownership
@@ -159,14 +161,17 @@ func GetBorrowers(c *fiber.Ctx) error{
 }
 
 func GetCheckedOutItems(c *fiber.Ctx) error{
+	log.Print("GetCheckedOutItems: Started")
 	// Initialize variables
 	user := c.Locals("user").(models.User)
 	var ownerships []models.Ownership
 	var checkedOut []models.CheckedOutDTO
-
+	
 	// Get borrower	
 	var borrowers []models.Borrower
 	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
+	log.Print("Borrowers searched")
+	log.Print(borrowers)
 	var self models.Borrower
 	db.DB.Where("borrower_uid = ?", "22222222-2222-2222-2222-222222222222").First(&self)
 
@@ -197,5 +202,5 @@ func GetCheckedOutItems(c *fiber.Ctx) error{
 }
 
 type BorrowerRequest struct {
-	Ownerships []int `json:"ownerships"` 
+	Ownerships []string `json:"ownerships"` 
 }
