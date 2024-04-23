@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 // The regex expression to check username requirements
@@ -162,6 +163,7 @@ func UserSignup(c *fiber.Ctx) error {
 		Email:    data["email"],
 		Salt:     data["salt"],
 		Hash:     data["hash"],
+		UserUID:  uuid.New(),
 	}
 
 	db.DB.Create(&user)
