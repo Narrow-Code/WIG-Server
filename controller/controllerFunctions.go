@@ -74,8 +74,6 @@ func createOwnership(uid uint, item models.Item, qr string, customName string) (
 		ItemQuantity: 1,
 		ItemQR: qr,
 		CustomItemName: customName,
-		ItemLocation: 1,
-		ItemBorrower: uuid.MustParse("11111111-1111-1111-1111-111111111111"),
 	}
 
 	result := db.DB.Create(&ownership)
