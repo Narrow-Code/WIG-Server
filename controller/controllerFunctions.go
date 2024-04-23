@@ -160,7 +160,7 @@ func preloadLocation(location *models.Location) {
 	db.DB.Preload("User").Preload("Location").Find(&location)
 
 	// Recursively preload the parent's hierarchy
-	if location.Parent != nil && location.Location.LocationUID != 1 {
+	if location.Parent != nil && location.Location.LocationUID != uuid.MustParse("LLLLLLLL-LLLL-LLLL-LLLL-LLLLLLLLLLLL") {
 		preloadLocation(location.Location)
 	}
 }
@@ -206,4 +206,16 @@ func ReturnAllInventory(location models.Location, user models.User) models.Inven
 	inventoryDTO.Locations = inventoryList
 
 	return inventoryDTO
+}
+
+func generateCustomUUID(prefix string) uuid.UUID {
+	id := uuid.New()
+
+	strID := id.String()
+
+	strID = prefix + strID[1:]
+
+	customUUID, _ := uuid.Parse(strID)
+
+	return customUUID
 }
