@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 /*
@@ -48,6 +49,7 @@ func LocationCreate(c *fiber.Ctx) error {
 		LocationName:  locationName,
 		LocationOwner: user.UserUID,
 		LocationQR:    locationQR,
+		Parent:	       uuid.MustParse("LLLLLLLL-LLLL-LLLL-LLLL-LLLLLLLLLLLL"),
 		LocationUID: generateCustomUUID("L"),
 	}
 
@@ -93,7 +95,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	}
 
 	// Set the location and save
-	location.Parent = &setLocation.LocationUID
+	location.Parent = setLocation.Location.LocationUID
 	db.DB.Save(&location)
 
 	// return success

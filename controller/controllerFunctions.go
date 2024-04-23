@@ -75,7 +75,7 @@ func createOwnership(uid uint, item models.Item, qr string, customName string) (
 	ownership := models.Ownership{
 		ItemOwner:  uid,
 		ItemNumber: item.ItemUid,
-		ItemLocation: generateCustomUUID("L"),
+		ItemLocation: uuid.MustParse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"),
 		ItemQR: qr,
 		CustomItemName: customName,
 	}
@@ -165,7 +165,7 @@ func preloadLocation(location *models.Location) {
 	db.DB.Preload("User").Preload("Location").Find(&location)
 
 	// Recursively preload the parent's hierarchy
-	if location.Parent != nil && location.Location.LocationUID != uuid.MustParse("L4444444-4444-4444-4444-444444444444") {
+	if location.Location.LocationUID != uuid.MustParse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA") {
 		preloadLocation(location.Location)
 	}
 }

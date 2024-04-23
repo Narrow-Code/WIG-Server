@@ -12,7 +12,7 @@ type Ownership struct {
 	CustomItemName string   `json:"customItemName" gorm:"column:custom_item_name"`
 	CustItemImg    string   `json:"customItemImage" gorm:"column:custom_item_img"`
 	OwnedCustDesc  string   `json:"customItemDescription" gorm:"column:custom_item_description"`
-	ItemLocation   uuid.UUID     `json:"itemLocation" gorm:"column:item_location;default:44444444-4444-4444-4444-444444444444;;type:varchar(191)"`
+	ItemLocation   uuid.UUID     `json:"itemLocation" gorm:"column:item_location;default:AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA;type:varchar(191)"`
 	ItemQR         string   `json:"itemQR" gorm:"column:item_qr"`
 	ItemTags       string   `json:"itemTags" gorm:"column:item_tags"`
 	ItemQuantity   int      `json:"itemQuantity" gorm:"column:item_quantity;default:1"`

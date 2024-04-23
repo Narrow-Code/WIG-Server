@@ -102,7 +102,7 @@ func AutoMigrate(connection *gorm.DB) {
 	if locationCount == 0 {
 		// Create a default Location record
 		defaultLocation := models.Location{
-			LocationUID:   uuid.MustParse("44444444-4444-4444-4444-444444444444"),
+			LocationUID:   uuid.MustParse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"),
 			LocationName:  "Default Location",
 			LocationOwner: 1}
 		connection.Create(&defaultLocation)
