@@ -14,6 +14,12 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+const DefaultBorrowerUUID = "11111111-1111-1111-1111-111111111111"
+const SelfBorrowerUUID = "22222222-2222-2222-2222-222222222222"
+const DefaultUserUUID = "33333333-3333-3333-3333-333333333333"
+const DefaultLocationUUID = "44444444-4444-4444-4444-444444444444"
+const DefaultItemUUID = "55555555-5555-5555-5555-555555555555"
+
 // DB holds the database connection instance.
 var DB *gorm.DB
 
@@ -89,12 +95,12 @@ func ensureBorrowerRecords(connection *gorm.DB) {
 	if borrowerCount == 0 {
 		defaultBorrower := models.Borrower{
 			BorrowerName: "Default",
-			BorrowerUID: uuid.MustParse("11111111-1111-1111-1111-111111111111")}
+			BorrowerUID: uuid.MustParse(DefaultBorrowerUUID)}
 		connection.Create(&defaultBorrower)
 
 		selfBorrower := models.Borrower{
 			BorrowerName: "Self",
-			BorrowerUID: uuid.MustParse("22222222-2222-2222-2222-222222222222")}
+			BorrowerUID: uuid.MustParse(SelfBorrowerUUID)}
 		connection.Create(&selfBorrower)
 	}
 }
@@ -106,7 +112,7 @@ func ensureUserRecords(connection *gorm.DB) {
 
 	if userCount == 0 {
 		defaultUser := models.User{
-			UserUID:  uuid.MustParse("BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"),
+			UserUID:  uuid.MustParse(DefaultUserUUID),
 			Username: "Default User"}
 		connection.Create(&defaultUser)
 	}
@@ -119,9 +125,9 @@ func ensureLocationRecords(connection *gorm.DB) {
 
 	if locationCount == 0 {
 		defaultLocation := models.Location{
-			LocationUID:   uuid.MustParse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"),
+			LocationUID:   uuid.MustParse(DefaultLocationUUID),
 			LocationName:  "Default Location",
-			LocationOwner: uuid.MustParse("BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB")}
+			LocationOwner: uuid.MustParse(DefaultUserUUID)}
 		connection.Create(&defaultLocation)
 	}
 }
@@ -133,7 +139,7 @@ func ensureItemRecords(connection *gorm.DB) {
 
 	if itemCount == 0 {
 		defaultItem := models.Item{
-			ItemUid: uuid.MustParse("33333333-3333-3333-3333-333333333333"),
+			ItemUid: uuid.MustParse(DefaultItemUUID),
 			Name: "Default Item"}
 		connection.Create(&defaultItem)
 	}

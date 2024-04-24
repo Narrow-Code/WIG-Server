@@ -14,7 +14,7 @@ type Location struct {
 	LocationName string `json:"locationName" gorm:"column:location_name"`
 	
 	// Parent is the parent location in which the location is located in
-	Parent uuid.UUID `json:"locationParent" gorm:"column:location_parent;type:varchar(191);default:AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"`
+	Parent uuid.UUID `json:"locationParent" gorm:"column:location_parent;type:varchar(191)"`
 	
 	//LocationQR is the QR code associated with the location
 	LocationQR string `json:"locationQR" gorm:"column:location_qr"`

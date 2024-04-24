@@ -25,7 +25,7 @@ type Ownership struct {
 	OwnedCustDesc string `json:"customItemDescription" gorm:"column:custom_item_description"`
 	
 	// ItemLocation is the UUID of the location in which the ownership is stored
-	ItemLocation uuid.UUID `json:"itemLocation" gorm:"column:item_location;default:AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA;type:varchar(191)"`
+	ItemLocation uuid.UUID `json:"itemLocation" gorm:"column:item_location;type:varchar(191)"`
 	
 	// ItemQR is the QR code representing the ownership
 	ItemQR string `json:"itemQR" gorm:"column:item_qr"`
@@ -40,7 +40,7 @@ type Ownership struct {
 	ItemCheckedOut string `json:"itemCheckedOut" gorm:"column:item_checked_out"`
 	
 	// ItemBorrower is the UUID of the borrower who the ownership is checked out to
-	ItemBorrower uuid.UUID `json:"itemBorrower" gorm:"column:item_borrower;type:varchar(191);default:11111111-1111-1111-1111-111111111111"`
+	ItemBorrower uuid.UUID `json:"itemBorrower" gorm:"column:item_borrower;type:varchar(191)"`
 	
 	// User is the user account associated with the ownership
 	User User `json:"user" gorm:"foreignkey:item_owner"`

@@ -48,7 +48,7 @@ func checkinItems(ownerships []string) []string {
 		
 		_, err := RecordExists("Ownership", result)
 		if err == nil {
-			item.ItemBorrower = uuid.MustParse("11111111-1111-1111-1111-111111111111")
+			item.ItemBorrower = uuid.MustParse(db.DefaultBorrowerUUID)
 			item.ItemCheckedOut = "false"
 			db.DB.Save(&item)
 			preloadOwnership(&item)

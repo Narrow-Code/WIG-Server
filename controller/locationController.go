@@ -49,7 +49,7 @@ func LocationCreate(c *fiber.Ctx) error {
 		LocationName:  locationName,
 		LocationOwner: user.UserUID,
 		LocationQR:    locationQR,
-		Parent:	       uuid.MustParse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"),
+		Parent:	       uuid.MustParse(db.DefaultLocationUUID),
 		LocationUID: uuid.New(),
 	}
 
@@ -220,7 +220,7 @@ func ReturnInventory(c *fiber.Ctx) error {
 	user := c.Locals("user").(models.User)
 
 	var locations models.Location
-	db.DB.Where("location_uid = ?", "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA").First(&locations)
+	db.DB.Where("location_uid = ?", db.DefaultLocationUUID).First(&locations)
 
 	inventory := ReturnAllInventory(locations, user)
 	inventoryDTO := DTO("inventory", inventory)

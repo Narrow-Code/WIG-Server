@@ -88,7 +88,7 @@ func CheckinItem(c *fiber.Ctx) error {
 
 	// Check if ownerships were successful
 	if len(successfulOwnerships) == 0 {
-		return Error(c, 400, "Failed to checkout ownerships")
+		return Error(c, 400, "Failed to check in ownerships")
 	}
 
 	// Return as DTO
@@ -124,7 +124,7 @@ func CheckedOutInventory(c *fiber.Ctx) error{
 	
 	// Get all borrower associated with User and include Self	
 	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
-	db.DB.Where("borrower_uid = ?", "22222222-2222-2222-2222-222222222222").First(&self)
+	db.DB.Where("borrower_uid = ?", db.SelfBorrowerUUID).First(&self)
 	borrowers = append(borrowers, self)
 
 	// Get checkedOutDTO and return as DTO
