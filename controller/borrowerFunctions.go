@@ -74,7 +74,8 @@ func checkinItems(ownerships []string) []string {
 	return successfulOwnerships
 }
 
-/* getCheckedOutDto returns a CheckedOutDTO model with all borrowed Ownerships
+/* 
+* getCheckedOutDto returns a CheckedOutDTO model with all borrowed Ownerships
 *
 * @param list of Borrowers to retrieve checked out items for
 * @return []models.CheckedOutDTO the CheckedOutDTO list of inventory
