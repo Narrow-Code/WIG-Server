@@ -1,4 +1,4 @@
-// Handles the API calls with upcitemdb.com.
+// upcitemdb handles the API calls with upcitemdb.com.
 package upcitemdb
 
 import (

@@ -1,4 +1,4 @@
-// Defines the HTTP routes for the WIG-Server application.
+// routes defines the HTTP routes for the WIG-Server application.
 package routes
 
 import (

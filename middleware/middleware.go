@@ -1,4 +1,4 @@
-// The Handles all middle functions between the API calls.
+// middleware handles all middle functions between the API calls.
 package middleware
 
 import (

@@ -1,4 +1,4 @@
-// Defines the data models used in the WIG-Server application.
+// models defines the data models used in the WIG-Server application.
 package models
 
 import (

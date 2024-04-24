@@ -1,4 +1,4 @@
-// Provides functions that may be regularly used throughout the WIG-Application.
+// utils provides functions that may be regularly used throughout the WIG-Application.
 package utils
 
 import (
