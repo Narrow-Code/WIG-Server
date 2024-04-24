@@ -31,7 +31,7 @@ func CreateBorrower(c *fiber.Ctx) error {
 	// Create Borrower and return as DTO
 	borrower = createBorrower(borrowerName, user)
 	dto := DTO("borrower", borrower)
-	return Success(c, "Success: Borrower created", dto)
+	return Success(c, "Borrower created", dto)
 }
 
 // CheckoutItems checks out the list of Ownerships to a specified Borrower 
@@ -56,7 +56,9 @@ func CheckoutItems(c *fiber.Ctx) error {
 		
 	// Parse json body
 	err = c.BodyParser(&ownerships)
-	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
 
 	// Checkout items in list
 	successfulOwnerships := checkoutItems(ownerships, borrowerUUID)
@@ -68,7 +70,7 @@ func CheckoutItems(c *fiber.Ctx) error {
 
 	// Return as DTO
 	dto := DTO("ownerships", successfulOwnerships)	
-	return Success(c, "Checked out", dto)
+	return Success(c, "Ownerships checked out", dto)
 }
 
 // CheckinItems sets returns checked out items to original locations within the list.
@@ -78,7 +80,9 @@ func CheckinItem(c *fiber.Ctx) error {
 
 	// Parse json body
 	err := c.BodyParser(&ownerships)
-	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
 
 	// Checkin items in list
 	successfulOwnerships := checkinItems(ownerships)
@@ -90,31 +94,26 @@ func CheckinItem(c *fiber.Ctx) error {
 
 	// Return as DTO
 	dto := DTO("ownerships", successfulOwnerships)	
-	return Success(c, "Checked in", dto)
+	return Success(c, "Ownerships checked in", dto)
 }
 
-/*
-* Returns all borrowers associated with user.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
-*/
+// GetBorrower returns all borrowers associated with user.
 func GetBorrowers(c *fiber.Ctx) error{
 	// Initialize variables
 	user := c.Locals("user").(models.User)
 
-	// Get borrower	
+	// Get borrowers	
 	var borrowers []models.Borrower
 	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
 
+	// Check if borrowers is empty
 	if len(borrowers) == 0 {
 		return Success(c, "No borrowers found")
 	}
 
-	borrowersDTO := DTO("borrowers", &borrowers)
-
-	return Success(c, "Borrowers returned", borrowersDTO)
+	// Return as DTO
+	dto := DTO("borrowers", &borrowers)
+	return Success(c, "Borrowers returned", dto)
 }
 
 func GetCheckedOutItems(c *fiber.Ctx) error{
@@ -156,8 +155,4 @@ func GetCheckedOutItems(c *fiber.Ctx) error{
 	checkedOutItems := DTO("borrowers", checkedOut)
 
 	return Success(c, "Checked Out Items returned", checkedOutItems)
-}
-
-type BorrowerRequest struct {
-	Ownerships []string `json:"ownerships"` 
 }
