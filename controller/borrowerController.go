@@ -54,7 +54,7 @@ func CheckoutItems(c *fiber.Ctx) error {
 		return Error(c, code, err.Error())
 	}
 		
-	// Prase json body into borrowerRequest
+	// Parse json body
 	err = c.BodyParser(&ownerships)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
 
@@ -71,46 +71,26 @@ func CheckoutItems(c *fiber.Ctx) error {
 	return Success(c, "Checked out", dto)
 }
 
-/*
-* Sets returns checked out items to original owners within the list.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
-*/
-
+// CheckinItems sets returns checked out items to original locations within the list.
 func CheckinItem(c *fiber.Ctx) error {
 	// Initialize variables
-	user := c.Locals("user").(models.User)
 	var ownerships []string
 
+	// Parse json body
 	err := c.BodyParser(&ownerships)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
 
-	success := 0
-	var successfulOwnerships []string
+	// Checkin items in list
+	successfulOwnerships := checkinItems(ownerships)
 
-	for _, ownership := range ownerships{		
-		var item models.Ownership
-		result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownership, user.UserUID).First(&item)
-		
-		_, err := RecordExists("Ownership", result)
-		if err == nil {
-			item.ItemBorrower = uuid.MustParse("11111111-1111-1111-1111-111111111111")
-			db.DB.Save(&item)
-			preloadOwnership(&item)
-			successfulOwnerships = append(successfulOwnerships, ownership)
-			success++
-		}
-	}
-
-	if success == 0 {
+	// Check if ownerships were successful
+	if len(successfulOwnerships) == 0 {
 		return Error(c, 400, "Failed to checkout ownerships")
 	}
 
-	ownershipsDTO := DTO("ownerships", successfulOwnerships)	
-	return Success(c, "Checked in", ownershipsDTO)
-
+	// Return as DTO
+	dto := DTO("ownerships", successfulOwnerships)	
+	return Success(c, "Checked in", dto)
 }
 
 /*
