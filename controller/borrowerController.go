@@ -9,15 +9,10 @@ import (
 	"github.com/google/uuid"
 )
 
-/**
-* Creates a borrower and adds it to the database.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// CreateBorrower creates a borrower and adds it to the database.
 func CreateBorrower(c *fiber.Ctx) error {
 	// Initialize variables
+	var borrower models.Borrower
 	user := c.Locals("user").(models.User)
 	borrowerName := c.Query("borrower")
 
@@ -27,68 +22,53 @@ func CreateBorrower(c *fiber.Ctx) error {
 	}
 
 	// Validate borrowerName is not in use
-	var borrower models.Borrower
 	result := db.DB.Where("borrower_name = ? AND borrower_owner = ?", borrowerName, user.UserUID).First(&borrower)
 	code, err := recordNotInUse("Borrower Name", result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
-
+	
+	// Create Borrower and return as DTO
 	borrower = createBorrower(borrowerName, user)
-
-	borrowerDTO := DTO("borrower", borrower)
-
-	return Success(c, "Borrower created", borrowerDTO)
+	dto := DTO("borrower", borrower)
+	return Success(c, "Success: Borrower created", dto)
 }
 
-/*
-* Sets a list of ownerships to be checked out to a borrower.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
-*/
-func CheckoutItem(c *fiber.Ctx) error {
+// CheckoutItems checks out the list of Ownerships to a specified Borrower 
+func CheckoutItems(c *fiber.Ctx) error {
 	// Initialize variables
-	user := c.Locals("user").(models.User)
-	var request BorrowerRequest
+	var borrower models.Borrower
+	var ownerships []string
 	borrowerUID := c.Query("borrowerUID")
+
+	// Check if borrowerUID is of correct UUID format
 	borrowerUUID, err := uuid.Parse(borrowerUID)
 	if err != nil {
 		Error(c, 400, "Borrower UUID not correct format")	
 	}
-	var borrower models.Borrower
+
+	// Check that borrower exists
 	result := db.DB.Where("borrower_uid = ?", borrowerUID).First(&borrower)
-			
-	err = c.BodyParser(&request)
+	code, err := RecordExists("Borrower UID", result)
+	if err != nil{
+		return Error(c, code, err.Error())
+	}
+		
+	// Prase json body into borrowerRequest
+	err = c.BodyParser(&ownerships)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
 
-	code, err := RecordExists("Borrower UID", result)
-	if err != nil {return Error(c, code, err.Error())}
+	// Checkout items in list
+	successfulOwnerships := checkoutItems(ownerships, borrowerUUID)
 
-	success := 0
-	var successfulOwnerships []string
-
-	for _, ownership := range request.Ownerships {		
-		var item models.Ownership
-		result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownership, user.UserUID).First(&item)
-		
-		_, err := RecordExists("Ownership", result)
-		if err == nil {
-			item.ItemBorrower = borrowerUUID
-			db.DB.Save(&item)
-			preloadOwnership(&item)
-			successfulOwnerships = append(successfulOwnerships, ownership)
-			success++
-		}
-	}
-
-	if success == 0 {
+	// Check if ownerships were successful
+	if len(successfulOwnerships) == 0 {
 		return Error(c, 400, "Failed to checkout ownerships")
 	}
 
-	ownershipsDTO := DTO("ownerships", successfulOwnerships)	
-	return Success(c, "Checked out", ownershipsDTO)
+	// Return as DTO
+	dto := DTO("ownerships", successfulOwnerships)	
+	return Success(c, "Checked out", dto)
 }
 
 /*
@@ -102,15 +82,15 @@ func CheckoutItem(c *fiber.Ctx) error {
 func CheckinItem(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
-	var request BorrowerRequest
+	var ownerships []string
 
-	err := c.BodyParser(&request)
+	err := c.BodyParser(&ownerships)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
 
 	success := 0
 	var successfulOwnerships []string
 
-	for _, ownership := range request.Ownerships {		
+	for _, ownership := range ownerships{		
 		var item models.Ownership
 		result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownership, user.UserUID).First(&item)
 		
