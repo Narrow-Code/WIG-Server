@@ -7,7 +7,12 @@ import (
 	"github.com/google/uuid"
 )
 
-// createBorrower creates a models.Borrower and adds it to the database
+/*
+* createBorrower creates a models.Borrower and adds it to the database
+* 
+* borrowerName the name of the Borrower to create
+* user the User creating the Borrower
+*/
 func createBorrower(borrowerName string, user models.User) models.Borrower{
 	borrower := models.Borrower{
 		BorrowerName:  borrowerName,
@@ -20,7 +25,13 @@ func createBorrower(borrowerName string, user models.User) models.Borrower{
 	return borrower
 }
 
-// checkoutItems takes a list of ownership UUID's and checks them out to a single borrower
+/* 
+* checkoutItems takes a list of ownership UUID's and checks them out to a single borrower
+* 
+* @param ownerships the list of ownerships UID's to be checked out
+* @param borrowerUUID the UUID of the Borrower who the Ownerships are being checked out to
+* @return []string list of successfully checked out Ownership UID's
+*/
 func checkoutItems(ownerships []string, borrowerUUID uuid.UUID) []string{
 	var successfulOwnerships []string
 	for _, ownership := range ownerships {		
@@ -39,7 +50,12 @@ func checkoutItems(ownerships []string, borrowerUUID uuid.UUID) []string{
 	return successfulOwnerships
 }
 
-// checkinItems takes a list of ownership UUID's and returns them to the original location
+/* 
+* checkinItems takes a list of ownership UUID's and returns them to the original location
+*
+* @param ownerships the list of Ownership UID's in which to return to original location
+* @return []string list of successfully checked in Ownership UID's
+*/
 func checkinItems(ownerships []string) []string {
 	var successfulOwnerships []string
 	for _, ownership := range ownerships{		
@@ -58,7 +74,11 @@ func checkinItems(ownerships []string) []string {
 	return successfulOwnerships
 }
 
-// getCheckedOutDto returns a CheckedOutDTO model with all borrowed Ownerships
+/* getCheckedOutDto returns a CheckedOutDTO model with all borrowed Ownerships
+*
+* @param list of Borrowers to retrieve checked out items for
+* @return []models.CheckedOutDTO the CheckedOutDTO list of inventory
+*/
 func getCheckedOutDto(borrowers []models.Borrower) []models.CheckedOutDTO {
 	var ownerships []models.Ownership
 	var checkedOutDTO []models.CheckedOutDTO
