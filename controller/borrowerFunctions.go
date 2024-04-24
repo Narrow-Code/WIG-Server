@@ -39,7 +39,7 @@ func checkoutItems(ownerships []string, borrowerUUID uuid.UUID) []string{
 	return successfulOwnerships
 }
 
-// checckinItems takes a list of ownership UUID's and returns them to the original location
+// checkinItems takes a list of ownership UUID's and returns them to the original location
 func checkinItems(ownerships []string) []string {
 	var successfulOwnerships []string
 	for _, ownership := range ownerships{		
