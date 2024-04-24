@@ -109,16 +109,6 @@ func CheckedOutDto(borrower models.Borrower, ownerships []models.Ownership) mode
 }
 
 /*
-* Preloads the Ownerships foreignkey structs
-*
-* @param ownership The ownership to preload.
- */
-func preloadOwnership(ownership *models.Ownership) {
-	db.DB.Preload("User").Preload("Item").Preload("Borrower").Preload("Location").Find(ownership)
-	preloadLocation(&ownership.Location)
-}
-
-/*
 * Preloads the Locations foreignkey structs
 *
 * @param location The location to preload.

@@ -48,3 +48,13 @@ func createOwnership(uid uuid.UUID, item models.Item, qr string, customName stri
 	return ownership, nil
 }
 
+/*
+* Preloads the Ownerships foreignkey structs
+*
+* @param ownership The ownership to preload.
+ */
+func preloadOwnership(ownership *models.Ownership) {
+	db.DB.Preload("User").Preload("Item").Preload("Borrower").Preload("Location").Find(ownership)
+	preloadLocation(&ownership.Location)
+}
+

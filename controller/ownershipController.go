@@ -270,3 +270,4 @@ func OwnershipSearch(c *fiber.Ctx) error {
 	ownershipDTO := DTO("ownership", ownerships)
 	return Success(c, "Items found", ownershipDTO)
 }
+
