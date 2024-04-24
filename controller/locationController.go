@@ -81,7 +81,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	// Validate the QR code
 	var location models.Location
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
-	code, err := RecordExists("Location QR", result)
+	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
@@ -89,7 +89,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	// Validate the ownership
 	var setLocation models.Location
 	result = db.DB.Where("location_uid = ? AND location_owner = ?", setLocationUID, user.UserUID).First(&setLocation)
-	code, err = RecordExists("Location", result)
+	code, err = recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
@@ -124,7 +124,7 @@ func LocationEdit(c *fiber.Ctx) error {
 	// Validate ownership
 	var location models.Location
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
-	code, err := RecordExists("Ownership", result)
+	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
@@ -155,7 +155,7 @@ func UnpackLocation( c *fiber.Ctx) error {
 	// Validate ownership
 	var location models.Location
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
-	code, err := RecordExists("Location", result)
+	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}

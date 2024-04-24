@@ -38,7 +38,7 @@ func checkoutItems(ownerships []string, borrowerUUID uuid.UUID) []string{
 		var item models.Ownership
 		result := db.DB.Where("ownership_uid = ?", ownership).First(&item)
 		
-		_, err := RecordExists("Ownership", result)
+		_, err := recordExists(result)
 		if err == nil {
 			item.ItemBorrower = borrowerUUID
 			item.ItemCheckedOut = "true"
@@ -62,7 +62,7 @@ func checkinItems(ownerships []string) []string {
 		var item models.Ownership
 		result := db.DB.Where("ownership_uid = ?", ownership).First(&item)
 		
-		_, err := RecordExists("Ownership", result)
+		_, err := recordExists(result)
 		if err == nil {
 			item.ItemBorrower = uuid.MustParse(db.DefaultBorrowerUUID)
 			item.ItemCheckedOut = "false"

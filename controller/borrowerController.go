@@ -48,7 +48,7 @@ func CheckoutItems(c *fiber.Ctx) error {
 
 	// Check that borrower exists
 	result := db.DB.Where("borrower_uid = ?", borrowerUID).First(&borrower)
-	code, err := RecordExists("Borrower UID", result)
+	code, err := recordExists(result)
 	if err != nil{
 		return Error(c, code, err.Error())
 	}

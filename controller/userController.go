@@ -35,7 +35,7 @@ func UserSalt(c *fiber.Ctx) error {
 	// Query database for username
 	var user models.User
 	result := db.DB.Where("username = ?", username).First(&user)
-	code, err := RecordExists("Username", result)
+	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
@@ -79,7 +79,7 @@ func UserLogin(c *fiber.Ctx) error {
 	// Check that user exists
 	var user models.User
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
-	code, err := RecordExists("Username", result)
+	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}

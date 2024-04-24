@@ -2,7 +2,6 @@
 package controller
 
 import (
-	"WIG-Server/db"
 	"WIG-Server/models"
 	"WIG-Server/utils"
 	"errors"
@@ -10,27 +9,23 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 /*
-* Checks a gorm.DB error message to see if a record existed in the database.
+* RecordExists checks a gorm.DB error message to see if a record existed in the database.
 *
-* @param field A string representing the field that is getting checked.
 * @param result The gorm.DB result to be checked.
-*
 * @return int The HTTP error code to return
 * @return error The error message, if there is one.
  */
-func RecordExists(field string, result *gorm.DB) (int, error) {
+func recordExists(result *gorm.DB) (int, error) {
 	if result.Error == gorm.ErrRecordNotFound {
-		return 404, fmt.Errorf("%s was not found in the database", field)
+		return 404, fmt.Errorf("Not found in the database")
 	}
 	if result.Error != nil {
 		return 400, errors.New(result.Error.Error())
 	}
-	log.Printf("controller#recordExists: %s was successfully found in the database", field)
 	return 200, nil
 }
 
@@ -39,7 +34,6 @@ func RecordExists(field string, result *gorm.DB) (int, error) {
 *
 * @param field A string representing the field that is getting checked.
 * @param result The gorm.DB result to be checked.
-*
 * @return int The HTTP error code to return
 * @return error The error message, if there is one.
  */
@@ -60,7 +54,6 @@ func recordNotInUse(field string, result *gorm.DB) (int, error) {
 * @param c The fiber context containing the HTTP request and response objects.
 * @param message The success message to return via fiber.
 * @param dtos Any extra fields to be added to the response map.
-*
 * @return error The c.Status being returned via fiber.
  */
 func Success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
@@ -82,7 +75,6 @@ func Success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
 * @param c The fiber context containing the HTTP request and response objects.
 * @param code The error code to return via fiber.
 * @param message The error message to return via fiber.
-*
 * @return error The c.Status being returned via fiber.
  */
 func Error(c *fiber.Ctx, code int, message string) error {
@@ -97,7 +89,6 @@ func Error(c *fiber.Ctx, code int, message string) error {
 *
 * @param name The name of the field to add.
 * @param data The data to pass in the response map.
-*
 * @return models.DTO The DTO model.
  */
 func DTO(name string, data interface{}) models.DTO {
@@ -108,46 +99,4 @@ func CheckedOutDto(borrower models.Borrower, ownerships []models.Ownership) mode
 	return models.CheckedOutDTO{Borrower: borrower, Ownerships: ownerships}
 }
 
-/*
-* Returns the ownerships and locations inside of a parent location.
-*
-* @param location The location
-* @param user The user making the call
-*/
-func GetAllFromLocation(location models.Location, user models.User) ([]models.Ownership, []models.Location) {
-	// search and get all ownerships from location
-	var ownerships []models.Ownership
-	db.DB.Where("item_location = ? AND item_owner = ?", location.LocationUID, user.UserUID).Find(&ownerships)	
-
-	// search and get all locations from parent location
-	var locations []models.Location
-	db.DB.Where("location_parent = ? AND location_owner = ?", location.LocationUID, user.UserUID).Find(&locations)
-
-	for i := range ownerships {
-		preloadOwnership(&ownerships[i])
-	}
-
-	for i := range locations {
-		preloadLocation(&locations[i])
-	}
-
-	return ownerships, locations
-}
-
-func ReturnAllInventory(location models.Location, user models.User) models.InventoryDTO {
-	var inventoryDTO models.InventoryDTO
-	var inventoryList []models.InventoryDTO
-
-	ownerships, locations := GetAllFromLocation(location, user)
-
-	for i := range locations {
-		inventoryList = append(inventoryList, ReturnAllInventory(locations[i], user))
-	}
-	
-	inventoryDTO.Parent = location
-	inventoryDTO.Ownerships = ownerships	
-	inventoryDTO.Locations = inventoryList
-
-	return inventoryDTO
-}
 

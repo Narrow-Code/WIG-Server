@@ -36,7 +36,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	// Valide and retreive the ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
-	code, err := RecordExists("Ownership", result)
+	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
@@ -83,7 +83,7 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	// Validate ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
-	code, err := RecordExists("Ownership", result)
+	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
@@ -121,7 +121,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	// Validate ownership
 	var ownership models.Ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
-	code, err := RecordExists("Ownership", result)
+	code, err := recordExists(result)
 
 	if err != nil {
 		return Error(c, code, err.Error())
@@ -211,7 +211,7 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	// Validate the QR code
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, user.UserUID).First(&location)
-	code, err := RecordExists("Location QR", result)
+	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
@@ -219,7 +219,7 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	// Validate the ownership
 	var ownership models.Ownership
 	result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
-	code, err = RecordExists("Ownership", result)
+	code, err = recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}

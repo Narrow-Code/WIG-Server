@@ -49,7 +49,7 @@ func createOwnership(uid uuid.UUID, item models.Item, qr string, customName stri
 }
 
 /*
-* Preloads the Ownerships foreignkey structs
+* preloadOwnership preloads the Ownerships foreignkey structs
 *
 * @param ownership The ownership to preload.
  */
