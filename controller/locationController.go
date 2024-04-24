@@ -32,14 +32,14 @@ func LocationCreate(c *fiber.Ctx) error {
 	// Validate location QR code is not in use
 	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, user.UserUID).First(&location)
-	code, err := recordNotInUse("Location QR", result)
+	code, err := recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
 	// Valide location name is not in use
 	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, user.UserUID).First(&location)
-	code, err = recordNotInUse("Location Name", result)
+	code, err = recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}

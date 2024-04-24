@@ -22,7 +22,7 @@ func CreateBorrower(c *fiber.Ctx) error {
 
 	// Validate borrowerName is not in use
 	result := db.DB.Where("borrower_name = ? AND borrower_owner = ?", borrowerName, user.UserUID).First(&borrower)
-	code, err := recordNotInUse("Borrower Name", result)
+	code, err := recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}

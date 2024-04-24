@@ -130,16 +130,16 @@ func UserSignup(c *fiber.Ctx) error {
 	// Query for username in database
 	var user models.User
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
-	code, err := recordNotInUse("Username", result)
+	code, err := recordNotInUse(result)
 	if err != nil {
-		return Error(c, code, err.Error())
+		return Error(c, code, "Username: " + err.Error())
 	}
 
 	// Query for email in database
 	result = db.DB.Where("email = ?", data["email"]).First(&user)
-	code, err = recordNotInUse("Email", result)
+	code, err = recordNotInUse(result)
 	if err != nil {
-		return Error(c, code, err.Error())
+		return Error(c, code, "Email: " + err.Error())
 	}
 
 	// Check username requirements

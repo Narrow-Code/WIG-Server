@@ -165,20 +165,20 @@ func OwnershipCreateNoItem(c *fiber.Ctx) error {
 
 	var ownershipCheck models.Ownership
 	result := db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownershipCheck)
-	code, err := recordNotInUse("Ownership", result)
+	code, err := recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
 	var locationCheck models.Location
 	result = db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&locationCheck)
-	code, err = recordNotInUse("Location", result)
+	code, err = recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
 	result = db.DB.Where("custom_item_name = ? AND item_owner = ?", name, user.UserUID).First(&ownershipCheck)
-	code, err = recordNotInUse("Ownership", result)
+	code, err = recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}

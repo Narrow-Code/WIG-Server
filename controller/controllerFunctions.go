@@ -30,21 +30,20 @@ func recordExists(result *gorm.DB) (int, error) {
 }
 
 /*
-* Checks a gorm.DB error message to see if a record is in use in the database.
+* Checks a gorm.DB error message to see if a record is not in use in the database.
 *
 * @param field A string representing the field that is getting checked.
 * @param result The gorm.DB result to be checked.
 * @return int The HTTP error code to return
 * @return error The error message, if there is one.
  */
-func recordNotInUse(field string, result *gorm.DB) (int, error) {
+func recordNotInUse(result *gorm.DB) (int, error) {
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return 400, errors.New(result.Error.Error())
 	}
 	if result.RowsAffected != 0 {
-		return 400, errors.New(field + " Record is in use in the database")
+		return 400, errors.New("Record is in use in the database")
 	}
-	log.Printf("controller#recordNotInUse: %s is not in use in the database", field)
 	return 200, nil
 }
 
