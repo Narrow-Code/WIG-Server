@@ -1,4 +1,4 @@
-// Provides functionalities for configuring connecting to the database.
+// db provides functionalities for configuring connecting to the database.
 package db
 
 import (
@@ -17,9 +17,12 @@ import (
 // DB holds the database connection instance.
 var DB *gorm.DB
 
-// Establishes a connection to the database.
+// Connect establishes a connection to the database.
 func Connect() {
+	// Load environment variables 
 	godotenv.Load()
+
+	// Set environment variables
 	dbhost := os.Getenv("MYSQL_HOST")
 	dbuser := os.Getenv("MYSQL_USER")
 	dbpassword := os.Getenv("MYSQL_PASSWORD")
@@ -30,6 +33,7 @@ func Connect() {
 	var db *gorm.DB
 	var err error
 	retries := 5
+
 	for retries > 0 {
 		db, err = gorm.Open(mysql.Open(connection), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Info),
@@ -53,7 +57,7 @@ func Connect() {
 }
 
 /*
-* Performs automatic migrations on the provided connection.
+* AutoMigrate performs automatic migrations on the provided connection.
 *
 * @param connection The database connection instance on which the migrations will be applied.
  */
@@ -65,13 +69,24 @@ func AutoMigrate(connection *gorm.DB) {
 		&models.Location{},
 		&models.Ownership{},
 	)
+	
+	ensureDefaultRecords(connection)
+}
 
-	// Check if Borrower table is empty
+// ensureDefaultRecords checks if essential tables are empty and creates default records if necessary
+func ensureDefaultRecords(connection *gorm.DB) {
+	ensureBorrowerRecords(connection)
+	ensureUserRecords(connection)
+	ensureLocationRecords(connection)
+	ensureItemRecords(connection)
+}
+
+// ensureBorrowerRecords checks if Borrower table is empty and creates default records if necessary
+func ensureBorrowerRecords(connection *gorm.DB) {
 	var borrowerCount int64
 	connection.Model(&models.Borrower{}).Count(&borrowerCount)
 
 	if borrowerCount == 0 {
-		// Create a default Borrower record
 		defaultBorrower := models.Borrower{
 			BorrowerName: "Default",
 			BorrowerUID: uuid.MustParse("11111111-1111-1111-1111-111111111111")}
@@ -82,48 +97,50 @@ func AutoMigrate(connection *gorm.DB) {
 			BorrowerUID: uuid.MustParse("22222222-2222-2222-2222-222222222222")}
 		connection.Create(&selfBorrower)
 	}
+}
 
-	// Check if User table is empty
+// ensureUserRecords checks if User table is empty and creates default records if necessary
+func ensureUserRecords(connection *gorm.DB) {
 	var userCount int64
 	connection.Model(&models.User{}).Count(&userCount)
 
 	if userCount == 0 {
-		// Create a default User record
 		defaultUser := models.User{
 			UserUID:  uuid.MustParse("BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"),
 			Username: "Default User"}
 		connection.Create(&defaultUser)
 	}
+}
 
-	// Check if Location table is empty
+// ensureLocationRecords checks if Location table is empty and creates default records if necessary
+func ensureLocationRecords(connection *gorm.DB) {
 	var locationCount int64
 	connection.Model(&models.Location{}).Count(&locationCount)
 
 	if locationCount == 0 {
-		// Create a default Location record
 		defaultLocation := models.Location{
 			LocationUID:   uuid.MustParse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"),
 			LocationName:  "Default Location",
 			LocationOwner: uuid.MustParse("BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB")}
 		connection.Create(&defaultLocation)
 	}
+}
 
-	// Check if Item table is empty
+// ensureItemRecords checks if Item table is empty and creates default records if necessary
+func ensureItemRecords(connection *gorm.DB) {
 	var itemCount int64
 	connection.Model(&models.Item{}).Count(&itemCount)
 
 	if itemCount == 0 {
-		// Create a default Item record
 		defaultItem := models.Item{
 			ItemUid: uuid.MustParse("33333333-3333-3333-3333-333333333333"),
 			Name: "Default Item"}
 		connection.Create(&defaultItem)
 	}
-
 }
 
 /*
-* Retrieves the Port to be used in the .env file.
+* GetPort retrieves the Port to be used in the .env file.
 *
 * string The Port to be used.
 */
