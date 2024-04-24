@@ -65,7 +65,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
 		ownership, err := createOwnership(user.UserUID, item, "", "")
-		
+
 		if err != nil {
 			return Error(c, 400, err.Error())
 		}
@@ -78,7 +78,7 @@ func ScanBarcode(c *fiber.Ctx) error {
 
 	ownershipDTO := DTO("ownership", ownerships)
 
-	return Success(c, "Item found", ownershipDTO)
+	return success(c, "Item found", ownershipDTO)
 }
 
 /*
@@ -103,7 +103,7 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&location)
 	emptyUID := [16]byte{}
 	if location.LocationUID != emptyUID {
-		return Success(c, "LOCATION")
+		return success(c, "LOCATION")
 	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return Error(c, 400, "internal server error")
 	}
@@ -112,13 +112,13 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	var ownership models.Ownership
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownership)
 	if ownership.OwnershipUID != emptyUID {
-		return Success(c, "OWNERSHIP")
+		return success(c, "OWNERSHIP")
 	}
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return Error(c, 400, "internal server error")
 	}
 
-	return Success(c, "NEW")
+	return success(c, "NEW")
 }
 
 func ScanQRLocation(c *fiber.Ctx) error {
@@ -147,5 +147,5 @@ func ScanQRLocation(c *fiber.Ctx) error {
 	preloadLocation(&location)
 	locationDTO := DTO("location", location)
 
-	return Success(c, "Item found", locationDTO)
+	return success(c, "Item found", locationDTO)
 }

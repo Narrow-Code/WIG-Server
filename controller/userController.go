@@ -19,12 +19,12 @@ var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]{4,20}$`)
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
 /*
-* Retrieves the users salt. 
+* Retrieves the users salt.
 *
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func UserSalt(c *fiber.Ctx) error {
 	// Get parameters
 	username := c.Query("username")
@@ -42,27 +42,27 @@ func UserSalt(c *fiber.Ctx) error {
 
 	saltDTO := DTO("salt", user.Salt)
 
-	return Success(c, "Salt returned successfully", saltDTO)
+	return success(c, "Salt returned successfully", saltDTO)
 }
 
 /*
-* Validates the users token is still valid. 
+* Validates the users token is still valid.
 *
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func UserValidate(c *fiber.Ctx) error {
-	return Success(c, "Authorized")
+	return success(c, "Authorized")
 }
 
 /*
-* Handles the user Login logic. Returning a token. 
+* Handles the user Login logic. Returning a token.
 *
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func UserLogin(c *fiber.Ctx) error {
 	// Parse request into data map
 	var data map[string]string
@@ -100,17 +100,17 @@ func UserLogin(c *fiber.Ctx) error {
 
 	db.DB.Save(&user)
 
-	return Success(c, "Login was successful", tokenDTO, uidDTO)
+	return success(c, "Login was successful", tokenDTO, uidDTO)
 }
 
-/* 
+/*
 * Handles user registration requests.
 * It performs various checks such as data validation and database uniqueness before creating a new user record.
 *
 * @param c The Fiber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func UserSignup(c *fiber.Ctx) error {
 	// Parse request into data map
 	var data map[string]string
@@ -132,14 +132,14 @@ func UserSignup(c *fiber.Ctx) error {
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
 	code, err := recordNotInUse(result)
 	if err != nil {
-		return Error(c, code, "Username: " + err.Error())
+		return Error(c, code, "Username: "+err.Error())
 	}
 
 	// Query for email in database
 	result = db.DB.Where("email = ?", data["email"]).First(&user)
 	code, err = recordNotInUse(result)
 	if err != nil {
-		return Error(c, code, "Email: " + err.Error())
+		return Error(c, code, "Email: "+err.Error())
 	}
 
 	// Check username requirements
@@ -170,9 +170,9 @@ func UserSignup(c *fiber.Ctx) error {
 
 	// TODO send verification email
 
-	return Success(c, "Signup was successful")
+	return success(c, "Signup was successful")
 }
 
-func Ping (c *fiber.Ctx) error {
-	return Success(c, "Ping was successful")
+func Ping(c *fiber.Ctx) error {
+	return success(c, "Ping was successful")
 }

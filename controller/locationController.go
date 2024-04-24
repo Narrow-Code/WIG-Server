@@ -49,15 +49,15 @@ func LocationCreate(c *fiber.Ctx) error {
 		LocationName:  locationName,
 		LocationOwner: user.UserUID,
 		LocationQR:    locationQR,
-		Parent:	       uuid.MustParse(db.DefaultLocationUUID),
-		LocationUID: uuid.New(),
+		Parent:        uuid.MustParse(db.DefaultLocationUUID),
+		LocationUID:   uuid.New(),
 	}
 
 	db.DB.Create(&location)
 	preloadLocation(&location)
 	locationDTO := DTO("location", &location)
 
-	return Success(c, "Location has been added successfully", locationDTO)
+	return success(c, "Location has been added successfully", locationDTO)
 }
 
 /*
@@ -99,7 +99,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	db.DB.Save(&location)
 
 	// return success
-	return Success(c, location.LocationName+" set in "+setLocation.LocationName)
+	return success(c, location.LocationName+" set in "+setLocation.LocationName)
 }
 
 /*
@@ -138,7 +138,7 @@ func LocationEdit(c *fiber.Ctx) error {
 	db.DB.Save(&location)
 
 	// Ownership successfully updated
-	return Success(c, "Location updated successfully")
+	return success(c, "Location updated successfully")
 }
 
 /*
@@ -146,8 +146,8 @@ func LocationEdit(c *fiber.Ctx) error {
 *
 * @param c The fiber context containing the HTTP request and esponse objects.
 * @return error The error message, if there is any.
-*/
-func UnpackLocation( c *fiber.Ctx) error {
+ */
+func UnpackLocation(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
 	locationUID := c.Query("locationUID")
@@ -165,16 +165,16 @@ func UnpackLocation( c *fiber.Ctx) error {
 	ownershipDTO := DTO("ownerships", ownerships)
 	locationDTO := DTO("locations", locations)
 
-	return Success(c, "Unpacked", ownershipDTO, locationDTO)
+	return success(c, "Unpacked", ownershipDTO, locationDTO)
 }
 
-/* 
+/*
 * Searches for locations based on users query.
 *
 * @param c The FIber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func LocationSearch(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
@@ -195,7 +195,7 @@ func LocationSearch(c *fiber.Ctx) error {
 		query = query.Where("location_tags LIKE ?", "%"+tag+"%")
 	}
 
-	if err := query.Find(&locations).Error; err != nil{
+	if err := query.Find(&locations).Error; err != nil {
 		return Error(c, 404, "Not found")
 	}
 
@@ -204,17 +204,16 @@ func LocationSearch(c *fiber.Ctx) error {
 	}
 
 	locationDTO := DTO("locations", locations)
-	return Success(c, "Items found", locationDTO)
+	return success(c, "Items found", locationDTO)
 }
 
-
-/* 
+/*
 * Returns the entire inventory for a user.
 *
 * @param c The FIber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func ReturnInventory(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
@@ -224,7 +223,6 @@ func ReturnInventory(c *fiber.Ctx) error {
 
 	inventory := ReturnAllInventory(locations, user)
 	inventoryDTO := DTO("inventory", inventory)
-	
 
-	return Success(c, "Inventory returned", inventoryDTO)
+	return success(c, "Inventory returned", inventoryDTO)
 }

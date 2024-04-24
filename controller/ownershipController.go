@@ -65,7 +65,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	preloadOwnership(&ownership)
 
 	ownershipDTO := DTO("ownership", ownership)
-	return Success(c, "Item found", ownershipDTO)
+	return success(c, "Item found", ownershipDTO)
 }
 
 /*
@@ -96,7 +96,7 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	}
 
 	// Ownership successfully deleted
-	return Success(c, "Ownership was successfully deleted")
+	return success(c, "Ownership was successfully deleted")
 }
 
 /*
@@ -137,7 +137,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	db.DB.Save(&ownership)
 
 	// Ownership successfully updated
-	return Success(c, "Ownership was successfully updated")
+	return success(c, "Ownership was successfully updated")
 }
 
 /*
@@ -158,7 +158,7 @@ func OwnershipCreateNoItem(c *fiber.Ctx) error {
 	user := c.Locals("user").(models.User)
 	qr := data["qr"]
 	name := data["name"]
-	
+
 	if data["qr"] == "" && data["name"] == "" {
 		return Error(c, 400, "Missing field qr or name")
 	}
@@ -182,7 +182,7 @@ func OwnershipCreateNoItem(c *fiber.Ctx) error {
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
-	
+
 	var item models.Item
 
 	ownership, err := createOwnership(user.UserUID, item, qr, name)
@@ -192,7 +192,7 @@ func OwnershipCreateNoItem(c *fiber.Ctx) error {
 
 	preloadOwnership(&ownership)
 	ownershipDTO := DTO("ownership", ownership)
-	return Success(c, "Ownership was successfully created", ownershipDTO)
+	return success(c, "Ownership was successfully created", ownershipDTO)
 }
 
 /*
@@ -229,16 +229,16 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	db.DB.Save(&ownership)
 
 	// return success
-	return Success(c, "Ownership set in "+location.LocationName)
+	return success(c, "Ownership set in "+location.LocationName)
 }
 
-/* 
+/*
 * Searches for items based on users query.
 *
 * @param c The FIber context containing the HTTP request and response objects.
 *
 * @return error The error message, if there is any.
-*/
+ */
 func OwnershipSearch(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
@@ -259,15 +259,14 @@ func OwnershipSearch(c *fiber.Ctx) error {
 		query = query.Where("item_tags LIKE ?", "%"+tag+"%")
 	}
 
-	if err := query.Find(&ownerships).Error; err != nil{
+	if err := query.Find(&ownerships).Error; err != nil {
 		return Error(c, 404, "Not found")
 	}
-	
+
 	for i := range ownerships {
 		preloadOwnership(&ownerships[i])
 	}
 
 	ownershipDTO := DTO("ownership", ownerships)
-	return Success(c, "Items found", ownershipDTO)
+	return success(c, "Items found", ownershipDTO)
 }
-

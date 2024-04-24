@@ -100,3 +100,14 @@ func getCheckedOutDto(borrowers []models.Borrower) []models.CheckedOutDTO {
 	}
 	return checkedOutDTO
 }
+
+/*
+* checkedOutDto creates a models.CheckedOutDTO
+*
+* @param borrower The Borrower to create CheckedOutDTO for
+* @param ownerships All of the Ownerships to add with Borrower
+* @return models.CheckedOutDTO The CheckedOutDTO
+*/
+func CheckedOutDto(borrower models.Borrower, ownerships []models.Ownership) models.CheckedOutDTO {
+	return models.CheckedOutDTO{Borrower: borrower, Ownerships: ownerships}
+}

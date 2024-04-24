@@ -48,17 +48,17 @@ func recordNotInUse(result *gorm.DB) (int, error) {
 }
 
 /*
-* Returns a 200 success code, and a message through fiber to the application.
+* success returns a 200 success code, and a message through fiber to the application.
 *
 * @param c The fiber context containing the HTTP request and response objects.
 * @param message The success message to return via fiber.
 * @param dtos Any extra fields to be added to the response map.
 * @return error The c.Status being returned via fiber.
  */
-func Success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
+func success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
 	responseMap := fiber.Map{
 		"message": message,
-		"success": true,}
+		"success": true}
 
 	for _, dto := range dtos {
 		responseMap[dto.Name] = dto.Data
@@ -69,7 +69,7 @@ func Success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
 }
 
 /*
-* Returns the given error code, and message through fiber to the application.
+* Error returns the given error code, and message through fiber to the application.
 *
 * @param c The fiber context containing the HTTP request and response objects.
 * @param code The error code to return via fiber.
@@ -84,7 +84,7 @@ func Error(c *fiber.Ctx, code int, message string) error {
 }
 
 /*
-* Creates a DTO model to pass in a response map from a name and data interface.
+* DTO creates a DTO model to pass in a response map from a name and data interface.
 *
 * @param name The name of the field to add.
 * @param data The data to pass in the response map.
@@ -93,9 +93,4 @@ func Error(c *fiber.Ctx, code int, message string) error {
 func DTO(name string, data interface{}) models.DTO {
 	return models.DTO{Name: name, Data: data}
 }
-
-func CheckedOutDto(borrower models.Borrower, ownerships []models.Ownership) models.CheckedOutDTO {
-	return models.CheckedOutDTO{Borrower: borrower, Ownerships: ownerships}
-}
-
 
