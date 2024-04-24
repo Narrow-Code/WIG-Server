@@ -10,13 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-/*
-* Creates a location using a QR code, a location name and the type of location.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// LocationCreate creates a location using a QR code, a location name and the type of location.
 func LocationCreate(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
@@ -60,13 +54,7 @@ func LocationCreate(c *fiber.Ctx) error {
 	return success(c, "Location has been added successfully", locationDTO)
 }
 
-/*
-* Sets the location of a specific location.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// LocationSetLocation sets the location of a specific location.
 func LocationSetLocation(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
@@ -102,13 +90,7 @@ func LocationSetLocation(c *fiber.Ctx) error {
 	return success(c, location.LocationName+" set in "+setLocation.LocationName)
 }
 
-/*
-* Edits the fields of the location.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// LocationEdit edits the fields of the location.
 func LocationEdit(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
@@ -141,12 +123,7 @@ func LocationEdit(c *fiber.Ctx) error {
 	return success(c, "Location updated successfully")
 }
 
-/*
-* Returns all ownerships and locations stored in a location.
-*
-* @param c The fiber context containing the HTTP request and esponse objects.
-* @return error The error message, if there is any.
- */
+// Returns all ownerships and locations stored in a location.
 func UnpackLocation(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
@@ -168,13 +145,7 @@ func UnpackLocation(c *fiber.Ctx) error {
 	return success(c, "Unpacked", ownershipDTO, locationDTO)
 }
 
-/*
-* Searches for locations based on users query.
-*
-* @param c The FIber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// Searches for locations based on users query.
 func LocationSearch(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
@@ -207,13 +178,7 @@ func LocationSearch(c *fiber.Ctx) error {
 	return success(c, "Items found", locationDTO)
 }
 
-/*
-* Returns the entire inventory for a user.
-*
-* @param c The FIber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// Returns the entire inventory for a user.
 func ReturnInventory(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
