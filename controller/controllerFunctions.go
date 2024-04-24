@@ -109,20 +109,6 @@ func CheckedOutDto(borrower models.Borrower, ownerships []models.Ownership) mode
 }
 
 /*
-* Preloads the Locations foreignkey structs
-*
-* @param location The location to preload.
- */
-func preloadLocation(location *models.Location) {
-	db.DB.Preload("User").Preload("Location").Find(&location)
-
-	// Recursively preload the parent's hierarchy
-	if location.Location.LocationUID != uuid.MustParse(db.DefaultLocationUUID) {
-		preloadLocation(location.Location)
-	}
-}
-
-/*
 * Returns the ownerships and locations inside of a parent location.
 *
 * @param location The location
