@@ -13,6 +13,7 @@ import (
 // LocationCreate creates a location using a QR code, a location name and the type of location.
 func LocationCreate(c *fiber.Ctx) error {
 	// Initialize variables
+	var location models.Location
 	user := c.Locals("user").(models.User)
 	locationQR := c.Query("location_qr")
 	locationName := c.Query("location_name")
@@ -24,33 +25,22 @@ func LocationCreate(c *fiber.Ctx) error {
 	}
 
 	// Validate location QR code is not in use
-	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, user.UserUID).First(&location)
 	code, err := recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
-	// Valide location name is not in use
+	// Validate location name is not in use
 	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, user.UserUID).First(&location)
 	code, err = recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
-	// create location
-	location = models.Location{
-		LocationName:  locationName,
-		LocationOwner: user.UserUID,
-		LocationQR:    locationQR,
-		Parent:        uuid.MustParse(db.DefaultLocationUUID),
-		LocationUID:   uuid.New(),
-	}
-
-	db.DB.Create(&location)
-	preloadLocation(&location)
+	// Create location, add to DTO and return
+	createLocation(locationName, user, locationQR)
 	locationDTO := DTO("location", &location)
-
 	return success(c, "Location has been added successfully", locationDTO)
 }
 
