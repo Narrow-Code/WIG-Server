@@ -22,22 +22,19 @@ func CreateBorrower(c *fiber.Ctx) error {
 	borrowerName := c.Query("borrower")
 
 	// Check for empty fields
-	if borrowerName == "" {return Error(c, 400, "The borrower field is empty")}
+	if borrowerName == "" {
+		return Error(c, 400, "The borrower field is empty")
+	}
 
-	// Validate location QR code is not in use
+	// Validate borrowerName is not in use
 	var borrower models.Borrower
 	result := db.DB.Where("borrower_name = ? AND borrower_owner = ?", borrowerName, user.UserUID).First(&borrower)
 	code, err := recordNotInUse("Borrower Name", result)
-	if err != nil {return Error(c, code, err.Error())}
-
-	// create location
-	borrower = models.Borrower{
-		BorrowerName:  borrowerName,
-		BorrowerOwner: user.UserUID,
-		BorrowerUID: uuid.New(),
+	if err != nil {
+		return Error(c, code, err.Error())
 	}
 
-	db.DB.Create(&borrower)
+	borrower = createBorrower(borrowerName, user)
 
 	borrowerDTO := DTO("borrower", borrower)
 
@@ -62,7 +59,7 @@ func CheckoutItem(c *fiber.Ctx) error {
 	}
 	var borrower models.Borrower
 	result := db.DB.Where("borrower_uid = ?", borrowerUID).First(&borrower)
-
+			
 	err = c.BodyParser(&request)
 	if err != nil {return Error(c, 400, "There was an error parsing JSON")}
 
