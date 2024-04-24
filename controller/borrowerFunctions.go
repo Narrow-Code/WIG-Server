@@ -57,3 +57,25 @@ func checkinItems(ownerships []string) []string {
 	}
 	return successfulOwnerships
 }
+
+// getCheckedOutDto returns a CheckedOutDTO model with all borrowed Ownerships
+func getCheckedOutDto(borrowers []models.Borrower) []models.CheckedOutDTO {
+	var ownerships []models.Ownership
+	var checkedOutDTO []models.CheckedOutDTO
+
+	for b := range borrowers{
+		query := db.DB.Where("item_borrower = ?", borrowers[b].BorrowerUID)
+		
+		if err := query.Find(&ownerships).Error; err != nil{
+			continue
+		}	
+		for o := range ownerships {
+			preloadOwnership(&ownerships[o])
+		}
+		borrower := CheckedOutDto(borrowers[b], ownerships)
+		if len(ownerships) != 0 {
+			checkedOutDTO = append(checkedOutDTO, borrower)
+		}
+	}
+	return checkedOutDTO
+}

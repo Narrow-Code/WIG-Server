@@ -3,7 +3,6 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
-	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -116,43 +115,20 @@ func GetBorrowers(c *fiber.Ctx) error{
 	return Success(c, "Borrowers returned", dto)
 }
 
-func GetCheckedOutItems(c *fiber.Ctx) error{
-	log.Print("GetCheckedOutItems: Started")
+// CheckedOutInventory returns all checked out inventory
+func CheckedOutInventory(c *fiber.Ctx) error{
 	// Initialize variables
 	user := c.Locals("user").(models.User)
-	var ownerships []models.Ownership
-	var checkedOut []models.CheckedOutDTO
-	
-	// Get borrower	
 	var borrowers []models.Borrower
-	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
-	log.Print("Borrowers searched")
-	log.Print(borrowers)
 	var self models.Borrower
+	
+	// Get all borrower associated with User and include Self	
+	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
 	db.DB.Where("borrower_uid = ?", "22222222-2222-2222-2222-222222222222").First(&self)
-
 	borrowers = append(borrowers, self)
 
-	if len(borrowers) == 0 {
-		return Success(c, "No borrowers found")
-	}
-
-	for b := range borrowers{
-		ownerships = nil
-		query := db.DB.Where("item_owner = ? AND item_borrower = ?", user.UserUID, borrowers[b].BorrowerUID)
-		
-		if err := query.Find(&ownerships).Error; err != nil{
-			continue
-		}	
-		for o := range ownerships {
-			preloadOwnership(&ownerships[o])
-		}
-		borrower := CheckedOutDto(borrowers[b], ownerships)
-		if len(ownerships) != 0 {
-			checkedOut = append(checkedOut, borrower)
-		}
-	} 
-	checkedOutItems := DTO("borrowers", checkedOut)
-
-	return Success(c, "Checked Out Items returned", checkedOutItems)
+	// Get checkedOutDTO and return as DTO
+	checkedOutDTO := getCheckedOutDto(borrowers)
+	dto := DTO("borrowers", checkedOutDTO)
+	return Success(c, "Checked Out Items returned", dto)
 }
