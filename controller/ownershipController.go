@@ -113,59 +113,59 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	return success(c, "Ownership was successfully updated")
 }
 
-/*
-* Creates an ownership in the database.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// OwnershipCreateNoItem creates an ownership in the database.
 func OwnershipCreateNoItem(c *fiber.Ctx) error {
-	// Parse request into data map
+	// Initialize variables
+	var ownershipCheck models.Ownership
 	var data map[string]string
+	var locationCheck models.Location
+	var item models.Item
+
+	// Parse JSON body
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
-
 	user := c.Locals("user").(models.User)
 	qr := data["qr"]
 	name := data["name"]
 
+	// Check if fields are empty
 	if data["qr"] == "" && data["name"] == "" {
 		return Error(c, 400, "Missing field qr or name")
 	}
 
-	var ownershipCheck models.Ownership
+	// Check if QR exists as an ownership
 	result := db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownershipCheck)
 	code, err := recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
-	var locationCheck models.Location
+	// Check if QR exists as location
 	result = db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&locationCheck)
 	code, err = recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
+	// Check if custom item is already in use
 	result = db.DB.Where("custom_item_name = ? AND item_owner = ?", name, user.UserUID).First(&ownershipCheck)
 	code, err = recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
-	var item models.Item
-
+	// Create ownership
 	ownership, err := createOwnership(user.UserUID, item, qr, name)
 	if err != nil {
 		return Error(c, 400, err.Error())
 	}
 
+	// Preload ownership, add to dto and return
 	preloadOwnership(&ownership)
-	ownershipDTO := DTO("ownership", ownership)
-	return success(c, "Ownership was successfully created", ownershipDTO)
+	dto := DTO("ownership", ownership)
+	return success(c, "Ownership was successfully created", dto)
 }
 
 /*
