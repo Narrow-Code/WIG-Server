@@ -23,7 +23,6 @@ func CallerFunctionName(callback int) string {
 		return "unknown"
 	}
 	functionName := callerFunction.Name()
-    	// Extract only the function name without the package path
     	functionName = functionName[strings.LastIndex(functionName, ".")+1:]
     	return functionName
 }
