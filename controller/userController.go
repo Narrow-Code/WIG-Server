@@ -92,14 +92,13 @@ func UserLogin(c *fiber.Ctx) error {
 /*
 * Handles user registration requests.
 * It performs various checks such as data validation and database uniqueness before creating a new user record.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
  */
 func UserSignup(c *fiber.Ctx) error {
-	// Parse request into data map
+	// Initialize variables
 	var data map[string]string
+	var user models.User
+
+	// Parse request into data map
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing the JSON")
@@ -110,25 +109,24 @@ func UserSignup(c *fiber.Ctx) error {
 		return Error(c, 400, "Username or email is empty and required")
 	}
 	if data["salt"] == "" || data["hash"] == "" {
-		return Error(c, 400, "Sale or hash is empty and required")
+		return Error(c, 400, "Salt or hash is empty and required")
 	}
 
-	// Query for username in database
-	var user models.User
+	// Check if username is in use
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
 	code, err := recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, "Username: "+err.Error())
 	}
 
-	// Query for email in database
+	// Check if email is in use
 	result = db.DB.Where("email = ?", data["email"]).First(&user)
 	code, err = recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, "Email: "+err.Error())
 	}
 
-	// Check username requirements
+	// Check username and email requierments
 	if !usernameRegex.MatchString(data["username"]) {
 		return Error(c, 400, "Username does not match requirements")
 	}
@@ -143,16 +141,7 @@ func UserSignup(c *fiber.Ctx) error {
 		return Error(c, 400, "Email domain does not exist")
 	}
 
-	// Set user model
-	user = models.User{
-		Username: data["username"],
-		Email:    data["email"],
-		Salt:     data["salt"],
-		Hash:     data["hash"],
-		UserUID:  uuid.New(),
-	}
-
-	db.DB.Create(&user)
+	user = createUser(data)
 
 	// TODO send verification email
 
