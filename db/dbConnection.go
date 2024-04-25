@@ -25,21 +25,20 @@ var DB *gorm.DB
 
 // Connect establishes a connection to the database.
 func Connect() {
-	// Load environment variables 
+	// Load environment variables and initialize 
+	var db *gorm.DB
+	var err error
 	godotenv.Load()
-
-	// Set environment variables
 	dbhost := os.Getenv("MYSQL_HOST")
 	dbuser := os.Getenv("MYSQL_USER")
 	dbpassword := os.Getenv("MYSQL_PASSWORD")
 	dbname := os.Getenv("MYSQL_DBNAME")
-
+	
+	// Establish 
 	connection := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbuser, dbpassword, dbhost, dbname)
 	
-	var db *gorm.DB
-	var err error
+	// Attempt to connect to database, and retry x times
 	retries := 5
-
 	for retries > 0 {
 		db, err = gorm.Open(mysql.Open(connection), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Info),
@@ -51,14 +50,13 @@ func Connect() {
 		time.Sleep(5 * time.Second)
 		retries--
 	}
-
 	if err != nil {
 		panic("Database connection failed after multiple retries")
 	}
 
+	// Set DB variable and Automigrate
 	DB = db
 	fmt.Println("db connected successfully")
-
 	AutoMigrate(db)
 }
 
