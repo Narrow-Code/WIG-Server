@@ -4,7 +4,6 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"WIG-Server/upcitemdb"
-	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
