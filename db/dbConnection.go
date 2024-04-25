@@ -41,7 +41,7 @@ func Connect() {
 	retries := 5
 	for retries > 0 {
 		db, err = gorm.Open(mysql.Open(connection), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Info),
+			Logger: logger.Default.LogMode(logger.Silent), // change to logger.Info for logs
 		})
 		if err == nil {
 			break
