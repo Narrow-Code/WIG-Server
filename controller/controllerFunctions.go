@@ -21,7 +21,7 @@ import (
  */
 func recordExists(result *gorm.DB) (int, error) {
 	if result.Error == gorm.ErrRecordNotFound {
-		return 404, fmt.Errorf("Not found in the database")
+		return 404, fmt.Errorf("not found in the database")
 	}
 	if result.Error != nil {
 		return 400, errors.New(result.Error.Error())
@@ -42,7 +42,7 @@ func recordNotInUse(result *gorm.DB) (int, error) {
 		return 400, errors.New(result.Error.Error())
 	}
 	if result.RowsAffected != 0 {
-		return 400, errors.New("Record is in use in the database")
+		return 400, errors.New("record is in use in the database")
 	}
 	return 200, nil
 }
@@ -93,4 +93,3 @@ func Error(c *fiber.Ctx, code int, message string) error {
 func DTO(name string, data interface{}) models.DTO {
 	return models.DTO{Name: name, Data: data}
 }
-
