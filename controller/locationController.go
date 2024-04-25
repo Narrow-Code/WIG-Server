@@ -137,33 +137,41 @@ func UnpackLocation(c *fiber.Ctx) error {
 func LocationSearch(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
+	var locations []models.Location
 	var data map[string]string
+
+	// Parse JSON body	
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing the JSON")
 	}
-	name := data["name"]
-	tags := data["tags"]
-	var locations []models.Location
 
-	tagsFormat := strings.Split(strings.TrimSpace(tags), ",")
+	// Unpack variables
+	locationName := data["name"]
+	locationTags := data["tags"]
 
-	query := db.DB.Where("location_owner = ? AND location_name LIKE ?", user.UserUID, "%"+name+"%")
+	// Set tag format, split up by commas
+	tagsFormat := strings.Split(strings.TrimSpace(locationTags), ",")
 
+	// Add locationName and tags to query
+	query := db.DB.Where("location_owner = ? AND location_name LIKE ?", user.UserUID, "%"+locationName+"%")
 	for _, tag := range tagsFormat {
 		query = query.Where("location_tags LIKE ?", "%"+tag+"%")
 	}
 
+	// Search for query
 	if err := query.Find(&locations).Error; err != nil {
 		return Error(c, 404, "Not found")
 	}
 
+	// Preload locations with data
 	for i := range locations {
 		preloadLocation(&locations[i])
 	}
 
-	locationDTO := DTO("locations", locations)
-	return success(c, "Items found", locationDTO)
+	// Add to DTO and return
+	dto := DTO("locations", locations)
+	return success(c, "Items found", dto)
 }
 
 // Returns the entire inventory for a user.
