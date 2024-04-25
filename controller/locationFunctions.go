@@ -13,6 +13,7 @@ import (
 * @param location The location to preload.
  */
 func preloadLocation(location *models.Location) {
+	// Preload the current location
 	db.DB.Preload("User").Preload("Location").Find(&location)
 
 	// Recursively preload the parent's hierarchy
@@ -29,23 +30,22 @@ func preloadLocation(location *models.Location) {
 * @return []models.Ownership list of Ownerships contained in the location
 * @return []models.Location list of Locations contained in the location
 */
-func GetAllFromLocation(location models.Location, user models.User) ([]models.Ownership, []models.Location) {
-	// search and get all ownerships from location
+func unpackLocation(location models.Location, user models.User) ([]models.Ownership, []models.Location) {
+	// Initialize variables
 	var ownerships []models.Ownership
-	db.DB.Where("item_location = ? AND item_owner = ?", location.LocationUID, user.UserUID).Find(&ownerships)	
-
-	// search and get all locations from parent location
 	var locations []models.Location
+
+	// Search all locations and ownerships from location
+	db.DB.Where("item_location = ? AND item_owner = ?", location.LocationUID, user.UserUID).Find(&ownerships)	
 	db.DB.Where("location_parent = ? AND location_owner = ?", location.LocationUID, user.UserUID).Find(&locations)
 
+	// Preload ownerships and locations, then return
 	for i := range ownerships {
 		preloadOwnership(&ownerships[i])
 	}
-
 	for i := range locations {
 		preloadLocation(&locations[i])
 	}
-
 	return ownerships, locations
 }
 
@@ -56,24 +56,35 @@ func GetAllFromLocation(location models.Location, user models.User) ([]models.Ow
 * @param user The user getting the inventory
 * @return models.InventoryDTO The DTO with all locations and ownerships
 */
-func ReturnAllInventory(location models.Location, user models.User) models.InventoryDTO {
+func getInventoryDTO(location models.Location, user models.User) models.InventoryDTO {
+	// Initialize variables
 	var inventoryDTO models.InventoryDTO
 	var inventoryList []models.InventoryDTO
 
-	ownerships, locations := GetAllFromLocation(location, user)
+	// Unpack location
+	ownerships, locations := unpackLocation(location, user)
 
+	// Recursively append location hierarchy
 	for i := range locations {
-		inventoryList = append(inventoryList, ReturnAllInventory(locations[i], user))
+		inventoryList = append(inventoryList, getInventoryDTO(locations[i], user))
 	}
-	
+
+	// Set build inventoryDTO and return
 	inventoryDTO.Parent = location
 	inventoryDTO.Ownerships = ownerships	
 	inventoryDTO.Locations = inventoryList
-
 	return inventoryDTO
 }
 
+/*
+* createLocation creates a location and adds it to the database
+*
+* @param locationName the name of the location
+* @param user the user associated with the location
+* @param locationQR the QR code to associate with the location
+*/
 func createLocation(locationName string, user models.User, locationQR string) models.Location {
+	// Build location
 	location := models.Location{
 		LocationName:  locationName,
 		LocationOwner: user.UserUID,
@@ -82,8 +93,8 @@ func createLocation(locationName string, user models.User, locationQR string) mo
 		LocationUID:   uuid.New(),
 	}
 
+	// Add location to database, preload and return
 	db.DB.Create(&location)
 	preloadLocation(&location)
-
 	return location
 }

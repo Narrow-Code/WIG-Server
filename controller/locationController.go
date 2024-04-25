@@ -125,7 +125,7 @@ func UnpackLocation(c *fiber.Ctx) error {
 	}
 
 	// Unpack from location TODO switch to ReturnAllFromLocation
-	ownerships, locations := GetAllFromLocation(location, user)
+	ownerships, locations := unpackLocation(location, user)
 
 	// Add to DTO and return TODO switch to InventoryDTO
 	ownershipDTO := DTO("ownerships", ownerships)
@@ -184,7 +184,7 @@ func ReturnInventory(c *fiber.Ctx) error {
 	db.DB.Where("location_uid = ?", db.DefaultLocationUUID).First(&locations)
 
 	// Get Inventory dto, add to dto and return
-	inventoryDTO := ReturnAllInventory(locations, user)
+	inventoryDTO := getInventoryDTO(locations, user)
 	dto := DTO("inventory", inventoryDTO)
 	return success(c, "Inventory returned", dto)
 }
