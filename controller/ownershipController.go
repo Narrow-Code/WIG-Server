@@ -197,41 +197,42 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	return success(c, "Ownership set in "+location.LocationName)
 }
 
-/*
-* Searches for items based on users query.
-*
-* @param c The FIber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// OwnershipSearch searches for items based on users query.
 func OwnershipSearch(c *fiber.Ctx) error {
 	// Initialize variables
-	user := c.Locals("user").(models.User)
+	var ownerships []models.Ownership
 	var data map[string]string
+	user := c.Locals("user").(models.User)
+
+	// Parse JSON body
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing the JSON")
 	}
 	name := data["name"]
 	tags := data["tags"]
-	var ownerships []models.Ownership
 
+
+	// Split up tags by commas
 	tagsFormat := strings.Split(strings.TrimSpace(tags), ",")
 
+	// Add ownership name and tags to query
 	query := db.DB.Where("item_owner = ? AND custom_item_name LIKE ?", user.UserUID, "%"+name+"%")
-
 	for _, tag := range tagsFormat {
 		query = query.Where("item_tags LIKE ?", "%"+tag+"%")
 	}
 
+	// Search for query
 	if err := query.Find(&ownerships).Error; err != nil {
 		return Error(c, 404, "Not found")
 	}
 
+	// Preload locations with data
 	for i := range ownerships {
 		preloadOwnership(&ownerships[i])
 	}
 
-	ownershipDTO := DTO("ownership", ownerships)
-	return success(c, "Items found", ownershipDTO)
+	// Add to dto and return
+	dto := DTO("ownership", ownerships)
+	return success(c, "Items found", dto)
 }
