@@ -6,15 +6,15 @@ type DTO struct {
 	Data interface{}
 }
 
-// CheckedOutDTO is the data transmission object for getting Checked Out items
-type CheckedOutDTO struct {
-	Borrower Borrower `json:"borrower"`
+// BorrowerInventory is the data transmission object for getting Checked Out items
+type BorrowerInventory struct {
+	Borrower   Borrower    `json:"borrower"`
 	Ownerships []Ownership `json:"ownerships"`
 }
 
 // InventoryDTO is the data transmission object for getting Inventory
 type InventoryDTO struct {
-	Parent Location `json:"parent"`
-	Locations []InventoryDTO `json:"locations"`
-	Ownerships []Ownership `json:"ownerships"`
+	Parent     Location       `json:"parent"`
+	Locations  []InventoryDTO `json:"locations"`
+	Ownerships []Ownership    `json:"ownerships"`
 }

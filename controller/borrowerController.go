@@ -60,7 +60,7 @@ func BorrowerCheckout(c *fiber.Ctx) error {
 	}
 
 	// Checkout items in list
-	successfulOwnerships := checkoutItems(ownerships, borrowerUUID)
+	successfulOwnerships := checkout(ownerships, borrowerUUID)
 
 	// Check if ownerships were successful
 	if len(successfulOwnerships) == 0 {
@@ -84,7 +84,7 @@ func BorrowerCheckin(c *fiber.Ctx) error {
 	}
 
 	// Checkin items in list
-	successfulOwnerships := checkinItems(ownerships)
+	successfulOwnerships := checkin(ownerships)
 
 	// Check if ownerships were successful
 	if len(successfulOwnerships) == 0 {
@@ -128,7 +128,7 @@ func BorrowerGetInventory(c *fiber.Ctx) error {
 	borrowers = append(borrowers, self)
 
 	// Get checkedOutDTO and return as DTO
-	checkedOutDTO := getCheckedOutDto(borrowers)
+	checkedOutDTO := getBorrowerInventory(borrowers)
 	dto := DTO("borrowers", checkedOutDTO)
 	return success(c, "Checked Out Items returned", dto)
 }
