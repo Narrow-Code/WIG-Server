@@ -41,27 +41,19 @@ func UserSalt(c *fiber.Ctx) error {
 	return success(c, "Salt returned successfully", dto)
 }
 
-/*
-* Validates the users token is still valid.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// UserValidate validates the users token is still valid.
 func UserValidate(c *fiber.Ctx) error {
 	return success(c, "Authorized")
 }
 
-/*
-* Handles the user Login logic. Returning a token.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// UserLogin handles the user Login logic. Returning a token.
 func UserLogin(c *fiber.Ctx) error {
-	// Parse request into data map
+	// Initialize variables
 	var data map[string]string
+	var user models.User
+	username := data["username"]
+
+	// Parse JSON body
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
@@ -73,29 +65,27 @@ func UserLogin(c *fiber.Ctx) error {
 	}
 
 	// Check that user exists
-	var user models.User
-	result := db.DB.Where("username = ?", data["username"]).First(&user)
+	result := db.DB.Where("username = ?", username).First(&user)
 	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, "Username " + err.Error())
 	}
 
-	// Check if hash matches then generate token
+	// Check if hash matches
 	if data["hash"] != user.Hash {
 		return Error(c, 400, "The username and passwords do not match")
 	}
 
+	// Generate token
 	user.Token = utils.GenerateToken(user.Username, user.Hash)
-
 	if user.Token == "error" {
 		return Error(c, 400, "There was an error generating user token")
 	}
 
+	// Save to database, add to dto's and return
+	db.DB.Save(&user)
 	tokenDTO := DTO("token", user.Token)
 	uidDTO := DTO("uid", user.UserUID)
-
-	db.DB.Save(&user)
-
 	return success(c, "Login was successful", tokenDTO, uidDTO)
 }
 
