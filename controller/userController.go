@@ -12,37 +12,33 @@ import (
 	"github.com/google/uuid"
 )
 
-// The regex expression to check username requirements
+// usernameRegex is the regex expression to check username requirements
 var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]{4,20}$`)
 
-// The regex expression to check email requirements
+// emailRegex is the regex expression to check email requirements
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
-/*
-* Retrieves the users salt.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// UserSalt retrieves the users salt.
 func UserSalt(c *fiber.Ctx) error {
-	// Get parameters
+	// Initialize variables
+	var user models.User
 	username := c.Query("username")
+
+	// Check if username is empty
 	if username == "" {
 		return Error(c, 400, "Username is empty and required")
 	}
 
 	// Query database for username
-	var user models.User
 	result := db.DB.Where("username = ?", username).First(&user)
 	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, "Username " + err.Error())
 	}
 
-	saltDTO := DTO("salt", user.Salt)
-
-	return success(c, "Salt returned successfully", saltDTO)
+	// Add to dto and return
+	dto := DTO("salt", user.Salt)
+	return success(c, "Salt returned successfully", dto)
 }
 
 /*
