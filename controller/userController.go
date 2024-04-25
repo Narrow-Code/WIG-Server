@@ -148,6 +148,7 @@ func UserSignup(c *fiber.Ctx) error {
 	return success(c, "Signup was successful")
 }
 
+// Ping performs a health check
 func Ping(c *fiber.Ctx) error {
 	return success(c, "Ping was successful")
 }
