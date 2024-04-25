@@ -16,17 +16,15 @@ import (
 * If an item does not exist, it makes API call to upcitemdb.com to search barcode.
 * If the item exists at upcitemdb, it creates a new item with that data.
 * Then after all, it creates an ownership with item and userdata.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
  */
 func ScanBarcode(c *fiber.Ctx) error {
 	// Initialize variables
+	var item models.Item
+	var ownerships []models.Ownership
 	user := c.Locals("user").(models.User)
 	barcode := c.Query("barcode")
 
-	// Validate barcode
+	// Check if barcode is empty and convert to int
 	if barcode == "" {
 		return Error(c, 400, "Barcode is empty and required")
 	}
@@ -35,50 +33,45 @@ func ScanBarcode(c *fiber.Ctx) error {
 		return Error(c, 400, "There was an error converting barcode to an Int")
 	}
 
-	// Check if item exists in local database
-	var item models.Item
+	// Check if item exists
 	result := db.DB.Where("barcode = ?", barcode).First(&item)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return Error(c, 400, "internal server error")
+	}
 
-	// If item isn't found, check api and add to
+	// If item doesn't exist call upcitemdb and add to database
 	if result.Error == gorm.ErrRecordNotFound {
-		log.Println("Record not found")
-		limit := upcitemdb.GetBarcode(barcode)
-		if limit == 429 {
-			return Error(c, limit, "API limit reached")
+		// Check if API limit has been reached
+		code := upcitemdb.GetBarcode(barcode)
+		if code == 429 {
+			return Error(c, code, "API limit reached")
 		}
 
+		// Check if item was added to database
 		result = db.DB.Where("barcode = ?", barcode).First(&item)
 		if result.Error == gorm.ErrRecordNotFound {
 			return Error(c, 404, "Item was not found in the database")
 		}
 	}
 
-	// If there is a connection error
-	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
-		return Error(c, 400, "internal server error")
-	}
-
 	// Search Ownership by uid
-	var ownerships []models.Ownership
 	db.DB.Where("item_number = ? AND item_owner = ?", item.ItemUid, user.UserUID).Find(&ownerships)
 
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
 		ownership, err := createOwnership(user.UserUID, item, "", "")
-
 		if err != nil {
 			return Error(c, 400, err.Error())
 		}
 		ownerships = append(ownerships, ownership)
 	}
 
+	// Preload ownerships, add to dto and return
 	for i := range ownerships {
 		preloadOwnership(&ownerships[i])
 	}
-
-	ownershipDTO := DTO("ownership", ownerships)
-
-	return success(c, "Item found", ownershipDTO)
+	dto := DTO("ownership", ownerships)
+	return success(c, "Item found", dto)
 }
 
 /*
