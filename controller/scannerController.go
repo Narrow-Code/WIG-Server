@@ -16,7 +16,7 @@ import (
 * If the item exists at upcitemdb, it creates a new item with that data.
 * Then after all, it creates an ownership with item and userdata.
  */
-func ScanBarcode(c *fiber.Ctx) error {
+func ScannerBarcode(c *fiber.Ctx) error {
 	// Initialize variables
 	var item models.Item
 	var ownerships []models.Ownership
@@ -73,8 +73,8 @@ func ScanBarcode(c *fiber.Ctx) error {
 	return success(c, "Item found", dto)
 }
 
-// ScanCheckQR takes a QR code as parameters, and checks whether it is an item, location or an unused QR.
-func ScanCheckQR(c *fiber.Ctx) error {
+// ScannerCheckQR takes a QR code as parameters, and checks whether it is an item, location or an unused QR.
+func ScannerCheckQR(c *fiber.Ctx) error {
 	// Initialize variables
 	var location models.Location
 	var ownership models.Ownership
@@ -108,8 +108,8 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	return success(c, "NEW")
 }
 
-// ScanQRLocation takes a QR code and returns its corresponding location
-func ScanQRLocation(c *fiber.Ctx) error {
+// ScannerQRLocation takes a QR code and returns its corresponding location
+func ScannerQRLocation(c *fiber.Ctx) error {
 	// Initialize variables
 	var location models.Location
 	user := c.Locals("user").(models.User)
@@ -135,8 +135,8 @@ func ScanQRLocation(c *fiber.Ctx) error {
 	return success(c, "Location returned", dto)
 }
 
-// ScanQROwnership takes a QR code and returns its corresponding ownership
-func ScanQROwnership(c *fiber.Ctx) error {
+// ScannerQROwnership takes a QR code and returns its corresponding ownership
+func ScannerQROwnership(c *fiber.Ctx) error {
 	// Initialize variables
 	var ownership models.Ownership
 	user := c.Locals("user").(models.User)

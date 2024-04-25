@@ -22,10 +22,10 @@ func Setup(app *fiber.App) {
 	app.Post("/app/validate", controller.UserValidate)
 
 	// Scanner Routes
-	app.Post("/app/scan/barcode", controller.ScanBarcode)
-	app.Get("/app/scan/check-qr", controller.ScanCheckQR)
-	app.Get("/app/scan/qr/location", controller.ScanQRLocation)
-	app.Get("/app/scan/qr/ownership", controller.ScanQROwnership)
+	app.Post("/app/scan/barcode", controller.ScannerBarcode)
+	app.Get("/app/scan/check-qr", controller.ScannerCheckQR)
+	app.Get("/app/scan/qr/location", controller.ScannerQRLocation)
+	app.Get("/app/scan/qr/ownership", controller.ScannerQROwnership)
 
 	// Ownership Routes
 	app.Post("/app/ownership/create", controller.OwnershipCreate)
