@@ -74,15 +74,11 @@ func ScanBarcode(c *fiber.Ctx) error {
 	return success(c, "Item found", dto)
 }
 
-/*
-* Takes a QR code as parameters, and checks whether it is an item, location or an unused QR.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// ScanCheckQR takes a QR code as parameters, and checks whether it is an item, location or an unused QR.
 func ScanCheckQR(c *fiber.Ctx) error {
 	// Initialize variables
+	var location models.Location
+	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
 	qr := c.Query("qr")
 
@@ -92,7 +88,6 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	}
 
 	// Check if qr exists as location
-	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&location)
 	emptyUID := [16]byte{}
 	if location.LocationUID != emptyUID {
@@ -102,7 +97,6 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	}
 
 	// Check if qr exists as ownership
-	var ownership models.Ownership
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownership)
 	if ownership.OwnershipUID != emptyUID {
 		return success(c, "OWNERSHIP")
@@ -111,6 +105,7 @@ func ScanCheckQR(c *fiber.Ctx) error {
 		return Error(c, 400, "internal server error")
 	}
 
+	// Return as unused QR code
 	return success(c, "NEW")
 }
 
