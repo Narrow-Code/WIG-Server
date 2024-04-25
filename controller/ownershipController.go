@@ -131,7 +131,7 @@ func OwnershipCreateNoItem(c *fiber.Ctx) error {
 	name := data["name"]
 
 	// Check if fields are empty
-	if data["qr"] == "" && data["name"] == "" {
+	if qr == "" && name == "" {
 		return Error(c, 400, "Missing field qr or name")
 	}
 

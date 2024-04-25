@@ -50,16 +50,18 @@ func UserLogin(c *fiber.Ctx) error {
 	// Initialize variables
 	var data map[string]string
 	var user models.User
-	username := data["username"]
-
+	
 	// Parse JSON body
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
+	username := data["username"]
+	hash := data["hash"]
+
 
 	// Check for empty fields
-	if data["username"] == "" || data["hash"] == "" {
+	if username == "" || hash == "" {
 		return Error(c, 400, "Username or hash is empty and required")
 	}
 
@@ -71,7 +73,7 @@ func UserLogin(c *fiber.Ctx) error {
 	}
 
 	// Check if hash matches
-	if data["hash"] != user.Hash {
+	if hash != user.Hash {
 		return Error(c, 400, "The username and passwords do not match")
 	}
 
