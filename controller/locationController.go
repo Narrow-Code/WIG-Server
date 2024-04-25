@@ -13,6 +13,7 @@ import (
 func LocationCreate(c *fiber.Ctx) error {
 	// Initialize variables
 	var location models.Location
+	var ownershipCheck models.Ownership
 	user := c.Locals("user").(models.User)
 	locationQR := c.Query("location_qr")
 	locationName := c.Query("location_name")
@@ -23,12 +24,20 @@ func LocationCreate(c *fiber.Ctx) error {
 		return Error(c, 400, "The locationQR or locationName field is empty")
 	}
 
-	// Validate location QR code is not in use
+	// Check if QR exists as a location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, user.UserUID).First(&location)
 	code, err := recordNotInUse(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
+
+	// Check if QR exists as an ownership
+	result = db.DB.Where("item_qr = ? AND item_owner = ?", locationQR, user.UserUID).First(&ownershipCheck)
+	code, err = recordNotInUse(result)
+	if err != nil {
+		return Error(c, code, err.Error())
+	}
+
 
 	// Validate location name is not in use
 	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, user.UserUID).First(&location)
