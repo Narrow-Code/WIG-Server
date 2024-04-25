@@ -124,13 +124,10 @@ func UnpackLocation(c *fiber.Ctx) error {
 		return Error(c, code, err.Error())
 	}
 
-	// Unpack from location TODO switch to ReturnAllFromLocation
-	ownerships, locations := unpackLocation(location, user)
-
-	// Add to DTO and return TODO switch to InventoryDTO
-	ownershipDTO := DTO("ownerships", ownerships)
-	locationDTO := DTO("locations", locations)
-	return success(c, "Unpacked", ownershipDTO, locationDTO)
+	// Get inventoryDTO, add to dto and return
+	inventoryDTO := getInventoryDTO(location, user)
+	dto := DTO("ownerships", inventoryDTO)
+	return success(c, "Unpacked", dto)
 }
 
 // Searches for locations based on users query.
