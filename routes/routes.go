@@ -28,7 +28,7 @@ func Setup(app *fiber.App) {
 	app.Get("/app/scan/qr/ownership", controller.ScanQROwnership)
 
 	// Ownership Routes
-	app.Post("/app/ownership/create", controller.OwnershipCreateNoItem)
+	app.Post("/app/ownership/create", controller.OwnershipCreate)
 	app.Put("/app/ownership/quantity/:type", controller.OwnershipQuantity)
 	app.Put("/app/ownership/edit", controller.OwnershipEdit)
 	app.Put("/app/ownership/set-location", controller.OwnershipSetLocation)

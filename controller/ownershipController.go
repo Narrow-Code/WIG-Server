@@ -3,8 +3,8 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
-	"strings"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -113,8 +113,8 @@ func OwnershipEdit(c *fiber.Ctx) error {
 	return success(c, "Ownership was successfully updated")
 }
 
-// OwnershipCreateNoItem creates an ownership in the database.
-func OwnershipCreateNoItem(c *fiber.Ctx) error {
+// OwnershipCreate creates an ownership in the database.
+func OwnershipCreate(c *fiber.Ctx) error {
 	// Initialize variables
 	var ownershipCheck models.Ownership
 	var data map[string]string
@@ -211,7 +211,6 @@ func OwnershipSearch(c *fiber.Ctx) error {
 	}
 	name := data["name"]
 	tags := data["tags"]
-
 
 	// Split up tags by commas
 	tagsFormat := strings.Split(strings.TrimSpace(tags), ",")
