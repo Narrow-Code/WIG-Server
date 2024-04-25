@@ -4,21 +4,15 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"strings"
-
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-/*
-* Changes the quantity of an ownership, using increment, decrement or setter method.
-*
-* @param c The Fiber context containing the HTTP request and response objects.
-*
-* @return error The error message, if there is any.
- */
+// OwnershipQuantity changes the quantity of an ownership, using increment, decrement or setter method.
 func OwnershipQuantity(c *fiber.Ctx) error {
 	// Initialize variables
+	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
 	ownershipUID := c.Query("ownershipUID")
 	amountStr := c.Query("amount")
@@ -33,25 +27,23 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 		return Error(c, 400, "Amount cannot be negative")
 	}
 
-	// Valide and retreive the ownership
-	var ownership models.Ownership
+	// Retreive the ownership
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
 	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
-	// Check type of change
+	// Make changes based on changeType
 	switch changeType {
 	case "increment":
 		ownership.ItemQuantity += amount
 	case "decrement":
-		if ownership.ItemQuantity == 0 {
-		} else {
+		if ownership.ItemQuantity != 0 {
 			ownership.ItemQuantity -= amount
-			if ownership.ItemQuantity < 0 {
-				ownership.ItemQuantity = 0
-			}
+		}
+		if ownership.ItemQuantity < 0 {
+			ownership.ItemQuantity = 0
 		}
 	case "set":
 		ownership.ItemQuantity = amount
@@ -59,13 +51,11 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 		return Error(c, 400, "Change type must be increment, decrement or set")
 	}
 
-	// Save new amount to the database and create response
+	// Save new amount to the database, preload, make dto and return
 	db.DB.Save(&ownership)
-
 	preloadOwnership(&ownership)
-
-	ownershipDTO := DTO("ownership", ownership)
-	return success(c, "Item found", ownershipDTO)
+	dto := DTO("ownership", ownership)
+	return success(c, "Item found", dto)
 }
 
 /*
