@@ -141,10 +141,10 @@ func UserSignup(c *fiber.Ctx) error {
 		return Error(c, 400, "Email domain does not exist")
 	}
 
-	user = createUser(data)
-
 	// TODO send verification email
 
+	// Create user and return
+	user = createUser(data)
 	return success(c, "Signup was successful")
 }
 
