@@ -38,7 +38,6 @@ func LocationCreate(c *fiber.Ctx) error {
 		return Error(c, code, err.Error())
 	}
 
-
 	// Validate location name is not in use
 	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, user.UserUID).First(&location)
 	code, err = recordNotInUse(result)
@@ -52,8 +51,8 @@ func LocationCreate(c *fiber.Ctx) error {
 	return success(c, "Location has been added successfully", locationDTO)
 }
 
-// LocationSetLocation sets the location of a specific location.
-func LocationSetLocation(c *fiber.Ctx) error {
+// LocationSetParent sets the location of a specific location.
+func LocationSetParent(c *fiber.Ctx) error {
 	// Initialize variables
 	var location models.Location
 	var setLocation models.Location
@@ -120,7 +119,7 @@ func LocationEdit(c *fiber.Ctx) error {
 }
 
 // Returns all ownerships and locations stored in a location.
-func UnpackLocation(c *fiber.Ctx) error {
+func LocationUnpack(c *fiber.Ctx) error {
 	// Initialize variables
 	var location models.Location
 	user := c.Locals("user").(models.User)
@@ -146,7 +145,7 @@ func LocationSearch(c *fiber.Ctx) error {
 	var locations []models.Location
 	var data map[string]string
 
-	// Parse JSON body	
+	// Parse JSON body
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing the JSON")
@@ -181,7 +180,7 @@ func LocationSearch(c *fiber.Ctx) error {
 }
 
 // Returns the entire inventory for a user.
-func ReturnInventory(c *fiber.Ctx) error {
+func LocationGetInventory(c *fiber.Ctx) error {
 	// Initialize variables
 	var locations models.Location
 	user := c.Locals("user").(models.User)
