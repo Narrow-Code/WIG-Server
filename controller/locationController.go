@@ -177,13 +177,14 @@ func LocationSearch(c *fiber.Ctx) error {
 // Returns the entire inventory for a user.
 func ReturnInventory(c *fiber.Ctx) error {
 	// Initialize variables
+	var locations models.Location
 	user := c.Locals("user").(models.User)
 
-	var locations models.Location
+	// Get default location
 	db.DB.Where("location_uid = ?", db.DefaultLocationUUID).First(&locations)
 
-	inventory := ReturnAllInventory(locations, user)
-	inventoryDTO := DTO("inventory", inventory)
-
-	return success(c, "Inventory returned", inventoryDTO)
+	// Get Inventory dto, add to dto and return
+	inventoryDTO := ReturnAllInventory(locations, user)
+	dto := DTO("inventory", inventoryDTO)
+	return success(c, "Inventory returned", dto)
 }
