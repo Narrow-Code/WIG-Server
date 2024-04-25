@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// CreateBorrower creates a borrower and adds it to the database.
-func CreateBorrower(c *fiber.Ctx) error {
+// BorrowerCreate creates a borrower and adds it to the database.
+func BorrowerCreate(c *fiber.Ctx) error {
 	// Initialize variables
 	var borrower models.Borrower
 	user := c.Locals("user").(models.User)
@@ -33,8 +33,8 @@ func CreateBorrower(c *fiber.Ctx) error {
 	return success(c, "Borrower created", dto)
 }
 
-// CheckoutItems checks out the list of Ownerships to a specified Borrower
-func CheckoutItems(c *fiber.Ctx) error {
+// BorrowerCheckout checks out the list of Ownerships to a specified Borrower
+func BorrowerCheckout(c *fiber.Ctx) error {
 	// Initialize variables
 	var borrower models.Borrower
 	var ownerships []string
@@ -73,7 +73,7 @@ func CheckoutItems(c *fiber.Ctx) error {
 }
 
 // CheckinItems sets returns checked out items to original locations within the list.
-func CheckinItem(c *fiber.Ctx) error {
+func BorrowerCheckin(c *fiber.Ctx) error {
 	// Initialize variables
 	var ownerships []string
 
@@ -97,7 +97,7 @@ func CheckinItem(c *fiber.Ctx) error {
 }
 
 // GetBorrower returns all borrowers associated with user.
-func GetBorrowers(c *fiber.Ctx) error {
+func BorrowerGetAll(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
 
@@ -115,8 +115,8 @@ func GetBorrowers(c *fiber.Ctx) error {
 	return success(c, "Borrowers returned", dto)
 }
 
-// CheckedOutInventory returns all checked out inventory
-func CheckedOutInventory(c *fiber.Ctx) error {
+// BorrowerGetInventory returns all checked out inventory
+func BorrowerGetInventory(c *fiber.Ctx) error {
 	// Initialize variables
 	user := c.Locals("user").(models.User)
 	var borrowers []models.Borrower
