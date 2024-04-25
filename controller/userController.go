@@ -22,6 +22,7 @@ func UserSalt(c *fiber.Ctx) error {
 	// Initialize variables
 	var user models.User
 	username := c.Query("username")
+	utils.Log("called by " + username)
 
 	// Check if username is empty
 	if username == "" {

@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"log"
 	"runtime"
+	"strings"
 )
 
 /*
@@ -20,7 +22,13 @@ func CallerFunctionName(callback int) string {
 	if callerFunction == nil {
 		return "unknown"
 	}
-
-	return callerFunction.Name()
+	functionName := callerFunction.Name()
+    	// Extract only the function name without the package path
+    	functionName = functionName[strings.LastIndex(functionName, ".")+1:]
+    	return functionName
 }
 
+func Log(message string) {	
+	log.Printf("TESTING")
+	log.Printf("%s: %s", CallerFunctionName(2), message)
+}
