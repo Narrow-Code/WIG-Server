@@ -46,6 +46,8 @@ func LocationCreate(c *fiber.Ctx) error {
 // LocationSetLocation sets the location of a specific location.
 func LocationSetLocation(c *fiber.Ctx) error {
 	// Initialize variables
+	var location models.Location
+	var setLocation models.Location
 	user := c.Locals("user").(models.User)
 	locationUID := c.Query("location_uid")
 	setLocationUID := c.Query("set_location_uid")
@@ -55,23 +57,21 @@ func LocationSetLocation(c *fiber.Ctx) error {
 		return Error(c, 400, "Cannot set location in itself")
 	}
 
-	// Validate the QR code
-	var location models.Location
+	// Validate the location exists
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
 	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
-	// Validate the ownership
-	var setLocation models.Location
+	// Validate the set location exists
 	result = db.DB.Where("location_uid = ? AND location_owner = ?", setLocationUID, user.UserUID).First(&setLocation)
 	code, err = recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
 
-	// Set the location and save
+	// Set the location parent and save
 	location.Parent = setLocation.Location.LocationUID
 	db.DB.Save(&location)
 
