@@ -109,31 +109,29 @@ func ScanCheckQR(c *fiber.Ctx) error {
 	return success(c, "NEW")
 }
 
+// ScanQRLocation takes a QR code and returns its corresponding location
 func ScanQRLocation(c *fiber.Ctx) error {
 	// Initialize variables
+	var location models.Location
 	user := c.Locals("user").(models.User)
 	qr := c.Query("qr")
 
-	// Validate qr
+	// Check if QR is empty
 	if qr == "" {
-		return Error(c, 400, "Barcode is empty and required")
+		return Error(c, 400, "QR is empty and required")
 	}
 
 	// Check if item exists in local database
-	var location models.Location
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&location)
-
 	if result.Error == gorm.ErrRecordNotFound {
 		return Error(c, 400, "Item was not found in the database")
 	}
-
-	// If there is a connection error
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return Error(c, 400, "internal server error")
 	}
 
+	// Preload location, add to dto and return
 	preloadLocation(&location)
-	locationDTO := DTO("location", location)
-
-	return success(c, "Item found", locationDTO)
+	dto := DTO("location", location)
+	return success(c, "Location returned", dto)
 }
