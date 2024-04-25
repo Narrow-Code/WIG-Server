@@ -37,7 +37,7 @@ func UserSalt(c *fiber.Ctx) error {
 	result := db.DB.Where("username = ?", username).First(&user)
 	code, err := recordExists(result)
 	if err != nil {
-		return Error(c, code, err.Error())
+		return Error(c, code, "Username " + err.Error())
 	}
 
 	saltDTO := DTO("salt", user.Salt)
@@ -81,7 +81,7 @@ func UserLogin(c *fiber.Ctx) error {
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
 	code, err := recordExists(result)
 	if err != nil {
-		return Error(c, code, err.Error())
+		return Error(c, code, "Username " + err.Error())
 	}
 
 	// Check if hash matches then generate token
