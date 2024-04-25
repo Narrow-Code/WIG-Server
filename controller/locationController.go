@@ -38,7 +38,7 @@ func LocationCreate(c *fiber.Ctx) error {
 	}
 
 	// Create location, add to DTO and return
-	createLocation(locationName, user, locationQR)
+	location = createLocation(locationName, user, locationQR)
 	locationDTO := DTO("location", &location)
 	return success(c, "Location has been added successfully", locationDTO)
 }
@@ -126,7 +126,7 @@ func UnpackLocation(c *fiber.Ctx) error {
 
 	// Get inventoryDTO, add to dto and return
 	inventoryDTO := getInventoryDTO(location, user)
-	dto := DTO("ownerships", inventoryDTO)
+	dto := DTO("inventory", inventoryDTO)
 	return success(c, "Unpacked", dto)
 }
 

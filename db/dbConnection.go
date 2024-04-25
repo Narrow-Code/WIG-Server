@@ -126,6 +126,7 @@ func ensureLocationRecords(connection *gorm.DB) {
 	if locationCount == 0 {
 		defaultLocation := models.Location{
 			LocationUID:   uuid.MustParse(DefaultLocationUUID),
+			Parent:		uuid.MustParse(DefaultLocationUUID),
 			LocationName:  "Default Location",
 			LocationOwner: uuid.MustParse(DefaultUserUUID)}
 		connection.Create(&defaultLocation)
