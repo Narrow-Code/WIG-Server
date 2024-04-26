@@ -3,6 +3,7 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"WIG-Server/utils"
 
 	"github.com/google/uuid"
 )
@@ -14,6 +15,7 @@ import (
 * user the User creating the Borrower
  */
 func createBorrower(borrowerName string, user models.User) models.Borrower {
+	utils.Log("building borrower")
 	borrower := models.Borrower{
 		BorrowerName:  borrowerName,
 		BorrowerOwner: user.UserUID,
@@ -21,7 +23,7 @@ func createBorrower(borrowerName string, user models.User) models.Borrower {
 	}
 
 	db.DB.Create(&borrower)
-
+	utils.Log("borrower successfully created")
 	return borrower
 }
 
