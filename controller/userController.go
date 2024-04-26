@@ -108,16 +108,19 @@ func UserLogin(c *fiber.Ctx) error {
  */
 func UserSignup(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.Log("call began")
 	var data map[string]string
 	var user models.User
 
 	// Parse request into data map
+	utils.Log("parsing json body")
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing the JSON")
 	}
 
 	// Check for empty fields
+	utils.Log("checking for empty fields")
 	if data["username"] == "" || data["email"] == "" {
 		return Error(c, 400, "Username or email is empty and required")
 	}
@@ -126,6 +129,7 @@ func UserSignup(c *fiber.Ctx) error {
 	}
 
 	// Check if username is in use
+	utils.Log("checking if username is in use")
 	result := db.DB.Where("username = ?", data["username"]).First(&user)
 	code, err := recordNotInUse(result)
 	if err != nil {
@@ -133,6 +137,7 @@ func UserSignup(c *fiber.Ctx) error {
 	}
 
 	// Check if email is in use
+	utils.Log("checking if email is in use")
 	result = db.DB.Where("email = ?", data["email"]).First(&user)
 	code, err = recordNotInUse(result)
 	if err != nil {
@@ -140,6 +145,7 @@ func UserSignup(c *fiber.Ctx) error {
 	}
 
 	// Check username and email requierments
+	utils.Log("validating username and email match requirements")
 	if !usernameRegex.MatchString(data["username"]) {
 		return Error(c, 400, "Username does not match requirements")
 	}
@@ -148,6 +154,7 @@ func UserSignup(c *fiber.Ctx) error {
 	}
 
 	// Run DNS check on Email
+	utils.Log("running DNS check on email for verification")
 	domain := strings.Split(data["email"], "@")[1]
 	_, err = net.LookupMX(domain)
 	if err != nil {
@@ -158,10 +165,12 @@ func UserSignup(c *fiber.Ctx) error {
 
 	// Create user and return
 	user = createUser(data)
+	utils.Log("registration for " + user.Username + " was successful")
 	return success(c, "Signup was successful")
 }
 
 // Ping performs a health check
 func Ping(c *fiber.Ctx) error {
+	utils.Log("health check performed")
 	return success(c, "Ping was successful")
 }
