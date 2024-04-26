@@ -103,18 +103,21 @@ func LocationSetParent(c *fiber.Ctx) error {
 
 func LocationEdit(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var data map[string]string
 	var location models.Location
 	user := c.Locals("user").(models.User)
 	locationUID := c.Query("locationUID")
 
 	// Parse request into data map
+	utils.UserLog(c, "parsing json body")
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
 
 	// Validate location exists
+	utils.UserLog(c, "validating location exists")
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
 	code, err := recordExists(result)
 	if err != nil {
@@ -129,6 +132,8 @@ func LocationEdit(c *fiber.Ctx) error {
 
 	// Save location to database and return
 	db.DB.Save(&location)
+
+	utils.UserLog(c, "success")
 	return success(c, "Location updated successfully")
 }
 
