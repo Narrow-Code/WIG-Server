@@ -54,7 +54,6 @@ func UserValidate(c *fiber.Ctx) error {
 func UserLogin(c *fiber.Ctx) error {
 	// Initialize variables
 	utils.Log("call began")
-	println("TEST")
 	var data map[string]string
 	var user models.User
 	
