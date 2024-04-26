@@ -56,6 +56,7 @@ func recordNotInUse(result *gorm.DB) (int, error) {
 * @return error The c.Status being returned via fiber.
  */
 func success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
+	user := c.Locals("user").(models.User)
 	responseMap := fiber.Map{
 		"message": message,
 		"success": true}
@@ -64,7 +65,7 @@ func success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
 		responseMap[dto.Name] = dto.Data
 	}
 
-	log.Printf("%s: Status Code: 200, Response: %v", utils.CallerFunctionName(2), responseMap)
+	log.Printf("%s#%s: %v \n\n", user.Username, utils.CallerFunctionName(2), responseMap)
 	return c.Status(200).JSON(responseMap)
 }
 
@@ -77,7 +78,8 @@ func success(c *fiber.Ctx, message string, dtos ...models.DTO) error {
 * @return error The c.Status being returned via fiber.
  */
 func Error(c *fiber.Ctx, code int, message string) error {
-	log.Printf("%s: Status Code: %d, Response: %v", utils.CallerFunctionName(2), code, fiber.Map{"message": message})
+	user := c.Locals("user").(models.User)
+	log.Printf("%s#%s: %v \n\n", user.Username, utils.CallerFunctionName(2), fiber.Map{"message": message})
 	return c.Status(code).JSON(fiber.Map{
 		"message": message,
 		"success": false})
