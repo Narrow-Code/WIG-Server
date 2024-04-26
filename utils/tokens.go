@@ -10,7 +10,7 @@ import (
 
 /*
 * GenerateToken generates a randomized authentication token for API calls between the WIG-Application and server.
-* 
+*
 * @param username The username.
 * @param hash The hashed password.
 * @return string The generated authentication token.
@@ -18,6 +18,7 @@ import (
 func GenerateToken(username string, hash string) string {
 	// Load environment variables
 	godotenv.Load()
+	Log("generating toke for " + username)
 
 	// Get token secret from environment
 	tokenSecret := []byte(os.Getenv("TOKEN_SECRET"))
@@ -36,5 +37,6 @@ func GenerateToken(username string, hash string) string {
 		return "error"
 	}
 
+	Log("success")
 	return tokenStr
 }
