@@ -139,11 +139,13 @@ func BorrowerGetAll(c *fiber.Ctx) error {
 // BorrowerGetInventory returns all checked out inventory
 func BorrowerGetInventory(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	user := c.Locals("user").(models.User)
 	var borrowers []models.Borrower
 	var self models.Borrower
 
 	// Get all borrower associated with User and include Self
+	utils.UserLog(c, "getting all borrowers from database")
 	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
 	db.DB.Where("borrower_uid = ?", db.SelfBorrowerUUID).First(&self)
 	borrowers = append(borrowers, self)
@@ -151,5 +153,6 @@ func BorrowerGetInventory(c *fiber.Ctx) error {
 	// Get checkedOutDTO and return as DTO
 	checkedOutDTO := getBorrowerInventory(borrowers)
 	dto := DTO("borrowers", checkedOutDTO)
+	utils.UserLog(c, "success")
 	return success(c, "Checked Out Items returned", dto)
 }
