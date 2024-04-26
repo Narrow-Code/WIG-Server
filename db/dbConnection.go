@@ -3,6 +3,7 @@ package db
 
 import (
 	"WIG-Server/models"
+	"WIG-Server/utils"
 	"fmt"
 	"os"
 	"time"
@@ -38,6 +39,7 @@ func Connect() {
 	connection := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbuser, dbpassword, dbhost, dbname)
 	
 	// Attempt to connect to database, and retry x times
+	utils.Log("attempting to connect to database")
 	retries := 5
 	for retries > 0 {
 		db, err = gorm.Open(mysql.Open(connection), &gorm.Config{
@@ -46,17 +48,17 @@ func Connect() {
 		if err == nil {
 			break
 		}
-		fmt.Println("Database connection failed. Retrying in 5 seconds...")
+		utils.Log("database connection failed. Retrying in 5 seconds...")
 		time.Sleep(5 * time.Second)
 		retries--
 	}
 	if err != nil {
-		panic("Database connection failed after multiple retries")
+		panic("database connection failed after multiple retries")
 	}
 
 	// Set DB variable and Automigrate
 	DB = db
-	fmt.Println("db connected successfully")
+	utils.Log("db connected successfully")
 	AutoMigrate(db)
 }
 
