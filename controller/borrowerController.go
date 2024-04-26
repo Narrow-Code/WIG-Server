@@ -116,19 +116,23 @@ func BorrowerCheckin(c *fiber.Ctx) error {
 // GetBorrower returns all borrowers associated with user.
 func BorrowerGetAll(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	user := c.Locals("user").(models.User)
 
 	// Get borrowers
+	utils.UserLog(c, "query for borrowers in database")
 	var borrowers []models.Borrower
 	db.DB.Where("borrower_owner = ?", user.UserUID).Find(&borrowers)
 
 	// Check if borrowers is empty
+	utils.UserLog(c, "checking if borrowers were found")
 	if len(borrowers) == 0 {
 		return success(c, "No borrowers found")
 	}
 
 	// Return as DTO
 	dto := DTO("borrowers", &borrowers)
+	utils.UserLog(c, "success")
 	return success(c, "Borrowers returned", dto)
 }
 
