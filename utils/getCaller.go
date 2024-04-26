@@ -28,6 +28,5 @@ func CallerFunctionName(callback int) string {
 }
 
 func Log(message string) {	
-	log.Printf("TESTING")
 	log.Printf("%s: %s", CallerFunctionName(2), message)
 }
