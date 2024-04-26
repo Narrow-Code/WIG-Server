@@ -20,11 +20,12 @@ var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]
 // UserSalt retrieves the users salt.
 func UserSalt(c *fiber.Ctx) error {
 	// Initialize variables
-	utils.Log("initializing variables")
+	utils.Log("call began")
 	var user models.User
 	username := c.Query("username")
 
 	// Check if username is empty
+	utils.Log("checking for empty fields")
 	if username == "" {
 		return Error(c, 400, "Username is empty and required")
 	}
@@ -38,23 +39,26 @@ func UserSalt(c *fiber.Ctx) error {
 	}
 
 	// Add to dto and return
-	utils.Log("return salt success")
+	utils.Log("return for salt for " + user.Username + " successful")
 	dto := DTO("salt", user.Salt)
 	return success(c, "Salt returned successfully", dto)
 }
 
 // UserValidate validates the users token is still valid.
 func UserValidate(c *fiber.Ctx) error {
+	utils.UserLog(c, "user token authorized")
 	return success(c, "Authorized")
 }
 
 // UserLogin handles the user Login logic. Returning a token.
 func UserLogin(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.Log("call began")
 	var data map[string]string
 	var user models.User
 	
 	// Parse JSON body
+	utils.Log("parsing json body")
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
@@ -64,11 +68,13 @@ func UserLogin(c *fiber.Ctx) error {
 
 
 	// Check for empty fields
+	utils.Log("checking for empty fields")
 	if username == "" || hash == "" {
 		return Error(c, 400, "Username or hash is empty and required")
 	}
 
 	// Check that user exists
+	utils.Log("query username")
 	result := db.DB.Where("username = ?", username).First(&user)
 	code, err := recordExists(result)
 	if err != nil {
@@ -76,11 +82,13 @@ func UserLogin(c *fiber.Ctx) error {
 	}
 
 	// Check if hash matches
+	utils.Log("validating hash")
 	if hash != user.Hash {
 		return Error(c, 400, "The username and passwords do not match")
 	}
 
 	// Generate token
+	utils.Log("generating token for " + user.Username)
 	user.Token = utils.GenerateToken(user.Username, user.Hash)
 	if user.Token == "error" {
 		return Error(c, 400, "There was an error generating user token")
@@ -88,6 +96,7 @@ func UserLogin(c *fiber.Ctx) error {
 
 	// Save to database, add to dto's and return
 	db.DB.Save(&user)
+	utils.Log("user log in successful")
 	tokenDTO := DTO("token", user.Token)
 	uidDTO := DTO("uid", user.UserUID)
 	return success(c, "Login was successful", tokenDTO, uidDTO)
