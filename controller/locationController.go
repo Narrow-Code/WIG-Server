@@ -3,6 +3,7 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"WIG-Server/utils"
 	"log"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 // LocationCreate creates a location using a QR code, a location name and the type of location.
 func LocationCreate(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var location models.Location
 	var ownershipCheck models.Ownership
 	user := c.Locals("user").(models.User)
@@ -20,11 +22,13 @@ func LocationCreate(c *fiber.Ctx) error {
 	log.Printf("controller#LocationCreate: User %d called LocationCreate", user.UserUID)
 
 	// Check for empty fields
+	utils.UserLog(c, "checking for empty fields")
 	if locationQR == "" || locationName == "" {
 		return Error(c, 400, "The locationQR or locationName field is empty")
 	}
 
 	// Check if QR exists as a location
+	utils.UserLog(c, "checking if qr " + locationQR + " exists as a location")
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, user.UserUID).First(&location)
 	code, err := recordNotInUse(result)
 	if err != nil {
@@ -32,6 +36,7 @@ func LocationCreate(c *fiber.Ctx) error {
 	}
 
 	// Check if QR exists as an ownership
+	utils.UserLog(c, "checking if qr " + locationQR + " exists as an ownership")
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", locationQR, user.UserUID).First(&ownershipCheck)
 	code, err = recordNotInUse(result)
 	if err != nil {
@@ -39,6 +44,7 @@ func LocationCreate(c *fiber.Ctx) error {
 	}
 
 	// Validate location name is not in use
+	utils.UserLog(c, "checking if " + locationName + " is in use as a location name")
 	result = db.DB.Where("location_name = ? AND location_owner = ?", locationName, user.UserUID).First(&location)
 	code, err = recordNotInUse(result)
 	if err != nil {
@@ -46,8 +52,10 @@ func LocationCreate(c *fiber.Ctx) error {
 	}
 
 	// Create location, add to DTO and return
+	utils.Log("creating location " + locationName)
 	location = createLocation(locationName, user, locationQR)
 	locationDTO := DTO("location", &location)
+	utils.Log("success")
 	return success(c, "Location has been added successfully", locationDTO)
 }
 
