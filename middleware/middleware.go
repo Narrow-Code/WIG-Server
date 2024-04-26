@@ -5,6 +5,7 @@ import (
 	"WIG-Server/controller"
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"WIG-Server/utils"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -28,6 +29,7 @@ func AppAuth() fiber.Handler {
 		}
 
 		// Continue to the next middleware
+		utils.Log("authorized")
 		return c.Next()
 	}
 }
@@ -38,6 +40,7 @@ func AppAuth() fiber.Handler {
 func ValidateToken() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Get token from Authorization header
+		utils.Log("validating token")
 		token := c.Get("Authorization")
 
 		// Check if token is missing
@@ -58,6 +61,7 @@ func ValidateToken() fiber.Handler {
 		c.Locals("user", user)
 
 		// Continue to the next middleware
+		utils.Log(user.Username + " authorized")
 		return c.Next()
 	}
 }

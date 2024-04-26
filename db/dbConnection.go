@@ -26,7 +26,8 @@ var DB *gorm.DB
 
 // Connect establishes a connection to the database.
 func Connect() {
-	// Load environment variables and initialize 
+	// Load environment variables and initialize
+	utils.Log("began call")
 	var db *gorm.DB
 	var err error
 	godotenv.Load()
@@ -68,6 +69,7 @@ func Connect() {
 * @param connection The database connection instance on which the migrations will be applied.
  */
 func AutoMigrate(connection *gorm.DB) {
+	utils.Log("began call")
 	connection.Debug().AutoMigrate(
 		&models.User{},
 		&models.Item{},
@@ -77,14 +79,17 @@ func AutoMigrate(connection *gorm.DB) {
 	)
 	
 	ensureDefaultRecords(connection)
+	utils.Log("success")
 }
 
 // ensureDefaultRecords checks if essential tables are empty and creates default records if necessary
 func ensureDefaultRecords(connection *gorm.DB) {
+	utils.Log("began call")
 	ensureBorrowerRecords(connection)
 	ensureUserRecords(connection)
 	ensureLocationRecords(connection)
 	ensureItemRecords(connection)
+	utils.Log("success")
 }
 
 // ensureBorrowerRecords checks if Borrower table is empty and creates default records if necessary
@@ -93,6 +98,7 @@ func ensureBorrowerRecords(connection *gorm.DB) {
 	connection.Model(&models.Borrower{}).Count(&borrowerCount)
 
 	if borrowerCount == 0 {
+		utils.Log("setting up default borrowers")
 		defaultBorrower := models.Borrower{
 			BorrowerName: "Default",
 			BorrowerUID: uuid.MustParse(DefaultBorrowerUUID)}
@@ -102,6 +108,7 @@ func ensureBorrowerRecords(connection *gorm.DB) {
 			BorrowerName: "Self",
 			BorrowerUID: uuid.MustParse(SelfBorrowerUUID)}
 		connection.Create(&selfBorrower)
+		utils.Log("success")
 	}
 }
 
@@ -111,10 +118,12 @@ func ensureUserRecords(connection *gorm.DB) {
 	connection.Model(&models.User{}).Count(&userCount)
 
 	if userCount == 0 {
+		utils.Log("setting up default user")
 		defaultUser := models.User{
 			UserUID:  uuid.MustParse(DefaultUserUUID),
 			Username: "Default User"}
 		connection.Create(&defaultUser)
+		utils.Log("success")
 	}
 }
 
@@ -124,12 +133,14 @@ func ensureLocationRecords(connection *gorm.DB) {
 	connection.Model(&models.Location{}).Count(&locationCount)
 
 	if locationCount == 0 {
+		utils.Log("setting up default location")
 		defaultLocation := models.Location{
 			LocationUID:   uuid.MustParse(DefaultLocationUUID),
 			Parent:		uuid.MustParse(DefaultLocationUUID),
 			LocationName:  "Default Location",
 			LocationOwner: uuid.MustParse(DefaultUserUUID)}
 		connection.Create(&defaultLocation)
+		utils.Log("success")
 	}
 }
 
@@ -139,10 +150,12 @@ func ensureItemRecords(connection *gorm.DB) {
 	connection.Model(&models.Item{}).Count(&itemCount)
 
 	if itemCount == 0 {
+		utils.Log("setting up default item")
 		defaultItem := models.Item{
 			ItemUid: uuid.MustParse(DefaultItemUUID),
 			Name: "Default Item"}
 		connection.Create(&defaultItem)
+		utils.Log("success")
 	}
 }
 
@@ -152,10 +165,12 @@ func ensureItemRecords(connection *gorm.DB) {
 * string The Port to be used.
 */
 func GetPort() string {
+	utils.Log("getting port")
 	godotenv.Load()
 	var port = os.Getenv("PORT")
 	if port == "" {
 		port = "80"
 	}
+	utils.Log("success")
 	return port
 }
