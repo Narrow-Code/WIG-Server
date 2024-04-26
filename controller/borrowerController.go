@@ -41,17 +41,20 @@ func BorrowerCreate(c *fiber.Ctx) error {
 // BorrowerCheckout checks out the list of Ownerships to a specified Borrower
 func BorrowerCheckout(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var borrower models.Borrower
 	var ownerships []string
 	borrowerUID := c.Query("borrowerUID")
 
 	// Check if borrowerUID is of correct UUID format
+	utils.UserLog(c, "validating UUID format")
 	borrowerUUID, err := uuid.Parse(borrowerUID)
 	if err != nil {
 		Error(c, 400, "Borrower UUID not correct format")
 	}
 
 	// Check that borrower exists
+	utils.UserLog(c, "validating borrower exists")
 	result := db.DB.Where("borrower_uid = ?", borrowerUID).First(&borrower)
 	code, err := recordExists(result)
 	if err != nil {
@@ -59,21 +62,25 @@ func BorrowerCheckout(c *fiber.Ctx) error {
 	}
 
 	// Parse json body
+	utils.UserLog(c, "parsing json body")
 	err = c.BodyParser(&ownerships)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
 
 	// Checkout items in list
+	utils.UserLog(c, "checking out items in list")
 	successfulOwnerships := checkout(ownerships, borrowerUUID)
 
 	// Check if ownerships were successful
+	utils.UserLog(c, "checking for successful ownerships")
 	if len(successfulOwnerships) == 0 {
 		return Error(c, 400, "Failed to checkout ownerships")
 	}
 
 	// Return as DTO
 	dto := DTO("ownerships", successfulOwnerships)
+	utils.UserLog(c, "success")
 	return success(c, "Ownerships checked out", dto)
 }
 
