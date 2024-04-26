@@ -23,7 +23,7 @@ func createBorrower(borrowerName string, user models.User) models.Borrower {
 	}
 
 	db.DB.Create(&borrower)
-	utils.Log("borrower successfully created")
+	utils.Log(borrower.BorrowerName + " successfully created")
 	return borrower
 }
 
@@ -35,8 +35,10 @@ func createBorrower(borrowerName string, user models.User) models.Borrower {
 * @return []string list of successfully checked out Ownership UID's
  */
 func checkout(ownerships []string, borrowerUUID uuid.UUID) []string {
+	utils.Log("began call")
 	var successfulOwnerships []string
 	for _, ownership := range ownerships {
+		utils.Log("checking out " + ownership)
 		var item models.Ownership
 		result := db.DB.Where("ownership_uid = ?", ownership).First(&item)
 
@@ -47,8 +49,10 @@ func checkout(ownerships []string, borrowerUUID uuid.UUID) []string {
 			db.DB.Save(&item)
 			preloadOwnership(&item)
 			successfulOwnerships = append(successfulOwnerships, ownership)
+			utils.Log(item.CustomItemName + " checked out")
 		}
 	}
+	utils.Log("success")
 	return successfulOwnerships
 }
 
