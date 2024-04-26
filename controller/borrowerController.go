@@ -3,6 +3,7 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"WIG-Server/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -11,16 +12,19 @@ import (
 // BorrowerCreate creates a borrower and adds it to the database.
 func BorrowerCreate(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var borrower models.Borrower
 	user := c.Locals("user").(models.User)
 	borrowerName := c.Query("borrower")
 
 	// Check for empty fields
+	utils.UserLog(c, "checking for empty fields")
 	if borrowerName == "" {
 		return Error(c, 400, "The borrower field is empty")
 	}
 
 	// Validate borrowerName is not in use
+	utils.UserLog(c, "validating borrowerName is not in use")
 	result := db.DB.Where("borrower_name = ? AND borrower_owner = ?", borrowerName, user.UserUID).First(&borrower)
 	code, err := recordNotInUse(result)
 	if err != nil {
@@ -30,6 +34,7 @@ func BorrowerCreate(c *fiber.Ctx) error {
 	// Create Borrower and return as DTO
 	borrower = createBorrower(borrowerName, user)
 	dto := DTO("borrower", borrower)
+	utils.UserLog(c, "success")
 	return success(c, "Borrower created", dto)
 }
 
