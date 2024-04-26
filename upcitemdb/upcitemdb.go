@@ -24,6 +24,7 @@ import (
  */
 func GetBarcode(barcode string) int {
     // Construct URL
+    utils.Log("began call")
     url := constructURL(barcode)
 
     // Send request and process response
@@ -58,6 +59,7 @@ func constructURL(barcode string) string {
  * @return An error if the request fails or decoding is unsuccessful.
  */
 func fetchData(url string) (map[string]interface{}, error) {
+    utils.Log("fetching data from upcitemdb")
     req, err := http.NewRequest("GET", url, nil)
     if err != nil {
         log.Fatal(err)
@@ -75,6 +77,7 @@ func fetchData(url string) (map[string]interface{}, error) {
         return nil, err
     }
     defer resp.Body.Close()
+    utils.Log("response from upcitemdb successful")
 
     // Check for rate limit
     if resp.StatusCode == 429 {
@@ -87,7 +90,7 @@ func fetchData(url string) (map[string]interface{}, error) {
     case "gzip":
         reader, err = gzip.NewReader(resp.Body)
         if err != nil {
-            log.Println("Failed to decompress response")
+            utils.Log("failed to decompress response") 
             return nil, err
         }
         defer reader.Close()
@@ -96,12 +99,14 @@ func fetchData(url string) (map[string]interface{}, error) {
     }
 
     // Decode JSON response
+    utils.Log("decoding json response")
     var data map[string]interface{}
     decoder := json.NewDecoder(reader)
     err = decoder.Decode(&data)
     if err != nil {
         return nil, err
     }
+    utils.Log("decoding successful")
 
     return data, nil
 }
