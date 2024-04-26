@@ -63,8 +63,10 @@ func checkout(ownerships []string, borrowerUUID uuid.UUID) []string {
 * @return []string list of successfully checked in Ownership UID's
  */
 func checkin(ownerships []string) []string {
+	utils.Log("began call")
 	var successfulOwnerships []string
 	for _, ownership := range ownerships {
+		utils.Log("checking out " + ownership)
 		var item models.Ownership
 		result := db.DB.Where("ownership_uid = ?", ownership).First(&item)
 
@@ -75,8 +77,10 @@ func checkin(ownerships []string) []string {
 			db.DB.Save(&item)
 			preloadOwnership(&item)
 			successfulOwnerships = append(successfulOwnerships, ownership)
+			utils.Log(item.CustomItemName + " checked in")
 		}
 	}
+	utils.Log("success")
 	return successfulOwnerships
 }
 
