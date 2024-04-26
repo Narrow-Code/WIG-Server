@@ -4,6 +4,7 @@ package upcitemdb
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"WIG-Server/utils"
 	"compress/gzip"
 	"encoding/json"
 	"errors"
@@ -112,33 +113,40 @@ func fetchData(url string) (map[string]interface{}, error) {
  * @param items The items retrieved from the API response.
  */
 func createItems(barcode string, items interface{}) {
+    utils.Log("began call")
     for _, item := range items.([]interface{}) {
         itemData := item.(map[string]interface{})
         var newItem models.Item
 
         // Set barcode
         newItem.Barcode = barcode
+	utils.Log(newItem.Barcode + " set as barcode")
 
         // Set name if available
         if title, exists := itemData["title"]; exists {
             newItem.Name = title.(string)
+	    utils.Log(newItem.Name + " set as name")
         }
 
         // Set brand if available
         if brand, exists := itemData["brand"]; exists {
             newItem.Brand = brand.(string)
+	    utils.Log(newItem.Brand + " set as brand")
         }
 
         // Set image if available
         if images, exists := itemData["images"]; exists && len(images.([]interface{})) > 0 {
             newItem.Image = images.([]interface{})[0].(string)
+	    utils.Log(newItem.Image + " set as image")
         }
 
         // Generate unique identifier
         newItem.ItemUid = uuid.New()
+	utils.Log("UUID set")
 
         // Create item in database
         db.DB.Create(&newItem)
+	utils.Log(newItem.Name + " has been successfully added to database")
     }
 }
 
