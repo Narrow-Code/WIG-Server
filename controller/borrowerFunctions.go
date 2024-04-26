@@ -91,10 +91,12 @@ func checkin(ownerships []string) []string {
 * @return []models.CheckedOutDTO the CheckedOutDTO list of inventory
  */
 func getBorrowerInventory(borrowers []models.Borrower) []models.BorrowerInventory {
+	utils.Log("began call")
 	var ownerships []models.Ownership
 	var inventory []models.BorrowerInventory
 
 	for b := range borrowers {
+		utils.Log("query inventory for borrower " + borrowers[b].BorrowerName)
 		query := db.DB.Where("item_borrower = ?", borrowers[b].BorrowerUID)
 
 		if err := query.Find(&ownerships).Error; err != nil {
@@ -107,7 +109,9 @@ func getBorrowerInventory(borrowers []models.Borrower) []models.BorrowerInventor
 		if len(ownerships) != 0 {
 			inventory = append(inventory, borrower)
 		}
+		utils.Log("inventory returned for borrower " + borrowers[b].BorrowerName)
 	}
+	utils.Log("success")
 	return inventory
 }
 
