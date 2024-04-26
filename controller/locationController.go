@@ -62,6 +62,7 @@ func LocationCreate(c *fiber.Ctx) error {
 // LocationSetParent sets the location of a specific location.
 func LocationSetParent(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var location models.Location
 	var setLocation models.Location
 	user := c.Locals("user").(models.User)
@@ -69,11 +70,13 @@ func LocationSetParent(c *fiber.Ctx) error {
 	setLocationUID := c.Query("set_location_uid")
 
 	// Verify locations are not the same
+	utils.UserLog(c, "checking that both locations are not the same")
 	if locationUID == setLocationUID {
 		return Error(c, 400, "Cannot set location in itself")
 	}
 
 	// Validate the location exists
+	utils.UserLog(c, "validating that location exists")
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
 	code, err := recordExists(result)
 	if err != nil {
@@ -81,6 +84,7 @@ func LocationSetParent(c *fiber.Ctx) error {
 	}
 
 	// Validate the set location exists
+	utils.UserLog(c, "validating the set location exists")
 	result = db.DB.Where("location_uid = ? AND location_owner = ?", setLocationUID, user.UserUID).First(&setLocation)
 	code, err = recordExists(result)
 	if err != nil {
@@ -90,8 +94,10 @@ func LocationSetParent(c *fiber.Ctx) error {
 	// Set the location parent and save
 	location.Parent = setLocation.Location.LocationUID
 	db.DB.Save(&location)
+	utils.UserLog(c, location.LocationName + " is set in " + setLocation.LocationName)
 
 	// return success
+	utils.UserLog(c, "success")
 	return success(c, location.LocationName+" set in "+setLocation.LocationName)
 }
 
