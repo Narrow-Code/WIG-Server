@@ -20,9 +20,9 @@ var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]
 // UserSalt retrieves the users salt.
 func UserSalt(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.Log("initializing variables")
 	var user models.User
 	username := c.Query("username")
-	utils.Log("called by " + username)
 
 	// Check if username is empty
 	if username == "" {
@@ -30,6 +30,7 @@ func UserSalt(c *fiber.Ctx) error {
 	}
 
 	// Query database for username
+	utils.Log("query database for " + user.Username)
 	result := db.DB.Where("username = ?", username).First(&user)
 	code, err := recordExists(result)
 	if err != nil {
@@ -37,6 +38,7 @@ func UserSalt(c *fiber.Ctx) error {
 	}
 
 	// Add to dto and return
+	utils.Log("return salt success")
 	dto := DTO("salt", user.Salt)
 	return success(c, "Salt returned successfully", dto)
 }
