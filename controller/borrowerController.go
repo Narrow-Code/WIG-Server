@@ -87,24 +87,29 @@ func BorrowerCheckout(c *fiber.Ctx) error {
 // CheckinItems sets returns checked out items to original locations within the list.
 func BorrowerCheckin(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var ownerships []string
 
 	// Parse json body
+	utils.UserLog(c, "parsing json body")
 	err := c.BodyParser(&ownerships)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
 
 	// Checkin items in list
+	utils.UserLog(c, "checking in items in list")
 	successfulOwnerships := checkin(ownerships)
 
 	// Check if ownerships were successful
+	utils.UserLog(c, "checking if ownerships were successful")
 	if len(successfulOwnerships) == 0 {
 		return Error(c, 400, "Failed to check in ownerships")
 	}
 
 	// Return as DTO
 	dto := DTO("ownerships", successfulOwnerships)
+	utils.UserLog(c, "success")
 	return success(c, "Ownerships checked in", dto)
 }
 
