@@ -20,12 +20,14 @@ import (
 * @return error The error message, if there is one.
  */
 func recordExists(result *gorm.DB) (int, error) {
+	utils.Log("checking if record exists")
 	if result.Error == gorm.ErrRecordNotFound {
 		return 404, fmt.Errorf("not found in the database")
 	}
 	if result.Error != nil {
 		return 400, errors.New(result.Error.Error())
 	}
+	utils.Log("record exists")
 	return 200, nil
 }
 
@@ -38,12 +40,14 @@ func recordExists(result *gorm.DB) (int, error) {
 * @return error The error message, if there is one.
  */
 func recordNotInUse(result *gorm.DB) (int, error) {
+	utils.Log("checking that record is not in use")
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return 400, errors.New(result.Error.Error())
 	}
 	if result.RowsAffected != 0 {
 		return 400, errors.New("record is in use in the database")
 	}
+	utils.Log("record is not in use")
 	return 200, nil
 }
 
