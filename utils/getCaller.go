@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"WIG-Server/models"
 	"log"
 	"runtime"
 	"strings"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 /*
@@ -27,6 +30,29 @@ func CallerFunctionName(callback int) string {
     	return functionName
 }
 
+/*
+* Log prints a log message with the CallerFunctionName appended to it
+*
+* @param message The message to print
+*/
 func Log(message string) {	
 	log.Printf("%s: %s", CallerFunctionName(2), message)
+}
+
+/*
+* UserLog prints a log message with the CallerFunctionName and Username if applicable
+*
+* @param c The fiber context
+* @param message The message to print
+*/
+func UserLog(c *fiber.Ctx, message string) {
+	// Initialize user variable
+	user := c.Locals("user").(models.User)
+
+	// Append username if applicable
+	if user.Username != "" {
+		log.Printf("%s#%s: %s", user.Username, CallerFunctionName(2), message)
+	} else {
+		log.Printf("%s: %s", CallerFunctionName(2), message)
+	}		
 }
