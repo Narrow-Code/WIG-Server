@@ -140,11 +140,13 @@ func LocationEdit(c *fiber.Ctx) error {
 // Returns all ownerships and locations stored in a location.
 func LocationUnpack(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var location models.Location
 	user := c.Locals("user").(models.User)
 	locationUID := c.Query("locationUID")
 
 	// Validate location exists
+	utils.UserLog(c, "validating location exists")
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
 	code, err := recordExists(result)
 	if err != nil {
@@ -152,8 +154,10 @@ func LocationUnpack(c *fiber.Ctx) error {
 	}
 
 	// Get inventoryDTO, add to dto and return
+	utils.UserLog(c, "unpacking location")
 	inventoryDTO := getInventoryDTO(location, user)
 	dto := DTO("inventory", inventoryDTO)
+	utils.UserLog(c, "success")
 	return success(c, "Unpacked", dto)
 }
 
