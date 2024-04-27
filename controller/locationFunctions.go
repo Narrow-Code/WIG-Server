@@ -3,6 +3,7 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"WIG-Server/utils"
 
 	"github.com/google/uuid"
 )
@@ -14,6 +15,7 @@ import (
  */
 func preloadLocation(location *models.Location) {
 	// Preload the current location
+	utils.Log("preloading " + location.LocationName)
 	db.DB.Preload("User").Preload("Location").Find(&location)
 
 	// Recursively preload the parent's hierarchy
