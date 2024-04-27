@@ -164,17 +164,17 @@ func LocationUnpack(c *fiber.Ctx) error {
 // Searches for locations based on users query.
 func LocationSearch(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	user := c.Locals("user").(models.User)
 	var locations []models.Location
 	var data map[string]string
 
 	// Parse JSON body
+	utils.UserLog(c, "parsing json body")
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing the JSON")
 	}
-
-	// Unpack variables
 	locationName := data["name"]
 	locationTags := data["tags"]
 
@@ -182,23 +182,27 @@ func LocationSearch(c *fiber.Ctx) error {
 	tagsFormat := strings.Split(strings.TrimSpace(locationTags), ",")
 
 	// Add locationName and tags to query
+	utils.UserLog(c, "adding locationName and tags to query")
 	query := db.DB.Where("location_owner = ? AND location_name LIKE ?", user.UserUID, "%"+locationName+"%")
 	for _, tag := range tagsFormat {
 		query = query.Where("location_tags LIKE ?", "%"+tag+"%")
 	}
 
 	// Search for query
+	utils.UserLog(c, "searching for locations")
 	if err := query.Find(&locations).Error; err != nil {
 		return Error(c, 404, "Not found")
 	}
 
 	// Preload locations with data
+	utils.UserLog(c, "preloading locations")
 	for i := range locations {
 		preloadLocation(&locations[i])
 	}
 
 	// Add to DTO and return
 	dto := DTO("locations", locations)
+	utils.UserLog(c, "success")
 	return success(c, "Items found", dto)
 }
 
