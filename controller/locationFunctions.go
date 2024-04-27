@@ -34,6 +34,7 @@ func preloadLocation(location *models.Location) {
 */
 func unpackLocation(location models.Location, user models.User) ([]models.Ownership, []models.Location) {
 	// Initialize variables
+	utils.Log("unpacking " + location.LocationName)
 	var ownerships []models.Ownership
 	var locations []models.Location
 
