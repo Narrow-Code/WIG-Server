@@ -61,6 +61,7 @@ func unpackLocation(location models.Location, user models.User) ([]models.Owners
 */
 func getInventoryDTO(location models.Location, user models.User) models.InventoryDTO {
 	// Initialize variables
+	utils.Log("getting inventoryDTO for " + location.LocationName)
 	var inventoryDTO models.InventoryDTO
 	var inventoryList []models.InventoryDTO
 
@@ -88,6 +89,7 @@ func getInventoryDTO(location models.Location, user models.User) models.Inventor
 */
 func createLocation(locationName string, user models.User, locationQR string) models.Location {
 	// Build location
+	utils.Log("building Location for " + locationName)
 	location := models.Location{
 		LocationName:  locationName,
 		LocationOwner: user.UserUID,
@@ -98,6 +100,7 @@ func createLocation(locationName string, user models.User, locationQR string) mo
 
 	// Add location to database, preload and return
 	db.DB.Create(&location)
+	utils.Log(locationName + " added to database")
 	preloadLocation(&location)
 	return location
 }
