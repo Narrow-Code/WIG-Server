@@ -133,12 +133,14 @@ func OwnershipEdit(c *fiber.Ctx) error {
 // OwnershipCreate creates an ownership in the database.
 func OwnershipCreate(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var ownershipCheck models.Ownership
 	var data map[string]string
 	var locationCheck models.Location
 	var item models.Item
 
 	// Parse JSON body
+	utils.UserLog(c, "parsing json body")
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
@@ -148,11 +150,13 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	name := data["name"]
 
 	// Check if fields are empty
+	utils.UserLog(c, "validating fields are not empty")
 	if qr == "" && name == "" {
 		return Error(c, 400, "Missing field qr or name")
 	}
 
 	// Check if QR exists as an ownership
+	utils.UserLog(c, "validating QR is not in use as ownership")
 	result := db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownershipCheck)
 	code, err := recordNotInUse(result)
 	if err != nil {
@@ -160,6 +164,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	}
 
 	// Check if QR exists as location
+	utils.UserLog(c, "validating QR is not in use as location")
 	result = db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&locationCheck)
 	code, err = recordNotInUse(result)
 	if err != nil {
@@ -167,6 +172,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	}
 
 	// Check if custom item is already in use
+	utils.UserLog(c, "validating custom item name is not in use")
 	result = db.DB.Where("custom_item_name = ? AND item_owner = ?", name, user.UserUID).First(&ownershipCheck)
 	code, err = recordNotInUse(result)
 	if err != nil {
@@ -174,6 +180,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	}
 
 	// Create ownership
+	utils.UserLog(c, "creating ownership")
 	ownership, err := createOwnership(user.UserUID, item, qr, name)
 	if err != nil {
 		return Error(c, 400, err.Error())
@@ -182,6 +189,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 	// Preload ownership, add to dto and return
 	preloadOwnership(&ownership)
 	dto := DTO("ownership", ownership)
+	utils.UserLog(c, "success")
 	return success(c, "Ownership was successfully created", dto)
 }
 
