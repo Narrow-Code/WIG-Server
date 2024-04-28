@@ -140,7 +140,7 @@ func ScannerQRLocation(c *fiber.Ctx) error {
 	}
 
 	// Check if location exists in local database
-	utils.UserLog(c, "checking if location exists")
+	utils.UserLog(c, "validating location exists")
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&location)
 	if result.Error == gorm.ErrRecordNotFound {
 		return Error(c, 400, "Item was not found in the database")
@@ -159,16 +159,19 @@ func ScannerQRLocation(c *fiber.Ctx) error {
 // ScannerQROwnership takes a QR code and returns its corresponding ownership
 func ScannerQROwnership(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
 	qr := c.Query("qr")
 
 	// Check if QR is empty
+	utils.UserLog(c, "checking for empty fields")
 	if qr == "" {
 		return Error(c, 400, "QR is empty and required")
 	}
 
 	// Check if item exists in local database
+	utils.UserLog(c, "validating item exists")
 	result := db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownership)
 	if result.Error == gorm.ErrRecordNotFound {
 		return Error(c, 400, "Item was not found in the database")
@@ -180,5 +183,6 @@ func ScannerQROwnership(c *fiber.Ctx) error {
 	// Preload location, add to dto and return
 	preloadOwnership(&ownership)
 	dto := DTO("ownership", ownership)
+	utils.UserLog(c, "success")
 	return success(c, "Ownership returned", dto)
 }
