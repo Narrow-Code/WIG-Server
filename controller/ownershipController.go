@@ -3,6 +3,7 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"WIG-Server/utils"
 	"strconv"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 // OwnershipQuantity changes the quantity of an ownership, using increment, decrement or setter method.
 func OwnershipQuantity(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
 	ownershipUID := c.Query("ownershipUID")
@@ -19,6 +21,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	changeType := c.Params("type")
 
 	// Convert amount to int
+	utils.UserLog(c, "converting " + amountStr + " to an int")
 	amount, err := strconv.Atoi(amountStr)
 	if err != nil {
 		return Error(c, 400, "There was an error converting amount to Int")
@@ -28,33 +31,40 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	}
 
 	// Retreive the ownership
+	utils.UserLog(c, "retrieving the ownership")
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
 	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
 	}
+	utils.UserLog(c, ownership.CustomItemName + " retrieved")
 
 	// Make changes based on changeType
 	switch changeType {
 	case "increment":
 		ownership.ItemQuantity += amount
+		utils.UserLog(c, ownership.CustomItemName + " incremented")
 	case "decrement":
 		if ownership.ItemQuantity != 0 {
 			ownership.ItemQuantity -= amount
 		}
 		if ownership.ItemQuantity < 0 {
 			ownership.ItemQuantity = 0
+			utils.UserLog(c, ownership.CustomItemName + " incremented")
 		}
 	case "set":
 		ownership.ItemQuantity = amount
+		utils.UserLog(c, ownership.CustomItemName + " set")
 	default:
 		return Error(c, 400, "Change type must be increment, decrement or set")
 	}
 
 	// Save new amount to the database, preload, make dto and return
 	db.DB.Save(&ownership)
+	utils.UserLog(c, "ownership saved")
 	preloadOwnership(&ownership)
 	dto := DTO("ownership", ownership)
+	utils.UserLog(c, " success")
 	return success(c, "Item found", dto)
 }
 
