@@ -86,28 +86,34 @@ func ScannerBarcode(c *fiber.Ctx) error {
 // ScannerCheckQR takes a QR code as parameters, and checks whether it is an item, location or an unused QR.
 func ScannerCheckQR(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var location models.Location
 	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
 	qr := c.Query("qr")
 
 	// Check for empty fields
+	utils.UserLog(c, "checking for empty fields")
 	if qr == "" {
 		return Error(c, 400, "QR is empty and required")
 	}
 
 	// Check if qr exists as location
+	utils.UserLog(c, "checking if qr exists as location")
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", qr, user.UserUID).First(&location)
 	emptyUID := [16]byte{}
 	if location.LocationUID != emptyUID {
+		utils.UserLog(c, "returning location")
 		return success(c, "LOCATION")
 	} else if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return Error(c, 400, "internal server error")
 	}
 
 	// Check if qr exists as ownership
+	utils.UserLog(c, "checking if qr exists as ownership")
 	result = db.DB.Where("item_qr = ? AND item_owner = ?", qr, user.UserUID).First(&ownership)
 	if ownership.OwnershipUID != emptyUID {
+		utils.UserLog(c, "returning ownership")
 		return success(c, "OWNERSHIP")
 	}
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
@@ -115,6 +121,7 @@ func ScannerCheckQR(c *fiber.Ctx) error {
 	}
 
 	// Return as unused QR code
+	utils.UserLog(c, "returning new")
 	return success(c, "NEW")
 }
 
