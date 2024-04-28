@@ -3,6 +3,7 @@ package controller
 import (
 	"WIG-Server/db"
 	"WIG-Server/models"
+	"WIG-Server/utils"
 	"log"
 
 	"github.com/google/uuid"
@@ -27,6 +28,7 @@ func createOwnership(uid uuid.UUID, item models.Item, qr string, customName stri
 		item.ItemUid = uuid.MustParse(db.DefaultItemUUID)
 	}
 
+	utils.Log("building ownership for " + customName)
 	// Build ownership
 	ownership := models.Ownership{
 		OwnershipUID: uuid.New(),
@@ -41,12 +43,12 @@ func createOwnership(uid uuid.UUID, item models.Item, qr string, customName stri
 	// Create ownership in database and return
 	result := db.DB.Create(&ownership)
 	if result.Error != nil {
-		log.Printf("controller#createOwnership: Error creating ownership record: %v", result.Error)
+		utils.Log("Error creating ownership record: " + result.Error.Error())
 	}
 	if result.RowsAffected == 0 {
-		log.Printf("controller#CreateOwnership: No rows were affected, creation may not have been successful")
+		utils.Log("No rows were affected, creation may not have been successful")
 	}
-	log.Printf("controller#createOwnership: Ownership record successfully created between user %d and item %d", uid, item.ItemUid)
+	utils.Log("Ownership record successfully created")
 	return ownership, nil
 }
 
@@ -56,6 +58,7 @@ func createOwnership(uid uuid.UUID, item models.Item, qr string, customName stri
 * @param ownership The ownership to preload.
  */
 func preloadOwnership(ownership *models.Ownership) {
+	utils.Log("preloading: " + ownership.CustItemImg)
 	db.DB.Preload("User").Preload("Item").Preload("Borrower").Preload("Location").Find(ownership)
 	preloadLocation(&ownership.Location)
 }
