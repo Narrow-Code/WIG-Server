@@ -96,18 +96,21 @@ func OwnershipDelete(c *fiber.Ctx) error {
 // OwnershipEdit edits the fields of the ownership in the database.
 func OwnershipEdit(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var ownership models.Ownership
 	var data map[string]string
 	user := c.Locals("user").(models.User)
 	ownershipUID := c.Query("ownershipUID")
 
 	// Parse request into data map
+	utils.UserLog(c, "parsing json body")
 	err := c.BodyParser(&data)
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
 
 	// Validate ownership
+	utils.UserLog(c, "validating the ownership")
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
 	code, err := recordExists(result)
 	if err != nil {
@@ -123,6 +126,7 @@ func OwnershipEdit(c *fiber.Ctx) error {
 
 	// Save ownership and return
 	db.DB.Save(&ownership)
+	utils.UserLog(c, "success")
 	return success(c, "Ownership was successfully updated")
 }
 
