@@ -71,11 +71,13 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 // OwnershipDelete deletes an ownership from the database.
 func OwnershipDelete(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
 	ownershipUID := c.Query("ownershipUID")
 
 	// Validate ownership
+	utils.UserLog(c, "validating the ownership")
 	result := db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
 	code, err := recordExists(result)
 	if err != nil {
@@ -87,6 +89,7 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	if result := db.DB.Delete(&ownership); result.Error != nil {
 		return Error(c, 500, "There was an error deleting the ownership")
 	}
+	utils.UserLog(c, "success")
 	return success(c, "Ownership was successfully deleted")
 }
 
