@@ -196,13 +196,15 @@ func OwnershipCreate(c *fiber.Ctx) error {
 // OwnershipSetLocation sets the location of the ownership in the database.
 func OwnershipSetLocation(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")
 	var location models.Location
 	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
 	locationQR := c.Query("location_qr") // TODO fix to be location UID
 	ownershipUID := c.Query("ownershipUID")
 
-	// Validate the QR code
+	// Validate the location
+	utils.UserLog(c, "validating the existance of location")
 	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, user.UserUID).First(&location)
 	code, err := recordExists(result)
 	if err != nil {
@@ -210,6 +212,7 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	}
 
 	// Validate the ownership
+	utils.UserLog(c, "validating the existance of ownership")
 	result = db.DB.Where("ownership_uid = ? AND item_owner = ?", ownershipUID, user.UserUID).First(&ownership)
 	code, err = recordExists(result)
 	if err != nil {
@@ -217,8 +220,10 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	}
 
 	// Set the location, save and return
+	utils.UserLog(c, "setting location")
 	ownership.ItemLocation = location.LocationUID
 	db.DB.Save(&ownership)
+	utils.UserLog(c, "success")
 	return success(c, "Ownership set in "+location.LocationName)
 }
 
