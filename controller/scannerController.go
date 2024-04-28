@@ -4,6 +4,7 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"WIG-Server/upcitemdb"
+	"WIG-Server/utils"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,21 +19,25 @@ import (
  */
 func ScannerBarcode(c *fiber.Ctx) error {
 	// Initialize variables
+	utils.UserLog(c, "began call")	
 	var item models.Item
 	var ownerships []models.Ownership
 	user := c.Locals("user").(models.User)
 	barcode := c.Query("barcode")
 
 	// Check if barcode is empty and convert to int
+	utils.UserLog(c, "checking for empty fields")
 	if barcode == "" {
 		return Error(c, 400, "Barcode is empty and required")
 	}
+	utils.UserLog(c, "converting barcode to int")
 	barcodeCheck, err := strconv.Atoi(barcode)
 	if err != nil || barcodeCheck < 0 {
 		return Error(c, 400, "There was an error converting barcode to an Int")
 	}
 
 	// Check if item exists
+	utils.UserLog(c, "checking if item exists")
 	result := db.DB.Where("barcode = ?", barcode).First(&item)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return Error(c, 400, "internal server error")
@@ -41,12 +46,14 @@ func ScannerBarcode(c *fiber.Ctx) error {
 	// If item doesn't exist call upcitemdb and add to database
 	if result.Error == gorm.ErrRecordNotFound {
 		// Check if API limit has been reached
+		utils.UserLog(c, "call upcitemdb")
 		code := upcitemdb.GetBarcode(barcode)
 		if code == 429 {
 			return Error(c, code, "API limit reached")
 		}
 
 		// Check if item was added to database
+		utils.UserLog(c, "checking if item was added to database")
 		result = db.DB.Where("barcode = ?", barcode).First(&item)
 		if result.Error == gorm.ErrRecordNotFound {
 			return Error(c, 404, "Item was not found in the database")
@@ -54,10 +61,12 @@ func ScannerBarcode(c *fiber.Ctx) error {
 	}
 
 	// Search Ownership by uid
+	utils.UserLog(c, "checking for existing ownership")
 	db.DB.Where("item_number = ? AND item_owner = ?", item.ItemUid, user.UserUID).Find(&ownerships)
 
 	// If no ownership exists, create ownership
 	if len(ownerships) == 0 {
+		utils.UserLog(c, "creating ownership")
 		ownership, err := createOwnership(user.UserUID, item, "", "")
 		if err != nil {
 			return Error(c, 400, err.Error())
@@ -70,6 +79,7 @@ func ScannerBarcode(c *fiber.Ctx) error {
 		preloadOwnership(&ownerships[i])
 	}
 	dto := DTO("ownership", ownerships)
+	utils.UserLog(c, "success")
 	return success(c, "Item found", dto)
 }
 
