@@ -4,7 +4,6 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"WIG-Server/utils"
-	"log"
 
 	"github.com/google/uuid"
 )
