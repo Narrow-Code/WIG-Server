@@ -20,6 +20,10 @@ func preloadLocation(location *models.Location) {
 
 	// Recursively preload the parent's hierarchy
 	if location.Location.LocationUID != uuid.MustParse(db.DefaultLocationUUID) {
+		utils.Log("Locations UUID:")
+		utils.Log(location.Location.LocationUID.String())
+		utils.Log("DEFAULTS:")
+		utils.Log(db.DefaultLocationUUID)
 		preloadLocation(location.Location)
 	}
 }
