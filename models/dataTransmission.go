@@ -20,5 +20,5 @@ type InventoryDTO struct {
 }
 
 type BorrowerRequest struct {
-	Ownerships []int `json:"ownerships"` 
+	Ownerships []string `json:"ownerships"` 
 }
