@@ -35,11 +35,11 @@ func createBorrower(borrowerName string, user models.User) models.Borrower {
 * @param borrowerUUID the UUID of the Borrower who the Ownerships are being checked out to
 * @return []string list of successfully checked out Ownership UID's
  */
-func checkout(ownerships []string, borrowerUUID uuid.UUID) []string {
+func checkout(ownerships []int, borrowerUUID uuid.UUID) []int {
 	utils.Log("began call")
-	var successfulOwnerships []string
+	var successfulOwnerships []int
 	for _, ownership := range ownerships {
-		utils.Log("checking out " + ownership)
+		utils.Log(fmt.Sprintf("checking out %d", ownership))
 		var item models.Ownership
 		result := db.DB.Where("ownership_uid = ?", ownership).First(&item)
 
