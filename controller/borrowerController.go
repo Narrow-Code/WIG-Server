@@ -43,7 +43,7 @@ func BorrowerCheckout(c *fiber.Ctx) error {
 	// Initialize variables
 	utils.UserLog(c, "began call")
 	var borrower models.Borrower
-	var ownerships []string
+	var ownerships models.BorrowerRequest
 	borrowerUID := c.Query("borrowerUID")
 
 	// Check if borrowerUID is of correct UUID format
@@ -70,7 +70,7 @@ func BorrowerCheckout(c *fiber.Ctx) error {
 
 	// Checkout items in list
 	utils.UserLog(c, "checking out items in list")
-	successfulOwnerships := checkout(ownerships, borrowerUUID)
+	successfulOwnerships := checkout(ownerships.Ownerships, borrowerUUID)
 
 	// Check if ownerships were successful
 	utils.UserLog(c, "checking for successful ownerships")
