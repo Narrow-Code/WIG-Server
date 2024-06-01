@@ -88,7 +88,7 @@ func BorrowerCheckout(c *fiber.Ctx) error {
 func BorrowerCheckin(c *fiber.Ctx) error {
 	// Initialize variables
 	utils.UserLog(c, "began call")
-	var ownerships []string
+	var ownerships models.BorrowerRequest
 
 	// Parse json body
 	utils.UserLog(c, "parsing json body")
@@ -99,7 +99,7 @@ func BorrowerCheckin(c *fiber.Ctx) error {
 
 	// Checkin items in list
 	utils.UserLog(c, "checking in items in list")
-	successfulOwnerships := checkin(ownerships)
+	successfulOwnerships := checkin(ownerships.Ownerships)
 
 	// Check if ownerships were successful
 	utils.UserLog(c, "checking if ownerships were successful")
