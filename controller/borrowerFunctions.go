@@ -4,6 +4,7 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"WIG-Server/utils"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -62,11 +63,11 @@ func checkout(ownerships []string, borrowerUUID uuid.UUID) []string {
 * @param ownerships the list of Ownership UID's in which to return to original location
 * @return []string list of successfully checked in Ownership UID's
  */
-func checkin(ownerships []string) []string {
+func checkin(ownerships []int) []int {
 	utils.Log("began call")
-	var successfulOwnerships []string
+	var successfulOwnerships []int
 	for _, ownership := range ownerships {
-		utils.Log("checking out " + ownership)
+		utils.Log(fmt.Sprintf("checking out %d", ownership))
 		var item models.Ownership
 		result := db.DB.Where("ownership_uid = ?", ownership).First(&item)
 
