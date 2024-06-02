@@ -37,7 +37,7 @@ type Ownership struct {
 	ItemQuantity int `json:"itemQuantity" gorm:"column:item_quantity;default:1"`
 	
 	// ItemCheckedOut is a boolean expression detailing if the item is checked out or borrowed
-	ItemCheckedOut string `json:"itemCheckedOut" gorm:"column:item_checked_out"`
+	ItemCheckedOut string `json:"itemCheckedOut" gorm:"column:item_checked_out;default:'false'"`
 	
 	// ItemBorrower is the UUID of the borrower who the ownership is checked out to
 	ItemBorrower uuid.UUID `json:"itemBorrower" gorm:"column:item_borrower;type:varchar(191)"`
