@@ -92,7 +92,7 @@ func LocationSetParent(c *fiber.Ctx) error {
 	}
 
 	// Set the location parent and save
-	location.Parent = setLocation.Location.LocationUID
+	location.Parent = setLocation.LocationUID
 	db.DB.Save(&location)
 	utils.UserLog(c, location.LocationName + " is set in " + setLocation.LocationName)
 
