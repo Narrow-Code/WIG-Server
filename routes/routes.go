@@ -19,7 +19,7 @@ func Setup(app *fiber.App) {
 	app.Post("/user/signup", controller.UserSignup)
 	app.Get("/user/salt", controller.UserSalt)
 	app.Post("/user/login", controller.UserLogin)
-	app.Post("/app/validate", controller.UserValidate)
+	app.Get("/app/validate", controller.UserValidate)
 
 	// Scanner Routes
 	app.Post("/app/scan/barcode", controller.ScannerBarcode)
