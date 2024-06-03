@@ -17,7 +17,7 @@ func Setup(app *fiber.App) {
 
 	// User Routes
 	app.Post("/user/signup", controller.UserSignup)
-	app.Get("/user/salt", controller.UserSalt)
+	app.Get("/user/:username/salt", controller.UserSalt)
 	app.Post("/user/login", controller.UserLogin)
 	app.Get("/app/validate", controller.UserValidate)
 
