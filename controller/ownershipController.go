@@ -220,13 +220,26 @@ func OwnershipSetLocation(c *fiber.Ctx) error {
 	utils.UserLog(c, "began call")
 	var location models.Location
 	var ownership models.Ownership
+	var data map[string]string
 	user := c.Locals("user").(models.User)
-	locationQR := c.Query("location_qr") // TODO fix to be location UID
-	ownershipUID := c.Query("ownershipUID")
+	ownershipUID := c.Params("ownershipUID")
+
+	// Parse JSON body
+	utils.UserLog(c, "parsing json body")
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+
+	// Prase locationUID to UUID format
+	locationUID, err := uuid.Parse(data["locationUID"])
+	if err != nil {
+		Error(c, 400, "Borrower UUID not correct format")
+	}
 
 	// Validate the location
 	utils.UserLog(c, "validating the existance of location")
-	result := db.DB.Where("location_qr = ? AND location_owner = ?", locationQR, user.UserUID).First(&location)
+	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
 	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
