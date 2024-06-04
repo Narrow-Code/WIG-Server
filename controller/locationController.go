@@ -16,9 +16,17 @@ func LocationCreate(c *fiber.Ctx) error {
 	utils.UserLog(c, "began call")
 	var location models.Location
 	var ownershipCheck models.Ownership
+	var data map[string]string
 	user := c.Locals("user").(models.User)
-	locationQR := c.Query("location_qr")
-	locationName := c.Query("location_name")
+
+	// Parse JSON body
+	utils.UserLog(c, "parsing json body")
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+	locationQR := data["locationQR"]
+	locationName := data["locationName"]
 	log.Printf("controller#LocationCreate: User %d called LocationCreate", user.UserUID)
 
 	// Check for empty fields
@@ -65,10 +73,18 @@ func LocationSetParent(c *fiber.Ctx) error {
 	utils.UserLog(c, "began call")
 	var location models.Location
 	var setLocation models.Location
+	var data map[string]string
 	user := c.Locals("user").(models.User)
-	locationUID := c.Query("location_uid")
-	setLocationUID := c.Query("set_location_uid")
-
+	locationUID := c.Params("locationUID")
+	
+	// Parse JSON body
+	utils.UserLog(c, "parsing json body")
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+	setLocationUID := data["parentUID"]
+	
 	// Verify locations are not the same
 	utils.UserLog(c, "checking that both locations are not the same")
 	if locationUID == setLocationUID {
@@ -107,7 +123,6 @@ func LocationEdit(c *fiber.Ctx) error {
 	var data map[string]string
 	var location models.Location
 	user := c.Locals("user").(models.User)
-	locationUID := c.Query("locationUID")
 
 	// Parse request into data map
 	utils.UserLog(c, "parsing json body")
@@ -115,6 +130,7 @@ func LocationEdit(c *fiber.Ctx) error {
 	if err != nil {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
+	locationUID := data["locationUID"]
 
 	// Validate location exists
 	utils.UserLog(c, "validating location exists")
@@ -143,8 +159,8 @@ func LocationUnpack(c *fiber.Ctx) error {
 	utils.UserLog(c, "began call")
 	var location models.Location
 	user := c.Locals("user").(models.User)
-	locationUID := c.Query("locationUID")
-
+	locationUID := c.Params("locationUID")
+	
 	// Validate location exists
 	utils.UserLog(c, "validating location exists")
 	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
