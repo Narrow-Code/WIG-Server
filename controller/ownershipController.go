@@ -17,7 +17,7 @@ func OwnershipQuantity(c *fiber.Ctx) error {
 	utils.UserLog(c, "began call")
 	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
-	ownershipUID := c.Query("ownershipUID")
+	ownershipUID := c.Params("ownershipUID")
 	amountStr := c.Query("amount")
 	changeType := c.Params("type")
 
@@ -74,8 +74,22 @@ func OwnershipDelete(c *fiber.Ctx) error {
 	// Initialize variables
 	utils.UserLog(c, "began call")
 	var ownership models.Ownership
+	var data map[string]string
 	user := c.Locals("user").(models.User)
-	ownershipUID := c.Query("ownershipUID")
+	
+	// Parse request into data map
+	utils.UserLog(c, "parsing json body")
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+
+	// Parse UID from json body
+	ownershipUIDstring := data["ownershipUID"]
+	ownershipUID, err := uuid.Parse(ownershipUIDstring)
+	if err != nil {
+		Error(c, 400, "Borrower UUID not correct format")
+	}
 
 	// Validate ownership
 	utils.UserLog(c, "validating the ownership")
