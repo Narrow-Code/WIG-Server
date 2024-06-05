@@ -14,8 +14,17 @@ func BorrowerCreate(c *fiber.Ctx) error {
 	// Initialize variables
 	utils.UserLog(c, "began call")
 	var borrower models.Borrower
+	var data map[string]string
 	user := c.Locals("user").(models.User)
-	borrowerName := c.Query("borrower")
+
+	// Parse JSON body
+	utils.UserLog(c, "parsing json body")
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+	borrowerName := data["borrowerName"]
+
 
 	// Check for empty fields
 	utils.UserLog(c, "checking for empty fields")

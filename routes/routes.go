@@ -31,7 +31,7 @@ func Setup(app *fiber.App) {
 	app.Post("/app/ownership", controller.OwnershipCreate)
 	app.Put("/app/ownership", controller.OwnershipEdit)
 	app.Delete("/app/ownership", controller.OwnershipDelete)
-	app.Put("/app/ownership/:ownershipUID/quantity/:type", controller.OwnershipQuantity)
+	app.Put("/app/ownership/:ownershipUID/quantity/:type", controller.OwnershipQuantity) // TODO fix
 	app.Put("/app/ownership/:ownershipUID/set-parent", controller.OwnershipSetLocation)
 	app.Post("/app/ownership/search", controller.OwnershipSearch)
 
@@ -43,7 +43,7 @@ func Setup(app *fiber.App) {
 	app.Post("/app/location/search", controller.LocationSearch)
 
 	// Borrower Routes
-	app.Post("/app/borrower/create", controller.BorrowerCreate)
+	app.Post("/app/borrower", controller.BorrowerCreate)
 	app.Post("/app/borrower/checkout", controller.BorrowerCheckout)
 	app.Post("/app/borrower/checkin", controller.BorrowerCheckin)
 	app.Get("/app/borrower/get", controller.BorrowerGetAll)
