@@ -23,7 +23,7 @@ func ScannerBarcode(c *fiber.Ctx) error {
 	var item models.Item
 	var ownerships []models.Ownership
 	user := c.Locals("user").(models.User)
-	barcode := c.Query("barcode")
+	barcode := c.Params("barcode")
 
 	// Check if barcode is empty and convert to int
 	utils.UserLog(c, "checking for empty fields")
