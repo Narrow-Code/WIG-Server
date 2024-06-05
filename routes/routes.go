@@ -23,9 +23,9 @@ func Setup(app *fiber.App) {
 
 	// Scanner Routes
 	app.Post("/app/scan/:barcode", controller.ScannerBarcode)
-	app.Get("/app/scan/:qr/check", controller.ScannerCheckQR)
-	app.Get("/app/scan/:qr/location", controller.ScannerQRLocation)
-	app.Get("/app/scan/:qr/ownership", controller.ScannerQROwnership)
+	app.Get("/app/scan/check", controller.ScannerCheckQR)
+	app.Get("/app/scan/location", controller.ScannerQRLocation)
+	app.Get("/app/scan/ownership", controller.ScannerQROwnership)
 
 	// Ownership Routes
 	app.Post("/app/ownership", controller.OwnershipCreate)

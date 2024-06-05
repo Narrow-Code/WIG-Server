@@ -90,7 +90,7 @@ func ScannerCheckQR(c *fiber.Ctx) error {
 	var location models.Location
 	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
-	qr := c.Params("qr")
+	qr := c.Query("qr")
 
 	// Check for empty fields
 	utils.UserLog(c, "checking for empty fields")
@@ -131,7 +131,7 @@ func ScannerQRLocation(c *fiber.Ctx) error {
 	utils.UserLog(c, "began call")
 	var location models.Location
 	user := c.Locals("user").(models.User)
-	qr := c.Params("qr")
+	qr := c.Query("qr")
 
 	// Check if QR is empty
 	utils.UserLog(c, "checking for empty fields")
@@ -161,7 +161,7 @@ func ScannerQROwnership(c *fiber.Ctx) error {
 	// Initialize variables
 	var ownership models.Ownership
 	user := c.Locals("user").(models.User)
-	qr := c.Params("qr")
+	qr := c.Query("qr")
 
 	// Check if QR is empty
 	if qr == "" {
