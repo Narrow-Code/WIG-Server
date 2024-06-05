@@ -44,10 +44,10 @@ func Setup(app *fiber.App) {
 
 	// Borrower Routes
 	app.Post("/app/borrower", controller.BorrowerCreate)
-	app.Post("/app/borrower/checkout", controller.BorrowerCheckout)
-	app.Post("/app/borrower/checkin", controller.BorrowerCheckin)
+	app.Post("/app/borrower/:borrowerUID/checkout", controller.BorrowerCheckout)
+	app.Post("/app/borrower/check-in", controller.BorrowerCheckin)
 	app.Get("/app/borrower", controller.BorrowerGetAll)
-	app.Get("/app/borrower/getcheckedout", controller.BorrowerGetInventory)
+	app.Get("/app/borrower/checkedout", controller.BorrowerGetInventory)
 
 	app.Get("/app/inventory", controller.LocationGetInventory)
 }

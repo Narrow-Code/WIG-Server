@@ -53,7 +53,7 @@ func BorrowerCheckout(c *fiber.Ctx) error {
 	utils.UserLog(c, "began call")
 	var borrower models.Borrower
 	var ownerships models.BorrowerRequest
-	borrowerUID := c.Query("borrowerUID")
+	borrowerUID := c.Params("borrowerUID")
 
 	// Check if borrowerUID is of correct UUID format
 	utils.UserLog(c, "validating UUID format")
