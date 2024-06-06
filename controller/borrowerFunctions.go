@@ -93,10 +93,10 @@ func checkin(ownerships []string) []string {
  */
 func getBorrowerInventory(borrowers []models.Borrower) []models.BorrowerInventory {
 	utils.Log("began call")
-	var ownerships []models.Ownership
 	var inventory []models.BorrowerInventory
 
 	for b := range borrowers {
+		var ownerships []models.Ownership
 		utils.Log("query inventory for borrower " + borrowers[b].BorrowerName)
 		query := db.DB.Where("item_borrower = ?", borrowers[b].BorrowerUID)
 
