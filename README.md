@@ -16,9 +16,9 @@
 
 ## Introduction <a name="introduction"></a>
 
-- WIG is a self-hosted inventory management service to remember "What I Got".
-- It is built for the everyday person in need of organization.
-- The WIG-Server is the backend database manager that handles all functionality behind the application.
+WIG is a self-hosted inventory management service to remember "What I Got".<br>
+It is built for the everyday person in need of organization.<br>
+WIG-Server is the backend database manager that handles all functionality behind the application.
 
 ## Getting Started <a name="getting-started"></a>
 The WIG-Server is only needed if the plan is to Self-Host.
