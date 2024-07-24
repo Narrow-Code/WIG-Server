@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 // LocationCreate creates a location using a QR code, a location name and the type of location.
@@ -243,5 +244,52 @@ func LocationGetInventory(c *fiber.Ctx) error {
 
 // Deletes a Location and returns all Ownerships to default locations
 func LocationDelete(c *fiber.Ctx) error {
-	return success(c, "Place holder")
+	// Initialize variables
+	utils.UserLog(c, "began call")
+	var location models.Location
+	var ownerships []models.Ownership
+	var locations []models.Location
+	var data map[string]string
+	user := c.Locals("user").(models.User)
+
+	// Parse request into data map
+	utils.UserLog(c, "parsing json body")
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+	locationUID := data["locationUID"]
+
+	// Get default location and ownerships
+	utils.UserLog(c, "rerieving location")
+	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
+	code, err := recordExists(result)
+	if err != nil {
+		return Error(c, code, err.Error())
+	}
+
+	// Return ownerships to Default location
+	utils.UserLog(c, "Returning Ownerships to Default location")
+	db.DB.Where("item_owner = ? AND item_location = ?", user.UserUID, locationUID).Find(&ownerships)
+	for ownership := range ownerships {
+		ownerships[ownership].ItemLocation = uuid.MustParse(db.DefaultLocationUUID)
+	}
+	db.DB.Save(&ownerships)
+
+	// Return locations to Default location
+	utils.UserLog(c, "Retruning locations to Default location")
+	db.DB.Where("location_owner = ? AND location_parent = ?", user.UserUID, locationUID).Find(&locations)
+	for location := range locations {
+		locations[location].Parent = uuid.MustParse(db.DefaultLocationUUID)
+	}
+	db.DB.Save(&locations)
+
+	utils.UserLog(c, "Deleting Location")
+	db.DB.Delete(&location)
+	if result := db.DB.Delete(&location); result.Error != nil {
+		return Error(c, 500, "There was an error deleting the Location")
+	}
+	utils.UserLog(c, "success")
+
+	return success(c, "Location deleted successfully")
 }
