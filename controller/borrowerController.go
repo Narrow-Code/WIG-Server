@@ -168,5 +168,45 @@ func BorrowerGetInventory(c *fiber.Ctx) error {
 
 // BorrowerDelete deletes a borrower from the database and returns all Ownerships associated to them
 func BorrowerDelete(c *fiber.Ctx) error {
-	return success(c, "Placeholder")
+	// Initialize variables
+	utils.UserLog(c, "began call")
+	var borrower models.Borrower
+	var ownerships []models.Ownership
+	var data map[string]string
+	user := c.Locals("user").(models.User)
+
+	// Parse request into data map
+	utils.UserLog(c, "parsing json body")
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+	borrowerUID := data["borrowerUID"]
+
+	// Get borrower
+	utils.UserLog(c, "rerieving borrower")
+	result := db.DB.Where("borrower_uid = ? AND borrower_owner = ?", borrowerUID, user.UserUID).First(&borrower)
+	code, err := recordExists(result)
+	if err != nil {
+		return Error(c, code, err.Error())
+	}
+
+	// Return ownerships to Default Borrower and checked in
+	utils.UserLog(c, "Returning Ownerships to Default borrower")
+	db.DB.Where("item_owner = ? AND item_borrower = ?", user.UserUID, borrower.BorrowerUID).Find(&ownerships)
+	for ownership := range ownerships {
+		ownerships[ownership].ItemBorrower = uuid.MustParse(db.DefaultBorrowerUUID)
+		ownerships[ownership].ItemCheckedOut = "false"
+	}
+	db.DB.Save(&ownerships)
+
+
+	utils.UserLog(c, "Deleting Borrower")
+	db.DB.Delete(&borrower)
+	if result := db.DB.Delete(&borrower); result.Error != nil {
+		return Error(c, 500, "There was an error deleting the Borrower")
+	}
+	utils.UserLog(c, "success")
+
+	return success(c, "Borrower deleted successfully")
 }
