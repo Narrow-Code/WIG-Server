@@ -165,3 +165,8 @@ func BorrowerGetInventory(c *fiber.Ctx) error {
 	utils.UserLog(c, "success")
 	return success(c, "Checked Out Items returned", dto)
 }
+
+// BorrowerDelete deletes a borrower from the database and returns all Ownerships associated to them
+func BorrowerDelete(c *fiber.Ctx) error {
+	return success(c, "Placeholder")
+}

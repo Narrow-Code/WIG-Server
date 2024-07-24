@@ -46,6 +46,7 @@ func Setup(app *fiber.App) {
 	// Borrower Routes
 	app.Post("/app/borrower", controller.BorrowerCreate)
 	app.Get("/app/borrower", controller.BorrowerGetAll)
+	app.Delete("/app/borrower", controller.BorrowerDelete)
 	app.Post("/app/borrower/:borrowerUID/checkout", controller.BorrowerCheckout)
 	app.Post("/app/borrower/check-in", controller.BorrowerCheckin)
 	app.Get("/app/borrower/checked-out", controller.BorrowerGetInventory)
