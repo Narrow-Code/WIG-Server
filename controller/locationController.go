@@ -240,3 +240,8 @@ func LocationGetInventory(c *fiber.Ctx) error {
 	utils.UserLog(c, "success")
 	return success(c, "Inventory returned", dto)
 }
+
+// Deletes a Location and returns all Ownerships to default locations
+func LocationDelete(c *fiber.Ctx) error {
+	return success(c, "Place holder")
+}
