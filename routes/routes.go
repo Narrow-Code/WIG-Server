@@ -38,6 +38,7 @@ func Setup(app *fiber.App) {
 	// Location Routes
 	app.Post("/app/location", controller.LocationCreate)
 	app.Put("/app/location", controller.LocationEdit)
+	app.Delete("/app/location", controller.LocationDelete)
 	app.Put("/app/location/:locationUID/set-parent", controller.LocationSetParent)
 	app.Get("/app/location/:locationUID", controller.LocationUnpack)
 	app.Post("/app/location/search", controller.LocationSearch)
