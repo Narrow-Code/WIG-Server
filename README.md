@@ -65,7 +65,7 @@ The location controller API calls interact with the Location table.
 
 | URI | Supported Methods | Description |
 |-----|-------------------|-------------|
-| app/location | POST, PUT | POST = Create new Location<br> PUT = Edit location fields |
+| app/location | POST, PUT, DELETE | POST = Create new Location<br>PUT = Edit location fields<br>DELETE = Delete location |
 | app/location/{locationUID}/set-parent | PUT | Edits the parent location of the location | 
 | app/location/{locationUID} | GET | Returns all Ownerships associated with the Location in the URI |
 | app/location/search | POST | Searches inventory and returns matches for specified Location |
