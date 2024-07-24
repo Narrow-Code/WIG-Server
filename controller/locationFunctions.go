@@ -43,7 +43,7 @@ func unpackLocation(location models.Location, user models.User) ([]models.Owners
 	var locations []models.Location
 
 	// Search all locations and ownerships from location
-	db.DB.Where("item_location = ? AND item_owner = ?", location.LocationUID, user.UserUID).Find(&ownerships)	
+	db.DB.Where("item_location = ? AND item_owner = ? AND item_checked_out = ?", location.LocationUID, user.UserUID, "false").Find(&ownerships)	
 	db.DB.Where("location_parent = ? AND location_owner = ?", location.LocationUID, user.UserUID).Find(&locations)
 
 	// Preload ownerships and locations, then return

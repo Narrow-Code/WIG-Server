@@ -164,7 +164,7 @@ func LocationUnpack(c *fiber.Ctx) error {
 	
 	// Validate location exists
 	utils.UserLog(c, "validating location exists")
-	result := db.DB.Where("location_uid = ? AND location_owner = ? AND item_checked_out = ? ", locationUID, user.UserUID, "false").First(&location)
+	result := db.DB.Where("location_uid = ? AND location_owner = ?", locationUID, user.UserUID).First(&location)
 	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, err.Error())
