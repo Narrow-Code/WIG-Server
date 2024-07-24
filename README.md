@@ -55,7 +55,7 @@ The borrower controller API calls interact with the Borrower table.
 
 | URI | Supported Methods | Description |
 |-----|-------------------|-------------|
-| app/borrower | POST, GET | POST = Create new Borrower<br>GET = Get all Borrowers |
+| app/borrower | POST, GET, DELETE | POST = Create new Borrower<br>GET = Get all Borrowers<br>DELETE = Delete borrower |
 | app/borrower/{borrowerUID}/checkout | PUT | Checks out all included Ownerships from the body to the Borrower in the URI |
 | app/borrower/check-in | POST | Checks in all included Ownerships from the body |
 | app/borrower/checked-out | GET | Returns all checked-out Ownerships and their coorosponding Borrowers|
