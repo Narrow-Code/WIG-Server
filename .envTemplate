@@ -10,11 +10,3 @@ SELF_HOSTED = "false"
 
 # DO NOT CHANGE
 APP_SECRET = "what-i-got"
-
-# DO NOT INCLUDE IN SELF HOST
-EMAIL = "no-reply@narrowcode.org"
-EMAIL_PASS = "Mission2"
-EMAIL_HOST = "mail.privateemail.com"
-EMAIL_PORT = "587"
-~
-
