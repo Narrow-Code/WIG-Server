@@ -1,0 +1,20 @@
+MYSQL_DBNAME = wig
+MYSQL_USER = wig
+MYSQL_PASSWORD = wigsecret
+MYSQL_HOST = "localhost:3306"
+
+TOKEN_SECRET = "secretwig"
+PORT = "30001"
+
+SELF_HOSTED = "false"
+
+# DO NOT CHANGE
+APP_SECRET = "what-i-got"
+
+# DO NOT INCLUDE IN SELF HOST
+EMAIL = "no-reply@narrowcode.org"
+EMAIL_PASS = "Mission2"
+EMAIL_HOST = "mail.privateemail.com"
+EMAIL_PORT = "587"
+~
+
