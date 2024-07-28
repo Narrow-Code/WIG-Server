@@ -236,5 +236,4 @@ func ResetPassword(c *fiber.Ctx) error {
 	utils.SendResetPasswordEmail(email, user.Username)
 
 	return success(c, "Reset password email was resent")
-
 }
