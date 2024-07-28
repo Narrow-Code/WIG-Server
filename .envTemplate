@@ -1,3 +1,5 @@
+# Any changes made must be made coorosponding in docker-compose.yml
+
 MYSQL_DBNAME = wig
 MYSQL_USER = wig
 MYSQL_PASSWORD = wigsecret
@@ -10,11 +12,4 @@ SELF_HOSTED = "false"
 
 # DO NOT CHANGE
 APP_SECRET = "what-i-got"
-
-# DO NOT INCLUDE IN SELF HOST
-EMAIL = "no-reply@narrowcode.org"
-EMAIL_PASS = "Mission2"
-EMAIL_HOST = "mail.privateemail.com"
-EMAIL_PORT = "587"
-~
 
