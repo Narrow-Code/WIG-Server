@@ -12,4 +12,3 @@ SELF_HOSTED = "false"
 
 # DO NOT CHANGE
 APP_SECRET = "what-i-got"
-
