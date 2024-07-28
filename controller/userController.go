@@ -171,11 +171,41 @@ func UserSignup(c *fiber.Ctx) error {
 	// Create user and return
 	user = createUser(data)
 	utils.Log("registration for " + user.Username + " was successful")
-	return success(c, "Signup was successful")
+	return success(c, "Signup was successful. Slef Hosted: " + hosted)
 }
 
 // Ping performs a health check
 func Ping(c *fiber.Ctx) error {
 	utils.Log("health check performed")
 	return success(c, "Ping was successful")
+}
+
+// ResendVerificationEmail will cancel the old verification email and resend it
+func ResendVerificationEmail(c *fiber.Ctx) error {
+	utils.Log("call began")
+	var data map[string]string
+	var user models.User
+	
+	// Parse JSON body
+	utils.Log("parsing json body")
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+	email := data["email"]
+
+	// Check that user exists
+	utils.Log("query username")
+	result := db.DB.Where("email = ?", email).First(&user)
+	code, err := recordExists(result)
+	if err != nil {
+		return Error(c, code, "Username " + err.Error())
+	}
+
+	// TODO cancel live verification email
+
+	// Resend verification email
+	utils.SendVerificationEmail(email, user.Username)
+
+	return success(c, "Verification email was resent")
 }
