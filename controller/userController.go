@@ -5,6 +5,7 @@ import (
 	"WIG-Server/models"
 	"WIG-Server/utils"
 	"net"
+	"os"
 	"regexp"
 	"strings"
 
@@ -161,7 +162,12 @@ func UserSignup(c *fiber.Ctx) error {
 		return Error(c, 400, "Email domain does not exist")
 	}
 
-	// TODO send verification email
+	// send verification email
+        hosted := os.Getenv("SELF_HOSTED")
+  
+        if hosted == "false" {
+                utils.SendVerificationEmail(data["email"], data["username"])
+        }
 
 	// Create user and return
 	user = createUser(data)
