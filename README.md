@@ -52,7 +52,6 @@ The user controller API calls interact with the User table.
 | user/{username}/salt | GET | Returns the Users salt |
 | user/login | POST | Logs the user into the application creating a token |
 | user/validate | GET | Validates that the Users token is still active |
-| user/verification | POST | Resends the user a verification email |
 
 ### Borrower Controller <a name="borrower-controller"></a>
 The borrower controller API calls interact with the Borrower table.
