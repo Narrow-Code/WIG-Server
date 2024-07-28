@@ -29,6 +29,9 @@ To run the WIG-Server, Docker is required as all components are containerized. P
 
 ### Initial Setup <a name="initial-setup"></a>
 - To setup the WIG-Server clone the repository to the desired directory in your server.
+- In the wIG-Server directory, rename .envTemplate to .env
+- Make any personal changes to .env
+- Any changes made to .env must be changed in docker-compose.yml
 - From the WIG-Server directory, run the following command:
 
 ```bash
