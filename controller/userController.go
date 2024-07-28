@@ -164,7 +164,6 @@ func UserSignup(c *fiber.Ctx) error {
 
 	// send verification email
         hosted := os.Getenv("SELF_HOSTED")
- 	utils.Log("SELF_HOSTED = " + hosted)
         if hosted == "false" {
 		utils.SendVerificationEmail(data["email"], data["username"])
         }
