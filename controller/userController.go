@@ -209,3 +209,32 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 
 	return success(c, "Verification email was resent")
 }
+
+// ResetPassword will send a Reset Password email to the user
+func ResetPassword(c *fiber.Ctx) error {
+	utils.Log("call began")
+	var data map[string]string
+	var user models.User
+	
+	// Parse JSON body
+	utils.Log("parsing json body")
+	err := c.BodyParser(&data)
+	if err != nil {
+		return Error(c, 400, "There was an error parsing JSON")
+	}
+	email := data["email"]
+
+	// Check that user exists
+	utils.Log("query username")
+	result := db.DB.Where("email = ?", email).First(&user)
+	code, err := recordExists(result)
+	if err != nil {
+		return Error(c, code, "Username " + err.Error())
+	}
+
+	// Resend verification email
+	utils.SendResetPasswordEmail(email, user.Username)
+
+	return success(c, "Reset password email was resent")
+
+}
