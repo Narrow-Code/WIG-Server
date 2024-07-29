@@ -202,8 +202,6 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 		return Error(c, code, "Username " + err.Error())
 	}
 
-	// TODO cancel live verification email
-
 	// Resend verification email
 	utils.SendVerificationEmail(email, user.Username)
 
