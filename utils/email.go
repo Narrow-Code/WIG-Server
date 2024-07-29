@@ -1,12 +1,13 @@
 package utils
-                                
+
 import (
-    "fmt"
-    "net/smtp"
-    "os"
+	"WIG-Server/models"
+	"fmt"
+	"net/smtp"
+	"os"
 )
 
-func SendVerificationEmail(receiver string, username string) {
+func SendVerificationEmail(user models.User) {
     // TODO generate verification token & link
     verificationLink := "http://narrowcode.org"
 
@@ -18,11 +19,11 @@ func SendVerificationEmail(receiver string, username string) {
     auth := smtp.PlainAuth("", sender, pass, host)
 
     // The message to send.
-    to := []string{receiver}
-    msg := []byte("To: " + receiver + "\r\n" +
+    to := []string{user.Email}
+    msg := []byte("To: " + user.Email + "\r\n" +
         "Subject: WIG Verification\r\n" +
         "\r\n" +
-        "Hello " + username + ",\r\n\r\n" +
+        "Hello " + user.Username + ",\r\n\r\n" +
         "We just need to verify your email address before you can access WIG.\r\n\r\n" +
         "Verify your email address here: " + verificationLink + "\r\n\r\n" +
         "Thanks, \r\n\r\n" +
@@ -38,8 +39,8 @@ func SendVerificationEmail(receiver string, username string) {
     fmt.Println("Email sent successfully!")
 }
 
-func SendResetPasswordEmail(receiver string, username string) {
-    // TODO generate reset password token & link
+func SendResetPasswordEmail(user models.User) {
+    // See if token exists for User`
     resetLink := "http://narrowcode.org"
 
     sender := os.Getenv("EMAIL")
@@ -50,11 +51,11 @@ func SendResetPasswordEmail(receiver string, username string) {
     auth := smtp.PlainAuth("", sender, pass, host)
 
     // The message to send.
-    to := []string{receiver}
-    msg := []byte("To: " + receiver + "\r\n" +
+    to := []string{user.Email}
+    msg := []byte("To: " + user.Email + "\r\n" +
         "Subject: WIG Verification\r\n" +
         "\r\n" +
-        "Hello " + username + ",\r\n\r\n" +
+        "Hello " + user.Username + ",\r\n\r\n" +
         "You have requested to reset your password for our WIG service.\r\n\r\n" +
         "If you would like to reset your password please click the following link: " + resetLink + "\r\n\r\n" +
         "Thanks, \r\n\r\n" +

@@ -161,16 +161,17 @@ func UserSignup(c *fiber.Ctx) error {
 	if err != nil {
 		return Error(c, 400, "Email domain does not exist")
 	}
-
+	
+	// create user
+	user = createUser(data)
+	utils.Log("registration for " + user.Username + " was successful")
+	
 	// send verification email
         hosted := os.Getenv("SELF_HOSTED")
         if hosted == "false" {
-		utils.SendVerificationEmail(data["email"], data["username"])
+		utils.SendVerificationEmail(user)
         }
 
-	// Create user and return
-	user = createUser(data)
-	utils.Log("registration for " + user.Username + " was successful")
 	return success(c, "Signup was successful. Slef Hosted: " + hosted)
 }
 
@@ -203,7 +204,7 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 	}
 
 	// Resend verification email
-	utils.SendVerificationEmail(email, user.Username)
+	utils.SendVerificationEmail(user)
 
 	return success(c, "Verification email was resent")
 }
@@ -231,7 +232,7 @@ func ResetPassword(c *fiber.Ctx) error {
 	}
 
 	// Resend verification email
-	utils.SendResetPasswordEmail(email, user.Username)
+	utils.SendResetPasswordEmail(user)
 
 	return success(c, "Reset password email was resent")
 }
