@@ -2,9 +2,12 @@
 package utils
 
 import (
+	"WIG-Server/models"
 	"os"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 )
 
@@ -39,4 +42,16 @@ func GenerateToken(username string, hash string) string {
 
 	Log("success")
 	return tokenStr
+}
+
+/* GenerateVerificationToken generates a randomized UUID and expiration time.
+* 
+* @param user The user in which the token is being generated for.
+* @return string The generated token
+* @return time.Time the time in which the token expires.
+*/
+func GenerateVerificationToken(user models.User) (string, time.Time) {
+	token := uuid.New().String()
+	expiresAt := time.Now().Add(time.Hour)
+	return token, expiresAt
 }
