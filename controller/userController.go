@@ -97,6 +97,12 @@ func UserLogin(c *fiber.Ctx) error {
 		return Error(c, 400, "There was an error generating user token")
 	}
 
+	// Check for email verification
+	utils.Log("checking email verification")
+	if user.EmailConfirm == "false" {
+		return Error(c, 400, "Please verify email")
+	}
+
 	// Save to database, add to dto's and return
 	db.DB.Save(&user)
 	utils.Log("user log in successful")
