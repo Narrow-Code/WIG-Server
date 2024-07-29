@@ -8,9 +8,9 @@ import (
 )
 
 func SendVerificationEmail(user models.User) {
-    // Generate token and add to verification link
-    token, _ := GenerateVerificationToken(user) 
-    verificationLink := "http://ec2-18-209-15-108.compute-1.amazonaws.com:30001/verifications/" + token
+    // Generate token and verification link
+    token, _ := GenerateVerificationToken(user)
+    verificationLink := "http://ec2-18-209-15-108.compute-1.amazonaws.com:30001/verification/" + token
 
     sender := os.Getenv("EMAIL")
     pass := os.Getenv("EMAIL_PASS")

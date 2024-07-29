@@ -14,10 +14,12 @@ import (
 func main() {
 	db.Connect()
 	app := fiber.New()
-	app.Use(middleware.AppAuth())
+	appRoutes := app.Group("/user")
+	appRoutes.Use(middleware.AppAuth())
 	loggedRoutes := app.Group("/app")
 	loggedRoutes.Use(middleware.ValidateToken())
+	loggedRoutes.Use(middleware.AppAuth())
 	routes.Setup(app)
-	app.Listen(":" + db.GetPort()) 
+	app.Listen(":" + db.GetPort())
 }
 

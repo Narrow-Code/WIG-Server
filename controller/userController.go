@@ -9,6 +9,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -236,4 +237,25 @@ func ResetPassword(c *fiber.Ctx) error {
 	verification.SendResetPasswordEmail(user)
 
 	return success(c, "Reset password email was resent")
+}
+
+func VerificationEmail(c *fiber.Ctx) error {
+	uid := c.Params("uid")
+	
+	var emailVerification models.EmailVerification
+	var user models.User
+
+	result := db.DB.Where("verification_token = ?", uid).First(&emailVerification)
+
+	if result.Error != nil || result.RowsAffected == 0 || emailVerification.ExpiresAt.Before(time.Now()) {
+		return c.SendString("The email verification link you followed does not exist or has expired.")
+	}
+
+	db.DB.Where("user_uid = ?", emailVerification.UserID).First(&user)
+
+	user.EmailConfirm = "true"
+
+	db.DB.Save(&user)
+	db.DB.Delete(&emailVerification)
+        return c.SendString(user.Username + " you're email has been verified")
 }

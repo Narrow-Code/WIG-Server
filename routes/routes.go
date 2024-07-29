@@ -14,6 +14,7 @@ import (
  */
 func Setup(app *fiber.App) {
 	app.Get("/ping", controller.Ping)
+	app.Get("/verification/:uid", controller.VerificationEmail)
 
 	// User Routes
 	app.Post("/user/signup", controller.UserSignup)
@@ -54,4 +55,7 @@ func Setup(app *fiber.App) {
 	app.Get("/app/borrower/checked-out", controller.BorrowerGetInventory)
 
 	app.Get("/app/inventory", controller.LocationGetInventory)
+}
+
+func SetupHtml(app *fiber.App) {
 }

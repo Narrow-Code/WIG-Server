@@ -61,7 +61,7 @@ func GenerateVerificationToken(user models.User) (string, time.Time) {
 	expiresAt := time.Now().Add(time.Hour)
 
 	emailVerification = models.EmailVerification{
-		Token: 		token,
+		VerificationToken: 		token,
 		UserID:   	user.UserUID,
 		ExpiresAt: 	expiresAt,
 	}
