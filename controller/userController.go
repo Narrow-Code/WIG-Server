@@ -188,7 +188,7 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 	utils.Log("call began")
 	var data map[string]string
 	var user models.User
-	
+
 	// Parse JSON body
 	utils.Log("parsing json body")
 	err := c.BodyParser(&data)
@@ -203,6 +203,10 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 	code, err := recordExists(result)
 	if err != nil {
 		return Error(c, code, "Username " + err.Error())
+	}
+	
+	if user.EmailConfirm == "true" {
+		return Error(c, 400, "Email already verified")
 	}
 
 	// Resend verification email
