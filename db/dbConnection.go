@@ -76,6 +76,7 @@ func AutoMigrate(connection *gorm.DB) {
 		&models.Borrower{},
 		&models.Location{},
 		&models.Ownership{},
+		&models.EmailVerification{},
 	)
 	
 	ensureDefaultRecords(connection)
