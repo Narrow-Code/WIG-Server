@@ -172,7 +172,7 @@ func UserSignup(c *fiber.Ctx) error {
 		utils.SendVerificationEmail(user)
         }
 
-	return success(c, "Signup was successful. Slef Hosted: " + hosted)
+	return success(c, "Signup was successful. Self Hosted: " + hosted)
 }
 
 // Ping performs a health check

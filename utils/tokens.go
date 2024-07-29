@@ -2,6 +2,7 @@
 package utils
 
 import (
+	"WIG-Server/db"
 	"WIG-Server/models"
 	"os"
 	"time"
@@ -21,7 +22,7 @@ import (
 func GenerateToken(username string, hash string) string {
 	// Load environment variables
 	godotenv.Load()
-	Log("generating toke for " + username)
+	Log("generating token for " + username)
 
 	// Get token secret from environment
 	tokenSecret := []byte(os.Getenv("TOKEN_SECRET"))
@@ -51,7 +52,24 @@ func GenerateToken(username string, hash string) string {
 * @return time.Time the time in which the token expires.
 */
 func GenerateVerificationToken(user models.User) (string, time.Time) {
+	var emailVerification models.EmailVerification
+	result := db.DB.Where("user_id = ?", user.UserUID).First(&emailVerification)
+
+	if result != nil {
+		db.DB.Delete(&emailVerification)
+	}
+
 	token := uuid.New().String()
 	expiresAt := time.Now().Add(time.Hour)
+
+	emailVerification = models.EmailVerification{
+		Token: 		token,
+		UserID:   	user.UserUID,
+		ExpiresAt: 	expiresAt,
+	}
+
+	// Create user and return
+	db.DB.Create(&emailVerification)
+
 	return token, expiresAt
 }
