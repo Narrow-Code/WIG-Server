@@ -4,6 +4,7 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"WIG-Server/utils"
+	"WIG-Server/verification"
 	"net"
 	"os"
 	"regexp"
@@ -90,7 +91,7 @@ func UserLogin(c *fiber.Ctx) error {
 
 	// Generate token
 	utils.Log("generating token for " + user.Username)
-	user.Token = utils.GenerateToken(user.Username, user.Hash)
+	user.Token = verification.GenerateToken(user.Username, user.Hash)
 	if user.Token == "error" {
 		return Error(c, 400, "There was an error generating user token")
 	}
@@ -169,7 +170,7 @@ func UserSignup(c *fiber.Ctx) error {
 	// send verification email
         hosted := os.Getenv("SELF_HOSTED")
         if hosted == "false" {
-		utils.SendVerificationEmail(user)
+		verification.SendVerificationEmail(user)
         }
 
 	return success(c, "Signup was successful. Self Hosted: " + hosted)
@@ -204,7 +205,7 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 	}
 
 	// Resend verification email
-	utils.SendVerificationEmail(user)
+	verification.SendVerificationEmail(user)
 
 	return success(c, "Verification email was resent")
 }
@@ -232,7 +233,7 @@ func ResetPassword(c *fiber.Ctx) error {
 	}
 
 	// Resend verification email
-	utils.SendResetPasswordEmail(user)
+	verification.SendResetPasswordEmail(user)
 
 	return success(c, "Reset password email was resent")
 }

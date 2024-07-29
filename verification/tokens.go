@@ -1,5 +1,5 @@
 // utils provides functions that may be regularly used throughout the WIG-Application.
-package utils
+package verification
 
 import (
 	"WIG-Server/db"
@@ -22,7 +22,6 @@ import (
 func GenerateToken(username string, hash string) string {
 	// Load environment variables
 	godotenv.Load()
-	Log("generating token for " + username)
 
 	// Get token secret from environment
 	tokenSecret := []byte(os.Getenv("TOKEN_SECRET"))
@@ -41,7 +40,6 @@ func GenerateToken(username string, hash string) string {
 		return "error"
 	}
 
-	Log("success")
 	return tokenStr
 }
 

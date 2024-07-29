@@ -1,4 +1,4 @@
-package utils
+package verification
 
 import (
 	"WIG-Server/models"
