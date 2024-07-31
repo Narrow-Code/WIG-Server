@@ -4,7 +4,6 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"WIG-Server/utils"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"net/smtp"

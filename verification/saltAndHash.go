@@ -29,6 +29,8 @@ func GenerateSalt() (string, error) {
 	for _, byteValue := range salt {
 		sb.WriteString(fmt.Sprintf("%02x", byteValue))
 	}
+
+	fmt.Printf("Salt length: %d\n", len(sb.String()))
 	
 	return sb.String(), nil
 }
