@@ -4,6 +4,7 @@ import (
 	"WIG-Server/db"
 	"WIG-Server/models"
 	"WIG-Server/utils"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/smtp"
@@ -131,10 +132,15 @@ func ResetPasswordPage(c *fiber.Ctx) error {
 
 			// Save Salt and Hash
 			user.Hash = hash
-			user.Salt = string(salt)
+			saltString := base64.StdEncoding.EncodeToString(salt)
+			user.Salt = saltString
 
 			// Save User settings and delete token
-			db.DB.Save(&user)
+			if err := db.DB.Save(&user).Error; err != nil {
+            			utils.Log("error saving user: " + err.Error())
+            			return c.Status(fiber.StatusInternalServerError).SendString("Error updating user.")
+        		}
+
 			db.DB.Delete(&passwordChange)
 			utils.Log("user saved")
 

@@ -3,8 +3,9 @@ package verification
 import (
 	"crypto/rand"
 	"crypto/sha512"
-	"crypto/hmac"
 	"encoding/hex"
+
+	"golang.org/x/crypto/pbkdf2"
 )
 
 const (
@@ -31,20 +32,8 @@ func GenerateHash(password string, salt []byte) (string, error) {
 	saltAndSecret := append(salt, []byte(secret)...)
 
 	// Generate PBKDF2 hash
-	hash := pbkdf2(password, saltAndSecret, iterations, keyLength)
+	hash := pbkdf2.Key([]byte(password), saltAndSecret, iterations, keyLength, sha512.New)
 
 	return hex.EncodeToString(hash), nil
 }
 
-// pbkdf2 implements PBKDF2 with HMAC-SHA512
-func pbkdf2(password string, salt []byte, iterations, keyLength int) []byte {
-	key := make([]byte, keyLength)
-	hmac := hmac.New(sha512.New, []byte(password))
-	for i := 0; i < iterations; i++ {
-		hmac.Reset()
-		hmac.Write(salt)
-		hmac.Write(key)
-		hmac.Sum(key[:0])
-	}
-	return key
-}
