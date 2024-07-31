@@ -132,8 +132,7 @@ func ResetPasswordPage(c *fiber.Ctx) error {
 
 			// Save Salt and Hash
 			user.Hash = hash
-			saltString := base64.StdEncoding.EncodeToString(salt)
-			user.Salt = saltString
+			user.Salt = salt
 
 			// Save User settings and delete token
 			if err := db.DB.Save(&user).Error; err != nil {

@@ -18,23 +18,25 @@ const (
 )
 
 // GenerateSalt generates a random salt of specified length
-func GenerateSalt() ([]byte, error) {
+func GenerateSalt() (string, error) {
 	salt := make([]byte, saltLength)
 	_, err := rand.Read(salt)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return salt, nil
-}
-
-// GenerateHash generates a PBKDF2 hash of the password with the provided salt
-func GenerateHash(password string, salt []byte) (string, error) {
-	// Combine salt and secret
 	saltString := ""
 	for _, b := range salt {
 		saltString += fmt.Sprintf("%02x", b)
 	}
-	saltAndSecret := saltString + secret
+
+
+	return saltString, nil
+}
+
+// GenerateHash generates a PBKDF2 hash of the password with the provided salt
+func GenerateHash(password string, salt string) (string, error) {
+	// Combine salt and secret
+	saltAndSecret := salt + secret
 
 	// Generate PBKDF2 hash
 	hash := pbkdf2.Key([]byte(password), []byte(saltAndSecret), iterations, keyLength, sha512.New)
