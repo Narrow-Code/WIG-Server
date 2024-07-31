@@ -87,6 +87,8 @@ func UserLogin(c *fiber.Ctx) error {
 	// Check if hash matches
 	utils.Log("validating hash")
 	if hash != user.Hash {
+		utils.Log("Stored hash: " + user.Hash)
+		utils.Log("Sent in hash: " + hash)
 		return Error(c, 400, "The username and passwords do not match")
 	}
 
