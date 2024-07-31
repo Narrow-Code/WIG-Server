@@ -13,7 +13,7 @@
    - [Scanner Controller](#scanner-controller)
 
 ---
- 
+  
 ## Introduction <a name="introduction"></a>
 
 WIG is a self-hosted inventory management service to remember "What I Got".<br>
