@@ -13,16 +13,16 @@ type EmailVerification struct {
     VerificationToken string `json:"verification_token" gorm:"primary_key;column:verification_token;type:varchar(255);not null"`
 
     // UserID is the unique identifier of the user associated with the verification
-    UserID uuid.UUID `json:"userID" gorm:"column:user_id;type:varchar(191);not null"`
+    EmailUserID uuid.UUID `json:"userID" gorm:"column:user_id;type:varchar(191);not null"`
 
     // ExpiresAt is the time when the token will expire
-    ExpiresAt time.Time `json:"expiresAt" gorm:"column:expires_at;type:timestamp;not null"`
+    EmailExpiresAt time.Time `json:"expiresAt" gorm:"column:expires_at;type:timestamp;not null"`
 
     // CreatedAt and UpdatedAt are automatically managed by GORM
     CreatedAt time.Time
     UpdatedAt time.Time
 
     // User is the user account associated with the ownership
-    User User `json:"user" gorm:"foreignkey:user_id"`
+    EmailUser User `json:"user" gorm:"foreignkey:user_id"`
 	
 }

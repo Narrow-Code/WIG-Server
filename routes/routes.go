@@ -3,6 +3,7 @@ package routes
 
 import (
 	controller "WIG-Server/controller"
+	"WIG-Server/verification"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,6 +16,7 @@ import (
 func Setup(app *fiber.App) {
 	app.Get("/ping", controller.Ping)
 	app.Get("/verification/:uid", controller.VerificationEmail)
+	app.All("/resetpassword/:uid", verification.ResetPasswordPage)
 
 	// User Routes
 	app.Post("/user/signup", controller.UserSignup)
@@ -55,7 +57,4 @@ func Setup(app *fiber.App) {
 	app.Get("/app/borrower/checked-out", controller.BorrowerGetInventory)
 
 	app.Get("/app/inventory", controller.LocationGetInventory)
-}
-
-func SetupHtml(app *fiber.App) {
 }

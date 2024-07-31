@@ -51,6 +51,7 @@ func Connect() {
 		}
 		utils.Log("database connection failed. Retrying in 5 seconds...")
 		time.Sleep(5 * time.Second)
+		
 		retries--
 	}
 	if err != nil {
@@ -76,6 +77,7 @@ func AutoMigrate(connection *gorm.DB) {
 		&models.Borrower{},
 		&models.Location{},
 		&models.Ownership{},
+		&models.PasswordChange{},
 		&models.EmailVerification{},
 	)
 	

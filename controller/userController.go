@@ -5,8 +5,11 @@ import (
 	"WIG-Server/models"
 	"WIG-Server/utils"
 	"WIG-Server/verification"
+	"fmt"
+	"log"
 	"net"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -257,11 +260,11 @@ func VerificationEmail(c *fiber.Ctx) error {
 
 	result := db.DB.Where("verification_token = ?", uid).First(&emailVerification)
 
-	if result.Error != nil || result.RowsAffected == 0 || emailVerification.ExpiresAt.Before(time.Now()) {
+	if result.Error != nil || result.RowsAffected == 0 || emailVerification.EmailExpiresAt.Before(time.Now()) {
 		return c.SendString("The email verification link you followed does not exist or has expired.")
 	}
 
-	db.DB.Where("user_uid = ?", emailVerification.UserID).First(&user)
+	db.DB.Where("user_uid = ?", emailVerification.EmailUserID).First(&user)
 
 	user.EmailConfirm = "true"
 
@@ -269,3 +272,59 @@ func VerificationEmail(c *fiber.Ctx) error {
 	db.DB.Delete(&emailVerification)
         return c.SendString(user.Username + " you're email has been verified")
 }
+
+func ResetPasswordPage(c *fiber.Ctx) error {
+	utils.Log("Started Reset Password")
+    	uid := c.Params("uid")
+	regex := `^(?=.*[A-Z])(?=.*\d)[A-Za-z\d\s!@#$%^&*()_+={}\[\]:;<>,.?~\\-]{8,}$`
+	passwordRegex, _ := regexp.Compile(regex)
+	utils.Log("Regex set")
+
+	// Check if verification token is valid
+	var passwordChange models.PasswordChange
+	var user models.User
+	result := db.DB.Where("password_change_token = ?", uid).First(&passwordChange)
+	if result.Error != nil || result.RowsAffected == 0 || passwordChange.PasswordExpiresAt.Before(time.Now()) {
+		return c.SendString("The email verification link you followed does not exist or has expired.")
+	}
+	utils.Log("token found")
+	db.DB.Where("user_uid = ?", passwordChange.PasswordUserID).First(&user)
+	utils.Log(user.Username + " is resetting password")
+
+	// Set up HTML
+    	resetFilePath := filepath.Join("verification", "reset.html")
+    	if c.Method() == fiber.MethodGet {
+		utils.Log("HTML page setup")
+        	return c.SendFile(resetFilePath)
+    	} else if c.Method() == fiber.MethodPost {
+		utils.Log("POST BEGAN")
+        	newPassword := c.FormValue("password")
+		if passwordRegex.MatchString(newPassword) {
+			utils.Log("REGEX PASSED")
+			salt, err := verification.GenerateSalt()
+			if err != nil {
+				utils.Log("error with salt")
+				log.Fatalf("Error generating salt: %v", err)
+			}
+			utils.Log("salt created")
+
+			// Generate hash
+			hash, err := verification.GenerateHash(newPassword, salt)
+			if err != nil {
+				utils.Log("error with hash")
+				log.Fatalf("Error generating hash: %v", err)
+			}
+			utils.Log("hash made")
+			user.Hash = hash
+			user.Salt = string(salt)
+
+			db.DB.Save(&user)
+			utils.Log("user saved")
+
+        		return c.SendString(fmt.Sprintf("Password changed successfully:"))
+		}
+		
+    	}
+    	return nil
+}
+
