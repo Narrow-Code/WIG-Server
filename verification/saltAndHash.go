@@ -13,7 +13,7 @@ const (
 	iterations  = 120000
 	keyLength   = 32
 	secret      = "JesusIsKing"
-	saltLength  = 23
+	saltLength  = 16
 )
 
 // GenerateSalt generates a random salt of specified length
@@ -29,10 +29,11 @@ func GenerateSalt() ([]byte, error) {
 // GenerateHash generates a PBKDF2 hash of the password with the provided salt
 func GenerateHash(password string, salt []byte) (string, error) {
 	// Combine salt and secret
-	saltAndSecret := append(salt, []byte(secret)...)
+	saltString := string(salt)	
+	saltAndSecret := saltString + secret
 
 	// Generate PBKDF2 hash
-	hash := pbkdf2.Key([]byte(password), saltAndSecret, iterations, keyLength, sha512.New)
+	hash := pbkdf2.Key([]byte(password), []byte(saltAndSecret), iterations, keyLength, sha512.New)
 
 	return hex.EncodeToString(hash), nil
 }
