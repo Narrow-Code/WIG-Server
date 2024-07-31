@@ -13,7 +13,7 @@ const (
 	iterations  = 120000
 	keyLength   = 32
 	secret      = "JesusIsKing"
-	saltLength  = 16
+	saltLength  = 23
 )
 
 // GenerateSalt generates a random salt of specified length
