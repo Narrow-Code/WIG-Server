@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/sha512"
 	"encoding/hex"
+	"fmt"
 
 	"golang.org/x/crypto/pbkdf2"
 )
@@ -29,7 +30,10 @@ func GenerateSalt() ([]byte, error) {
 // GenerateHash generates a PBKDF2 hash of the password with the provided salt
 func GenerateHash(password string, salt []byte) (string, error) {
 	// Combine salt and secret
-	saltString := string(salt)	
+	saltString := ""
+	for _, b := range salt {
+		saltString += fmt.Sprintf("%02x", b)
+	}
 	saltAndSecret := saltString + secret
 
 	// Generate PBKDF2 hash
