@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/google/uuid"
 )
@@ -48,7 +49,13 @@ func GetBarcode(barcode string) int {
  * @return The constructed URL as a string.
  */
 func constructURL(barcode string) string {
-    return "https://api.upcitemdb.com/prod/trial/lookup?upc=" + barcode
+	upcItemCheck := os.Getenv("UPC_ITEM_DB")
+
+	if upcItemCheck == "trial" {
+		return "https://api.upcitemdb.com/prod/trial/lookup?upc=" + barcode
+	} else {
+		return "https://api.upcitemdb.com/prod/v1/lookup?upc=" + barcode
+	}
 }
 
 /*
@@ -60,6 +67,7 @@ func constructURL(barcode string) string {
  */
 func fetchData(url string) (map[string]interface{}, error) {
     utils.Log("fetching data from upcitemdb")
+    userKey := os.Getenv("UPC_ITEM_DB")
     req, err := http.NewRequest("GET", url, nil)
     if err != nil {
         log.Fatal(err)
@@ -69,6 +77,12 @@ func fetchData(url string) (map[string]interface{}, error) {
     req.Header.Set("Content-Type", "application/json")
     req.Header.Set("Accept", "application/json")
     req.Header.Set("Accept-Encoding", "gzip,deflate")
+
+    // If not trial add token to header
+    if userKey != "trial" {
+    	req.Header.Set("user_key", userKey)
+	req.Header.Set("key_type", "3scale")
+    }
 
     // Send request
     client := &http.Client{}
