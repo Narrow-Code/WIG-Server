@@ -9,6 +9,7 @@ TOKEN_SECRET = "secretwig"
 PORT = "30001"
 
 SELF_HOSTED = "false"
+UPC_ITEM_DB = "trial"
 
 # DO NOT CHANGE
 APP_SECRET = "what-i-got"
