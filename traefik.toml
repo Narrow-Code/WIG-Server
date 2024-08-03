@@ -1,0 +1,19 @@
+[api]	
+  insecure = true
+  dashboard = true
+
+[providers.docker]
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+  [entryPoints.websecure]
+    address = ":443"
+
+[certificatesResolvers.myresolver.acme]
+  email = "admin@narrowcode.org"
+  storage = "acme.json"
+
+  [certificatesResolvers.myresolver.acme.httpChallenge]
+    entryPoint = "web"
+

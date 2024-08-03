@@ -9,4 +9,6 @@ RUN go mod download && go mod verify
 COPY . .
 RUN go build -v 
 
+EXPOSE 30001/tcp
+
 CMD ["./WIG-Server"]
