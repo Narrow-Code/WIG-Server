@@ -5,6 +5,7 @@ services:
     build: ./
     depends_on:
       - db
+      - traefik
     environment:
       MYSQL_DBNAME: wig
       MYSQL_USER: wig
@@ -14,7 +15,13 @@ services:
       - "30001:30001"
     networks:
       - wig-db
-        
+      - traefik-wig
+    labels:
+      - "traefik.http.routers.wig.rule=Host(`dev.wig-app.com`)"
+      - "traefik.http.routers.wig.tls=true"
+      - "traefik.http.routers.wig.tls.certresolver=myresolver"
+      - "traefik.docker.network=wig-server_traefik-wig"      
+    
   db:
     image: mariadb:latest
     environment:
@@ -26,6 +33,20 @@ services:
       - wig-db:/var/lib/mysql
     networks:
       - wig-db
+      
+  traefik:
+      image: traefik
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./traefik.toml:/etc/traefik/traefik.toml
+        - ./acme.json:/acme.json
+#      command: --api.insecure=true --providers.docker 
+      ports:
+        - 80:80
+        - 8080:8080
+        - 443:443
+      networks:
+        - traefik-wig
 
       
 volumes:
@@ -33,4 +54,6 @@ volumes:
 
 networks:
   wig-db:
+    driver: overlay
+  traefik-wig:
     driver: overlay
