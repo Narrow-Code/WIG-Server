@@ -5,6 +5,7 @@ services:
     build: ./
     depends_on:
       - db
+      - traefik
     environment:
       MYSQL_DBNAME: wig
       MYSQL_USER: wig
@@ -14,7 +15,13 @@ services:
       - "30001:30001"
     networks:
       - wig-db
-        
+      - traefik-wig
+    labels:
+      - "traefik.http.routers.wig.rule=Host(`dev.wig-app.com`)"
+      - "traefik.http.routers.wig.tls=true"
+      - "traefik.http.routers.wig.tls.certresolver=myresolver"
+      - "traefik.docker.network=wig-server_traefik-wig"      
+    
   db:
     image: mariadb:latest
     environment:
