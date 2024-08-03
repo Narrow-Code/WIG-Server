@@ -26,6 +26,20 @@ services:
       - wig-db:/var/lib/mysql
     networks:
       - wig-db
+      
+  traefik:
+      image: traefik
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./config/traefik.toml:/etc/traefik/traefik.toml
+        - ./acme.json:/acme.json
+#      command: --api.insecure=true --providers.docker 
+      ports:
+        - 80:80
+        - 8080:8080
+        - 443:443
+      networks:
+        - traefik-wig
 
       
 volumes:
@@ -33,4 +47,6 @@ volumes:
 
 networks:
   wig-db:
+    driver: overlay
+  traefik-wig:
     driver: overlay
