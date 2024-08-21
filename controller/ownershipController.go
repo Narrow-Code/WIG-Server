@@ -172,7 +172,7 @@ func OwnershipCreate(c *fiber.Ctx) error {
 
 	// Check if fields are empty
 	utils.UserLog(c, "validating fields are not empty")
-	if qr == "" && name == "" {
+	if qr == "" || name == "" {
 		return Error(c, 400, "Missing field qr or name")
 	}
 
