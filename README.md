@@ -11,7 +11,7 @@
    - [Location Controller](#location-controller)
    - [Ownership Controller](#ownership-controller)
    - [Scanner Controller](#scanner-controller)
- 
+  
 ---
 
 ## Introduction <a name="introduction"></a>
