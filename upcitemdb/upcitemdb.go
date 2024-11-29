@@ -31,11 +31,13 @@ func GetBarcode(barcode string) int {
     // Send request and process response
     data, err := fetchData(url)
     if err != nil {
-        return 0
+ 		utils.Log("error occured while fetching data")
+	    return 0
     }
 
     // Process retrieved items
     if items, exists := data["items"]; exists {
+	    utils.Log("item exists")
         createItems(barcode, items)
     }
 
