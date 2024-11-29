@@ -35,9 +35,10 @@ func GetBarcode(barcode string) int {
 	    return 0
     }
 
+    utils.Log(data["items"].(string))
+
     // Process retrieved items
     if items, exists := data["items"]; exists {
-	    utils.Log("item exists")
         createItems(barcode, items)
     }
 
