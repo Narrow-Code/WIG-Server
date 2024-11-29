@@ -167,8 +167,10 @@ func OwnershipCreate(c *fiber.Ctx) error {
 		return Error(c, 400, "There was an error parsing JSON")
 	}
 	user := c.Locals("user").(models.User)
+	utils.UserLog(c, data["qr"] + " " + data["name"])
 	qr := data["qr"]
 	name := data["name"]
+	utils.UserLog(c, qr + " " + name)
 
 	// Check if fields are empty
 	utils.UserLog(c, "validating fields are not empty")

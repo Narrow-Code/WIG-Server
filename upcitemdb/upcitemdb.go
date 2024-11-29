@@ -31,6 +31,7 @@ func GetBarcode(barcode string) int {
     // Send request and process response
     data, err := fetchData(url)
     if err != nil {
+	utils.Log("Error is returned")
         return 0
     }
 
