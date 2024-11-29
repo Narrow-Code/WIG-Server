@@ -32,5 +32,4 @@ jobs:
           script: |
             cd /home/admin/src/WIG-Server
             docker-compose build app
-            docker-compose up -d 
-            
+            docker-compose up -d             
