@@ -8,6 +8,7 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -124,6 +125,14 @@ func fetchData(url string) (map[string]interface{}, error) {
         return nil, err
     }
     utils.Log("decoding successful")
+
+// Log the JSON response
+    jsonResponse, err := json.MarshalIndent(data, "", "  ") // Pretty-print the JSON for easier readability
+    if err != nil {
+        utils.Log(fmt.Sprintf("failed to serialize JSON response: %v", err))
+        return nil, err
+    }
+    utils.Log("JSON response: " + string(jsonResponse))
 
     return data, nil
 }
