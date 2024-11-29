@@ -35,8 +35,6 @@ func GetBarcode(barcode string) int {
 	    return 0
     }
 
-    utils.Log(data["items"].(string))
-
     // Process retrieved items
     if items, exists := data["items"]; exists {
         createItems(barcode, items)
@@ -55,7 +53,9 @@ func constructURL(barcode string) string {
 	upcItemCheck := os.Getenv("UPC_ITEM_DB")
 
 	if upcItemCheck == "trial" {
-		return "https://api.upcitemdb.com/prod/trial/lookup?upc=" + barcode
+		url := "https://api.upcitemdb.com/prod/trial/lookup?upc=" + barcode
+		utils.Log(url)
+		return url
 	} else {
 		return "https://api.upcitemdb.com/prod/v1/lookup?upc=" + barcode
 	}
